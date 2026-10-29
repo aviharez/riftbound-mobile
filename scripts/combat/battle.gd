@@ -52,6 +52,8 @@ var balance: CombatBalance
 var settings: PlayerSettings
 var font: Font
 var loadout: Loadout
+## The student playing this run (starting element, ultimate, colors).
+var character: CharacterData
 var mods: Loadout.Mods
 var rng := RandomNumberGenerator.new()
 
@@ -125,10 +127,11 @@ func setup(p_settings: PlayerSettings, p_font: Font) -> void:
 
 # ================================================================= run lifecycle
 
-## `run_bonuses` comes from GameState.run_bonuses() (academy buildings).
-func start_run(starting_element: StringName = &"ember", run_bonuses: Dictionary = {}) -> void:
+## `student` decides the starting element and the ultimate; `run_bonuses` comes from GameState.run_bonuses().
+func start_run(student: CharacterData = null, run_bonuses: Dictionary = {}) -> void:
 	rng.randomize()
-	loadout = Loadout.create(balance, Registry.elements.get(starting_element), run_bonuses)
+	character = student if student else Registry.character(&"lyra")
+	loadout = Loadout.create(balance, Registry.elements.get(character.element_id), run_bonuses)
 	mods = loadout.mods()
 	max_hp = mods.max_hp
 	hp = max_hp
@@ -214,12 +217,75 @@ func cast_ultimate() -> void:
 		fx.number(Vector2(Vector2(balance.world_size).x - 35.0, balance.world_size.y - 80.0), "NOT CHARGED", Color("a29db8"))
 		return
 	energy = 0.0
+	match character.ultimate_id:
+		&"frost_nova": _frost_nova()
+		&"verdant_bloom": _verdant_bloom()
+		_: _flame_orb()
+
+
+func ultimate_color() -> Color:
+	var e: ElementData = Registry.elements.get(character.element_id) if character else null
+	return e.glow_color if e else Color("ff6a3d")
+
+
+## Lyra: an orb along the aim that explodes on the first enemy.
+func _flame_orb() -> void:
 	var o := Orb.new()
 	o.pos = player - Vector2(0, 6)
 	o.vel = _aim_dir() * balance.flame_orb_speed
 	orbs.append(o)
 	fx.burst(o.pos, [Color("ffb347"), Color("ff6a3d"), Color("fff1a8")], 12, 60.0, 0.3, 2.0)
 	trauma = minf(1.0, trauma + 0.12)
+
+
+## Selene: every enemy on the field is slowed for a long time and takes ice damage.
+func _frost_nova() -> void:
+	var dmg := roundi(balance.frost_nova_damage_base + balance.frost_nova_damage_per_wave * float(wave))
+	var ice: Array[Color] = [Color.WHITE, Color("cfe8ff"), Color("96d2ff")]
+	for e: Enemy in enemies:
+		if not e.alive:
+			continue
+		e.slow = maxf(e.slow, balance.frost_nova_slow_duration)
+		fx.burst(e.center(), ice, 6, 40.0, 0.5, 1.0)
+		_hit_enemy(e, dmg, false, null)
+	for i in 3:
+		fx.ring(player, 120.0 + 90.0 * float(i), Color("96d2ff") if i != 1 else Color.WHITE, 0.45 + 0.15 * float(i))
+	hitstop = balance.hitstop_ultimate
+	trauma = minf(1.0, trauma + 0.4)
+
+
+## Noah: heal, gather every gem and prism on the field, and lash the enemies closest to the rune line.
+func _verdant_bloom() -> void:
+	hp = mini(max_hp, hp + balance.verdant_bloom_heal)
+	var gems := 0
+	for d: Drop in drops:
+		if d.dead:
+			continue
+		d.dead = true
+		fx.mote(d.pos, (player - d.pos) * 2.5, Color("d6ffe6") if not d.prism else Color("ffd27a"), 0.4, 1.0)
+		if d.prism:
+			prisms += 1
+			_fusion_snooze = ""
+		else:
+			gems += 1
+	if gems > 0:
+		var n := ceili(float(gems) * mods.xp_mult)
+		_gain_xp(n)
+		fx.number(player + Vector2(0, -22), "+%d XP" % n, COL_GEM)
+	var dmg := roundi(balance.verdant_bloom_damage_base + balance.verdant_bloom_damage_per_wave * float(wave))
+	var line := balance.rune_line_y
+	for e: Enemy in enemies:
+		if e.alive and e.pos.y + e.size > line - balance.verdant_bloom_reach:
+			fx.burst(e.center(), [COL_GEM, Color("2f6b47"), Color.WHITE], 8, 50.0, 0.5, 1.0)
+			_hit_enemy(e, dmg, false, null)
+	var x := float(balance.wall_width) + 8.0
+	while x < float(balance.world_size.x - balance.wall_width):
+		fx.burst(Vector2(x, line - 2.0), [COL_GEM, Color("2f6b47")], 3, 45.0, 0.6, 1.0)
+		x += 16.0
+	fx.ring(player, 40.0, COL_GEM, 0.4)
+	popup("+%d HP" % balance.verdant_bloom_heal, COL_GEM)
+	hitstop = balance.hitstop_ultimate
+	trauma = minf(1.0, trauma + 0.3)
 
 
 # ================================================================= level up / fusion (called by Main)
@@ -1147,13 +1213,15 @@ func _draw_aim() -> void:
 func _draw_player() -> void:
 	var p := player.round()
 	draw_rect(Rect2(p.x - 5, p.y + 6, 10, 2), Color(0, 0, 0, 0.4))
-	draw_rect(Rect2(p.x - 5, p.y - 3, 10, 9), Color("E6BD73"))
+	var hair := character.hair_color if character else Color("c7432c")
+	var accent := character.accent_color if character else Color("E6BD73")
+	draw_rect(Rect2(p.x - 5, p.y - 3, 10, 9), accent)
 	draw_rect(Rect2(p.x - 4, p.y - 2, 8, 7), Color("24306a"))
-	draw_rect(Rect2(p.x - 4, p.y + 5, 8, 1), Color("E6BD73"))
+	draw_rect(Rect2(p.x - 4, p.y + 5, 8, 1), accent)
 	draw_rect(Rect2(p.x - 2, p.y - 7, 5, 5), Color("f1d3bd"))
-	draw_rect(Rect2(p.x - 3, p.y - 9, 7, 3), Color("c7432c"))
-	draw_rect(Rect2(p.x - 3, p.y - 7, 2, 6), Color("c7432c"))
-	draw_rect(Rect2(p.x + 2, p.y - 7, 2, 4), Color("c7432c"))
+	draw_rect(Rect2(p.x - 3, p.y - 9, 7, 3), hair)
+	draw_rect(Rect2(p.x - 3, p.y - 7, 2, 6), hair)
+	draw_rect(Rect2(p.x + 2, p.y - 7, 2, 4), hair)
 	var dir := _aim_dir()
 	var i := 3.0
 	while i < 9.0:

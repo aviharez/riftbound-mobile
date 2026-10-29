@@ -16,6 +16,12 @@ func _ready() -> void:
 	hud.nav_pressed.connect(_on_nav)
 	overlays.upgrade_pressed.connect(_on_upgrade)
 	overlays.enter_rift_pressed.connect(_enter_rift)
+	overlays.student_select_pressed.connect(func(id: StringName) -> void:
+		GameState.select_student(id)
+		overlays.show_profile(id))
+	overlays.student_upgrade_pressed.connect(func(id: StringName) -> void:
+		GameState.upgrade_student(id)
+		overlays.show_profile(id))
 	get_viewport().size_changed.connect(_layout)
 	_layout()
 
@@ -63,6 +69,11 @@ func _open_building(id: StringName) -> void:
 func _on_upgrade(id: StringName) -> void:
 	if GameState.upgrade_building(id):
 		map.flash_building(id)
+		if id == &"dormitory":
+			var joined := GameState.students_joining_at(GameState.building_level(id))
+			if not joined.is_empty():
+				overlays.show_joined(joined)
+				return
 	overlays.show_building(id)
 
 
@@ -77,3 +88,5 @@ func _on_nav(tab: StringName) -> void:
 			_enter_rift()
 		&"academy":
 			overlays.close()
+		&"characters":
+			overlays.show_roster()

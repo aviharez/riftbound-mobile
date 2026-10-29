@@ -153,12 +153,16 @@ func _draw_ult() -> void:
 		var ring_col := (Color("ffd27a") if int(_time * 6.0) % 2 == 0 else UiTheme.GOLD) if ready else UiTheme.CYAN
 		draw_arc(c, r + 1.0, -PI * 0.5, -PI * 0.5 + TAU * frac, 40, Color(ring_col, alpha), 2.0)
 	var f := float(int(_time * 10.0) % 2) if ready else 0.0
-	var flame := Color("ff6a3d") if ready else Color("5d5068")
+	var flame := b.ultimate_color() if ready else Color("5d5068")
 	draw_rect(Rect2(c.x - 4, c.y - 1, 8, 7), Color(flame, alpha))
 	draw_rect(Rect2(c.x - 2, c.y - 5 - f, 5, 5), Color(flame, alpha))
 	draw_rect(Rect2(c.x - 1, c.y - 8 - f, 2, 3), Color(flame, alpha))
 	draw_rect(Rect2(c.x - 1, c.y + 1, 3, 4), Color(Color("ffd27a") if ready else Color("7d7088"), alpha))
-	_text(Vector2(c.x - 30, c.y + r + 10.0), "FLAME ORB", Color(UiTheme.GOLD if ready else Color("bdb7d0"), alpha), 60.0, HORIZONTAL_ALIGNMENT_CENTER)
+	# Center the name under the button, but keep it inside the playfield (long names like VERDANT BLOOM).
+	var ult_name := b.character.ultimate_name.to_upper() if b.character else "ULTIMATE"
+	var tw := _font.get_string_size(ult_name, HORIZONTAL_ALIGNMENT_LEFT, -1, 8).x
+	var tx := minf(c.x - tw * 0.5, float(Registry.balance.world_size.x) - tw - 3.0)
+	_text(Vector2(tx, c.y + r + 10.0), ult_name, Color(UiTheme.GOLD if ready else Color("bdb7d0"), alpha))
 	for i in 4:
 		var on := frac >= float(i + 1) / 4.0 - 0.0001
 		var dc := Vector2(c.x - 12.0 + float(i) * 8.0, c.y + r + 16.0)

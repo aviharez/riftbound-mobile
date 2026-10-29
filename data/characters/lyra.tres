@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="CharacterData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/data/character_data.gd" id="1_script"]
+
+[resource]
+script = ExtResource("1_script")
+id = &"lyra"
+display_name = "Lyra Emberveil"
+role = "Fire · Damage"
+bio = "A second-year who ran back into the burning east wing when everyone else ran out. She wants the Rift closed, and she wants it now."
+personality = "Bold, impulsive, protective"
+element_id = &"ember"
+ultimate_id = &"flame_orb"
+ultimate_name = "Flame Orb"
+ultimate_description = "Launches a blazing orb along your aim. It explodes on the first enemy it touches, burning everything nearby."
+hair_color = Color(0.7804, 0.2627, 0.1725, 1)
+accent_color = Color(0.902, 0.7412, 0.451, 1)
+unlock_dormitory_level = 0

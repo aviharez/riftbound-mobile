@@ -2,7 +2,7 @@
 
 Portrait mobile pixel-art roguelite. Ricochet magic combat in a vertical Rift arena, an academy to restore, and students to grow close to.
 
-**Status:** Combat (M1–M6) and the core loop (M8: title → academy → Rift → rewards → buildings) implemented with placeholder art; waiting for on-device testing. Next: students, expeditions, dialogue, library (see [`docs/milestones.md`](docs/milestones.md)).
+**Status:** Combat (M1–M6), core loop (M8) and students (M9) implemented with placeholder art; waiting for on-device testing. Next: expeditions, dialogue & relationships, library & quests (see [`docs/milestones.md`](docs/milestones.md)).
 
 ## Requirements
 
@@ -31,6 +31,7 @@ tools/screenshot.sh test 1080x2400              # single frame of the start scre
 | [`docs/game-overview.md`](docs/game-overview.md) | Vision, loop, characters, systems |
 | [`docs/combat-spec.md`](docs/combat-spec.md) | Combat rules and every tunable number |
 | [`docs/economy-spec.md`](docs/economy-spec.md) | Resources, rewards, buildings, save |
+| [`docs/character-spec.md`](docs/character-spec.md) | Students, ultimates, levels |
 | [`docs/art-spec.md`](docs/art-spec.md) | Resolution, scaling, sprite sizes, palette, VFX |
 | [`docs/milestones.md`](docs/milestones.md) | Build order and acceptance criteria |
 | [`docs/decisions.md`](docs/decisions.md) | Decision log and open questions |

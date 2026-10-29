@@ -56,7 +56,7 @@ func _ready() -> void:
 	var row := HBoxContainer.new()
 	row.add_theme_constant_override("separation", 2)
 	nav.add_child(row)
-	for tab: Array in [[&"academy", "Academy", true], [&"rift", "Rift", true], [&"characters", "Students", false], [&"expeditions", "Expedition", false], [&"stories", "Stories", false]]:
+	for tab: Array in [[&"academy", "Academy", true], [&"rift", "Rift", true], [&"characters", "Students", true], [&"expeditions", "Expedition", false], [&"stories", "Stories", false]]:
 		var b := Button.new()
 		b.text = tab[1] if tab[2] else "%s\nsoon" % tab[1]
 		b.size_flags_horizontal = Control.SIZE_EXPAND_FILL

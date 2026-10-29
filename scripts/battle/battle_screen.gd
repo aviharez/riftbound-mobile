@@ -87,7 +87,7 @@ func _set_state(s: State) -> void:
 
 func _start_run() -> void:
 	overlays.close()
-	battle.start_run(&"ember", GameState.run_bonuses())
+	battle.start_run(GameState.current_student(), GameState.run_bonuses())
 	_set_state(State.PLAYING)
 
 

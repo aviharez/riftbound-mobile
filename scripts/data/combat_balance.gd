@@ -99,6 +99,14 @@ extends Resource
 @export var flame_orb_radius: float = 46.0
 @export var flame_orb_damage_base: float = 4.0
 @export var flame_orb_damage_per_wave: float = 1.5
+@export var frost_nova_slow_duration: float = 4.0
+@export var frost_nova_damage_base: float = 2.0
+@export var frost_nova_damage_per_wave: float = 0.5
+@export var verdant_bloom_heal: int = 2
+@export var verdant_bloom_damage_base: float = 3.0
+@export var verdant_bloom_damage_per_wave: float = 1.0
+## Enemies whose bottom is within this distance above the rune line are hit by Verdant Bloom.
+@export var verdant_bloom_reach: float = 110.0
 
 @export_group("Feedback")
 @export var hitstop_kill: float = 0.03

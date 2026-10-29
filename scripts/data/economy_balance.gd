@@ -18,6 +18,13 @@ extends Resource
 @export var start_materials: int = 0
 @export var start_relics: int = 0
 
+@export_group("Students")
+## Cost to raise a student from `level` to `level + 1`: base + per_level × level, as (shards, materials, relics).
+@export var student_cost_base: Vector3i = Vector3i(30, 10, 0)
+@export var student_cost_per_level: Vector3i = Vector3i(25, 6, 0)
+## Levels at or above this also cost one Ancient Relic.
+@export var student_relic_from_level: int = 7
+
 @export_group("Academy hub")
 @export var hub_size: Vector2 = Vector2(300.0, 640.0)
 @export var hub_spawn: Vector2 = Vector2(150.0, 400.0)
@@ -33,3 +40,10 @@ func run_rewards(kills: int, wave: int, bosses: int, bonus_shards: int) -> Vecto
 	var materials := materials_per_wave * waves_cleared + materials_per_boss * bosses + int(kills / maxf(1.0, float(kills_per_material)))
 	var relics := relics_per_boss * bosses
 	return Vector3i(shards, materials, relics)
+
+
+func student_upgrade_cost(level: int) -> Vector3i:
+	var c := student_cost_base + student_cost_per_level * level
+	if level >= student_relic_from_level:
+		c.z += 1
+	return c

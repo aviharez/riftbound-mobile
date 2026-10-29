@@ -33,6 +33,8 @@ Newest at the bottom. When a decision changes, add a new entry instead of editin
 | 2026-10-30 | Base level-up rerolls 1 + Rift Gate level (Lv1 at start) = 2 on a new save. | Keeps the combat-spec value while letting the gate upgrade add more. |
 | 2026-10-30 | `GameState` autoload owns resources, buildings, stats, JSON save and scene changes. Test tools use a separate save file. | One place for persistent state; tests never wipe the player's progress. |
 
+| 2026-10-30 | Students: Lyra (start), Selene (Dormitory Lv1), Noah (Dormitory Lv2). Ultimates: Flame Orb, Frost Nova (slow everything + damage), Verdant Bloom (heal, collect all drops, hit enemies near the line). Levels 1–10 bought with resources: +1 max HP per level, +1 starting-ball damage at Lv4/7/10. | Gives the Dormitory a purpose and each student a distinct role (damage / control / support) as in the overview. |
+
 ## Open questions
 
 - Fused ball count: max of parents (current) vs always 1.

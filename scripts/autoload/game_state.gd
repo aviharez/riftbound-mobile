@@ -4,6 +4,7 @@ extends Node
 
 signal resources_changed
 signal building_changed(id: StringName)
+signal student_changed(id: StringName)
 
 const SAVE_PATH := "user://save.json"
 const TEST_SAVE_PATH := "user://save_test.json"
@@ -23,6 +24,9 @@ var runs: int = 0
 var best_wave: int = 0
 var total_kills: int = 0
 var bosses_defeated: int = 0
+## Student levels (1..max). Locked students keep level 1 until they join.
+var student_levels: Dictionary[StringName, int] = {}
+var selected_student: StringName = &"lyra"
 
 ## Screen hand-off (not saved): rewards of the run that just ended, shown on the result screen.
 var last_rewards: Vector3i = Vector3i.ZERO
@@ -60,6 +64,10 @@ func reset() -> void:
 	best_wave = 0
 	total_kills = 0
 	bosses_defeated = 0
+	student_levels.clear()
+	for c: CharacterData in Registry.characters:
+		student_levels[c.id] = 1
+	selected_student = Registry.characters[0].id if not Registry.characters.is_empty() else &"lyra"
 	resources_changed.emit()
 
 
@@ -126,12 +134,70 @@ func meta_bonus(stat: StringName) -> float:
 	return total
 
 
-## All meta bonuses as a dictionary, passed to Battle.start_run().
+## All meta bonuses as a dictionary, passed to Battle.start_run(): buildings plus the selected student's level.
 func run_bonuses() -> Dictionary:
 	var out := {}
 	for stat: StringName in [&"baby_balls", &"max_hp", &"xp_mult", &"energy_gain", &"rerolls"]:
 		out[stat] = meta_bonus(stat)
+	var c := current_student()
+	var lv := student_level(c.id)
+	out[&"max_hp"] = float(out[&"max_hp"]) + float(c.hp_bonus(lv))
+	out[&"start_damage"] = float(c.start_damage_bonus(lv))
 	return out
+
+
+# ---------------------------------------------------------------- students
+
+func current_student() -> CharacterData:
+	return Registry.character(selected_student)
+
+
+func student_level(id: StringName) -> int:
+	return student_levels.get(id, 1)
+
+
+func is_student_unlocked(id: StringName) -> bool:
+	return building_level(&"dormitory") >= Registry.character(id).unlock_dormitory_level
+
+
+## Students that become available at exactly this dormitory level (for the "joined" notice).
+func students_joining_at(dorm_level: int) -> Array[CharacterData]:
+	var out: Array[CharacterData] = []
+	for c: CharacterData in Registry.characters:
+		if c.unlock_dormitory_level == dorm_level and dorm_level > 0:
+			out.append(c)
+	return out
+
+
+func select_student(id: StringName) -> void:
+	if not is_student_unlocked(id):
+		return
+	selected_student = id
+	student_changed.emit(id)
+	save_game()
+
+
+## Cost of the next student level, or Vector3i(-1, -1, -1) at max level.
+func student_next_cost(id: StringName) -> Vector3i:
+	var lv := student_level(id)
+	if lv >= Registry.character(id).max_level:
+		return Vector3i(-1, -1, -1)
+	return Registry.economy.student_upgrade_cost(lv)
+
+
+func can_upgrade_student(id: StringName) -> bool:
+	var c := student_next_cost(id)
+	return is_student_unlocked(id) and c.x >= 0 and can_afford(c)
+
+
+func upgrade_student(id: StringName) -> bool:
+	if not can_upgrade_student(id):
+		return false
+	add_resources(-student_next_cost(id))
+	student_levels[id] = student_level(id) + 1
+	student_changed.emit(id)
+	save_game()
+	return true
 
 
 # ---------------------------------------------------------------- runs
@@ -167,6 +233,8 @@ func save_game() -> void:
 		"resources": {"mana_shards": mana_shards, "ruins_materials": ruins_materials, "ancient_relics": ancient_relics},
 		"buildings": levels,
 		"stats": {"runs": runs, "best_wave": best_wave, "total_kills": total_kills, "bosses_defeated": bosses_defeated},
+		"students": _student_dict(),
+		"selected_student": String(selected_student),
 	}
 	var f := FileAccess.open(save_path, FileAccess.WRITE)
 	if f == null:
@@ -199,5 +267,20 @@ func load_game() -> bool:
 	best_wave = int(st.get("best_wave", 0))
 	total_kills = int(st.get("total_kills", 0))
 	bosses_defeated = int(st.get("bosses_defeated", 0))
+	var studs: Dictionary = d.get("students", {})
+	for key: String in studs:
+		var sid := StringName(key)
+		if student_levels.has(sid):
+			student_levels[sid] = clampi(int(studs[key]), 1, Registry.character(sid).max_level)
+	var sel := StringName(str(d.get("selected_student", selected_student)))
+	if student_levels.has(sel) and is_student_unlocked(sel):
+		selected_student = sel
 	resources_changed.emit()
 	return true
+
+
+func _student_dict() -> Dictionary:
+	var out := {}
+	for id: StringName in student_levels:
+		out[String(id)] = student_levels[id]
+	return out

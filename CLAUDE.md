@@ -9,6 +9,7 @@ A portrait (9:16-ish) mobile pixel-art roguelite. Ricochet combat inspired by th
 - Game design overview: `docs/game-overview.md`
 - Combat rules and every tunable number: `docs/combat-spec.md` (source of truth for gameplay)
 - Meta economy, academy buildings, save: `docs/economy-spec.md`
+- Students (roster, ultimates, levels): `docs/character-spec.md`
 - Art and display rules: `docs/art-spec.md`
 - Build order and acceptance criteria: `docs/milestones.md`
 - Why things are the way they are: `docs/decisions.md`

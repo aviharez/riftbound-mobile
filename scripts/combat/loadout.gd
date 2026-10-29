@@ -21,7 +21,8 @@ var balls: Array[BallSlot] = []
 var items: Array[ItemSlot] = []
 ## Extra baby balls added by the debug menu.
 var debug_baby_balls: int = 0
-## Run bonuses from academy buildings (GameState.run_bonuses()): baby_balls, max_hp, xp_mult, energy_gain, rerolls.
+## Run bonuses from academy buildings and the student's level (GameState.run_bonuses()):
+## baby_balls, max_hp, xp_mult, energy_gain, rerolls, start_damage.
 var meta: Dictionary = {}
 
 
@@ -32,7 +33,7 @@ static func create(b: CombatBalance, starting_element: ElementData, run_bonuses:
 	l.balls.resize(b.ball_slots)
 	l.items.resize(b.item_slots)
 	if starting_element:
-		l.balls[0] = BallSlot.from_element(starting_element, b.new_ball_damage)
+		l.balls[0] = BallSlot.from_element(starting_element, b.new_ball_damage + roundi(run_bonuses.get(&"start_damage", 0.0)))
 	return l
 
 

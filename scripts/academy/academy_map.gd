@@ -274,8 +274,9 @@ func _draw_avatar() -> void:
 	var bob := roundf(absf(sin(_walk_t * 10.0))) if _target != Vector2.INF else 0.0
 	draw_rect(Rect2(p.x - 5, p.y + 6, 10, 2), Color(0, 0, 0, 0.4))
 	draw_rect(Rect2(p.x - 4, p.y - 2 - bob, 8, 8), Color("24306a"))
-	draw_rect(Rect2(p.x - 4, p.y + 5 - bob, 8, 1), UiTheme.GOLD)
+	var student := GameState.current_student()
+	draw_rect(Rect2(p.x - 4, p.y + 5 - bob, 8, 1), student.accent_color)
 	draw_rect(Rect2(p.x - 2, p.y - 7 - bob, 5, 5), Color("f1d3bd"))
-	draw_rect(Rect2(p.x - 3, p.y - 9 - bob, 7, 3), Color("c7432c"))
-	draw_rect(Rect2(p.x - 3 if _facing > 0.0 else p.x + 2, p.y - 7 - bob, 2, 6), Color("c7432c"))
+	draw_rect(Rect2(p.x - 3, p.y - 9 - bob, 7, 3), student.hair_color)
+	draw_rect(Rect2(p.x - 3 if _facing > 0.0 else p.x + 2, p.y - 7 - bob, 2, 6), student.hair_color)
 	draw_rect(Rect2(p.x + (2 if _facing > 0.0 else -3), p.y - 5 - bob, 1, 1), Color("3a2a1e"))

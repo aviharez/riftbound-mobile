@@ -9,6 +9,7 @@ const EVOLUTIONS_DIR := "res://data/evolutions"
 const ITEMS_DIR := "res://data/items"
 const ENEMIES_DIR := "res://data/enemies"
 const BUILDINGS_DIR := "res://data/buildings"
+const CHARACTERS_DIR := "res://data/characters"
 const ECONOMY_PATH := "res://data/balance/economy_balance.tres"
 
 var balance: CombatBalance
@@ -18,6 +19,8 @@ var items: Dictionary[StringName, ItemData] = {}
 var enemies: Dictionary[StringName, EnemyData] = {}
 var economy: EconomyBalance
 var buildings: Dictionary[StringName, BuildingData] = {}
+## Playable students, in roster order (by unlock level).
+var characters: Array[CharacterData] = []
 
 
 func _ready() -> void:
@@ -33,6 +36,11 @@ func _ready() -> void:
 		var bd := res as BuildingData
 		if bd:
 			buildings[bd.id] = bd
+	for res: Resource in _load_dir(CHARACTERS_DIR):
+		var cd := res as CharacterData
+		if cd:
+			characters.append(cd)
+	characters.sort_custom(func(a: CharacterData, b: CharacterData) -> bool: return a.unlock_dormitory_level < b.unlock_dormitory_level)
 	for res: Resource in _load_dir(ELEMENTS_DIR):
 		var e := res as ElementData
 		if e:
@@ -75,3 +83,10 @@ func _load_dir(path: String) -> Array[Resource]:
 		else:
 			push_error("Registry: failed to load %s" % path.path_join(file_name))
 	return out
+
+
+func character(id: StringName) -> CharacterData:
+	for c: CharacterData in characters:
+		if c.id == id:
+			return c
+	return characters[0] if not characters.is_empty() else null

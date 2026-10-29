@@ -92,9 +92,15 @@ Accept:
 - [ ] Walking and tapping buildings feel right on a phone.
 - [ ] Pacing: first repair after one run, all Lv1 after ~4–5 runs (playtest).
 
-## M9 — Students (roster)
+## M9 — Students ✅ (2026-10-30, placeholder art)
 
-Selene and Noah playable with their own starting element and ultimate; roster and profile screens; character levels; unlocks tied to the Dormitory.
+Selene and Noah playable with their own starting element and ultimate (Frost Nova, Verdant Bloom); roster and profile screens; student levels bought with resources; unlocks tied to the Dormitory. See `docs/character-spec.md`.
+
+Accept:
+- [x] Selene joins at Dormitory Lv1, Noah at Lv2, with a "joins" notice. *(verified off-device)*
+- [x] The selected student's element is slot 1 and their ultimate fires from the button. *(verified off-device)*
+- [x] Student levels add max HP and starting-ball damage to runs, and are saved. *(verified off-device)*
+- [ ] Each ultimate feels distinct and worth charging (playtest on a phone).
 
 ## M10 — Expeditions
 

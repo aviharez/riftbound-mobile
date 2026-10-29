@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="CharacterData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/data/character_data.gd" id="1_script"]
+
+[resource]
+script = ExtResource("1_script")
+id = &"noah"
+display_name = "Noah Verdant"
+role = "Nature · Support"
+bio = "Tends the ruined garden at night and talks to the plants. Students follow him because he always shows up."
+personality = "Friendly, curious, supportive"
+element_id = &"verdant"
+ultimate_id = &"verdant_bloom"
+ultimate_name = "Verdant Bloom"
+ultimate_description = "The rune line bursts into thorns: heals you, gathers every gem on the field and lashes the enemies closest to the line."
+hair_color = Color(0.1843, 0.4196, 0.2784, 1)
+accent_color = Color(0.498, 0.8784, 0.6588, 1)
+unlock_dormitory_level = 2

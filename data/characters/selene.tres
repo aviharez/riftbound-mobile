@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="CharacterData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/data/character_data.gd" id="1_script"]
+
+[resource]
+script = ExtResource("1_script")
+id = &"selene"
+display_name = "Selene Frostvale"
+role = "Ice · Control"
+bio = "Top of her class and quietly furious that nobody listened to her warnings about the Rift. She plans three moves ahead."
+personality = "Calm, analytical, perfectionist"
+element_id = &"frost"
+ultimate_id = &"frost_nova"
+ultimate_name = "Frost Nova"
+ultimate_description = "A wave of frost sweeps the arena: every enemy is slowed for a long time and takes ice damage."
+hair_color = Color(0.6588, 0.7843, 0.9098, 1)
+accent_color = Color(0.8118, 0.8471, 0.902, 1)
+unlock_dormitory_level = 1
