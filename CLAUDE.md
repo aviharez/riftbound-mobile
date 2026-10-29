@@ -53,7 +53,8 @@ assets/      art/ (sprites, vfx, tiles, ui, portraits), audio/, fonts/
 docs/        design and technical docs (English)
   engine-reference/godot/   Godot 4.4–4.7 API changes and best practices (check before using an API)
   qa/evidence/              screenshots proving each milestone was run and observed
-tools/       check.sh (parse check), screenshot.sh (run and capture), godot_parse_check.gd
+tools/       check.sh (parse check), stress.sh (simulation invariants), screenshot.sh and capture_flow.sh (run and capture)
+             run_runner.gd + runners/ (test drivers loaded at runtime, so they can use the Registry autoload)
 prototype/   HTML reference prototype (do not ship)
 ```
 
@@ -77,8 +78,16 @@ prototype/   HTML reference prototype (do not ship)
    tools/screenshot.sh <milestone>-<what> 1080x1920     # 16:9 phone, scale x3 (extra side space)
    ```
    Open the PNG with the Read tool and check it against the acceptance criteria. Keep it in `docs/qa/evidence/` (it is the evidence that the milestone was observed). Add `FRAMES=120` to capture later in the run, or pass a scene path as the third argument.
-3. **Logic with clear right answers** (collision math, card candidate rules, fusion results, XP curve) gets a unit test once a test framework is added (gdUnit4, ask first).
-4. Feel (controls, juice, performance) can only be judged on a real phone: list what the owner should test on device.
+3. **Simulation invariants** — after touching ball, enemy or collision code:
+   ```
+   tools/stress.sh         # headless, 3600 frames at x3 with 60+ balls; must print PASS
+   ```
+4. **Every screen at once** — after UI or flow changes, regenerate the evidence set and look at it:
+   ```
+   tools/capture_flow.sh <milestone> 1080x2400      # start, play, level up, fusion, pause, ultimate, many balls, game over
+   ```
+5. **Logic with clear right answers** (card candidate rules, fusion results, XP curve) gets a unit test once a test framework is added (gdUnit4, ask first).
+6. Feel (controls, juice, performance) can only be judged on a real phone: list what the owner should test on device. Frame timings measured on a machine without a GPU are meaningless.
 
 ## Don'ts
 

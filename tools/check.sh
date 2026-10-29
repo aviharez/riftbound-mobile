@@ -7,6 +7,6 @@ set -u
 GODOT="${GODOT:-godot}"
 cd "$(dirname "$0")/.."
 "$GODOT" --headless --path . --import >/dev/null 2>&1
-FILES=$(find scripts -name '*.gd' | sort | sed 's#^#res://#')
+FILES=$(find scripts tools -name '*.gd' | sort | sed 's#^#res://#')
 # shellcheck disable=SC2086
 "$GODOT" --headless --path . -s res://tools/godot_parse_check.gd -- $FILES
