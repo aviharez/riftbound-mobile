@@ -2,7 +2,7 @@
 
 Portrait mobile pixel-art roguelite. Ricochet magic combat in a vertical Rift arena, an academy to restore, and students to grow close to.
 
-**Status:** M0 bootstrap. Combat vertical slice in progress (see [`docs/milestones.md`](docs/milestones.md)).
+**Status:** Combat vertical slice M1–M6 implemented with placeholder art; waiting for on-device testing. Next: M7 art pass (see [`docs/milestones.md`](docs/milestones.md)).
 
 ## Requirements
 
@@ -18,7 +18,9 @@ Checks (set `GODOT=/path/to/godot` if it isn't on PATH):
 
 ```
 tools/check.sh                                  # parse-check every script
-tools/screenshot.sh m0-bootstrap 1080x2400      # run, capture a frame to docs/qa/evidence/
+tools/stress.sh                                 # headless ball-physics invariant test (PASS/FAIL)
+tools/capture_flow.sh flow 1080x2400            # play through every screen, screenshots to docs/qa/evidence/
+tools/screenshot.sh test 1080x2400              # single frame of the start screen
 ```
 
 ## Docs
@@ -33,6 +35,7 @@ tools/screenshot.sh m0-bootstrap 1080x2400      # run, capture a frame to docs/q
 | [`docs/decisions.md`](docs/decisions.md) | Decision log and open questions |
 | [`docs/engine-reference/`](docs/engine-reference/) | Godot 4.4–4.7 API changes (from Claude Code Game Studios, MIT) |
 | [`assets/art/`](assets/art/) | Palette, art provenance |
+| [`assets/fonts/`](assets/fonts/) | Silkscreen and Pixelify Sans (SIL Open Font License, licenses alongside) |
 | [`prototype/`](prototype/) | HTML combat prototype (behavior reference) |
 
 ## Layout

@@ -18,6 +18,10 @@ Work one milestone per Claude Code session. A milestone is done only when:
 - Placeholder arena drawing (walls, rune line, move zone) to verify pixel-perfect scaling.
 - Tooling: `tools/check.sh`, `tools/screenshot.sh`, Godot engine reference, starter palette. Evidence: `docs/qa/evidence/m0-bootstrap-*.png`.
 
+## M1–M6 status (2026-10-30)
+
+Implemented in Godot with placeholder art, verified with `tools/check.sh`, `tools/stress.sh` (0 violations in 3600 frames at x3 with 60+ balls) and `tools/capture_flow.sh` (evidence: `docs/qa/evidence/m1-m6-*`). **Not yet checked on a phone**: every criterion about touch, feel or frame rate below is still open until tested on device. Known gaps: hit flash is a white rectangle (a flash shader comes with real sprites in M7); explosions are particles and rings (flipbooks in M7).
+
 ## M1 — Arena, controls, ball physics
 
 Build:
@@ -30,7 +34,7 @@ Accept:
 - [ ] Moving and aiming at the same time with two thumbs works with no misread touches.
 - [ ] Angle stays locked while moving.
 - [ ] 50 balls on screen hold 60 fps on the test phone.
-- [ ] No ball ever tunnels through a wall or block, or gets stuck bouncing horizontally.
+- [x] No ball ever tunnels through a wall or block, or gets stuck bouncing horizontally. *(verified off-device)*
 - [ ] Perfect Catch triggers reliably and the next shot is visibly charged.
 
 ## M2 — Enemies, waves, boss
@@ -39,16 +43,16 @@ Build: enemy data-driven spawning (rows, gaps, types), descent, HP, damage, rune
 
 Accept:
 - [ ] Wave/boss timing matches combat-spec §4.
-- [ ] Shard chain blasts never recurse in one frame.
-- [ ] Game over and restart work without leaks (pools reset).
+- [x] Shard chain blasts never recurse in one frame. *(verified off-device)*
+- [x] Game over and restart work without leaks (pools reset). *(verified off-device)*
 
 ## M3 — Gems, XP, ultimate
 
 Build: gem/prism drops moving with the formation, absorption by balls (capacity, reach), delivery on return/catch with bonus, XP bar, ultimate energy + Flame Orb + button with fade.
 
 Accept:
-- [ ] Gems are lost at the rune line.
-- [ ] XP only arrives when balls return.
+- [x] Gems are lost at the rune line. *(verified off-device)*
+- [x] XP only arrives when balls return. *(verified off-device)*
 - [ ] Ultimate button never blocks movement unexpectedly (touch on it = ultimate only).
 
 ## M4 — Level up and loadout
@@ -56,17 +60,17 @@ Accept:
 Build: level-up screen (3 cards, rerolls), 4 ball slots + 4 item slots, random ball upgrades, items, fallback cards, slot display on level-up and pause. Element effects: burn, slow, siphon, chain.
 
 Accept:
-- [ ] Card candidates follow combat-spec §7 exactly (including full-slot behavior).
+- [x] Card candidates follow combat-spec §7 exactly (including full-slot behavior). *(verified off-device)*
 - [ ] Every element effect works and is visible.
-- [ ] Multiple pending level-ups chain correctly.
+- [x] Multiple pending level-ups chain correctly. *(verified off-device)*
 
 ## M5 — Fusion
 
 Build: prism inventory, fusion screen (recipes + generic), slot merge leaving an empty slot, fused ball visuals, "keep for later" + pause-menu access.
 
 Accept:
-- [ ] All 3 recipes produce the right effects; other pairs produce generic fusions.
-- [ ] The freed slot can receive a new element on the next level up.
+- [x] All 3 recipes produce the right effects; other pairs produce generic fusions. *(verified off-device)*
+- [x] The freed slot can receive a new element on the next level up. *(verified off-device)*
 - [ ] Fused balls can fuse again at level 3.
 
 ## M6 — Juice and polish pass

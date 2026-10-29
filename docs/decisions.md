@@ -24,6 +24,9 @@ Newest at the bottom. When a decision changes, add a new entry instead of editin
 | 2026-10-30 | Every task ends with `tools/check.sh` (parse check) and, for anything visible, a retained screenshot from `tools/screenshot.sh` in `docs/qa/evidence/`. | `--import`/`--quit-after` exit 0 on parse errors; compiling doesn't prove it looks right. |
 | 2026-10-30 | Art is generated with **PixelLab** and **SpriteCook** (MCP from Claude Code for bulk, web/Aseprite for key characters), snapped to `assets/art/palette.png` and cleaned in Aseprite. | Solo developer; tools speed up volume, curation keeps consistency. |
 | 2026-10-30 | Character canvas 32×32 (or 32×40), enemy canvas 32×32 with the creature within ~26 px; hitboxes unchanged. | Matches PixelLab's fixed canvas sizes; no downscaling of pixel art. |
+| 2026-10-30 | Combat ported to Godot as plain RefCounted objects in arrays (balls, enemies, drops) drawn by one `_draw()` per layer; enemies and drops bucketed by grid column for collision and pickup. | Enemies and drops never move sideways, so column buckets cut collision checks ~3×; measured ~2 ms/frame of script time on desktop with 49 balls. |
+| 2026-10-30 | Game flow is a small state machine in `Main` (start, playing, paused, level up, fusion, over); overlays are built in code from one `UiTheme`. HUD buttons are drawn and hit-tested by Main instead of being `Button` nodes. | Touch events must not reach both a GUI button and the aim/move logic; one hit-test path avoids double handling. |
+| 2026-10-30 | Test tools: `tools/stress.sh` (simulation invariants) and `tools/capture_flow.sh` (screenshot of every screen), driven by runners loaded at runtime. | Lets Claude Code verify its own changes; `-s` scripts can't reference autoload-dependent classes statically. |
 
 ## Open questions
 

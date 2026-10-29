@@ -1,6 +1,14 @@
-[gd_scene load_steps=2 format=3]
+[gd_scene load_steps=4 format=3]
 
 [ext_resource type="Script" path="res://scripts/world/world.gd" id="1_world"]
+[ext_resource type="Script" path="res://scripts/combat/battle.gd" id="2_battle"]
+[ext_resource type="Script" path="res://scripts/combat/fx.gd" id="3_fx"]
 
 [node name="World" type="Node2D"]
 script = ExtResource("1_world")
+
+[node name="Battle" type="Node2D" parent="."]
+script = ExtResource("2_battle")
+
+[node name="Fx" type="Node2D" parent="Battle"]
+script = ExtResource("3_fx")

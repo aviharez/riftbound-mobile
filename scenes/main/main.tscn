@@ -1,7 +1,9 @@
-[gd_scene load_steps=3 format=3]
+[gd_scene load_steps=5 format=3]
 
 [ext_resource type="Script" path="res://scripts/main/main.gd" id="1_main"]
 [ext_resource type="PackedScene" path="res://scenes/world/world.tscn" id="2_world"]
+[ext_resource type="Script" path="res://scripts/ui/hud.gd" id="3_hud"]
+[ext_resource type="Script" path="res://scripts/ui/overlays.gd" id="4_overlays"]
 
 [node name="Main" type="Node"]
 script = ExtResource("1_main")
@@ -38,12 +40,22 @@ grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
 
-[node name="DebugLabel" type="Label" parent="UI/Root"]
-layout_mode = 0
-offset_left = 4.0
-offset_top = 3.0
-offset_right = 266.0
-offset_bottom = 15.0
-theme_override_colors/font_color = Color(0.952941, 0.921569, 0.866667, 0.8)
-theme_override_font_sizes/font_size = 7
-text = "M0 bootstrap"
+[node name="Hud" type="Control" parent="UI/Root"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("3_hud")
+
+[node name="Overlays" type="Control" parent="UI/Root"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("4_overlays")
