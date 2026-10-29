@@ -20,6 +20,10 @@ Newest at the bottom. When a decision changes, add a new entry instead of editin
 | 2026-10-30 | **Godot 4.7.2**, GDScript, Compatibility renderer. | Latest stable; broad Android support. |
 | 2026-10-30 | **Base resolution 270×560**, `canvas_items` + `expand` + `integer` scaling; world in a pixel-perfect SubViewport, UI/illustrations native. | Integer 4× on 1080p phones, manageable sprite sizes for a solo artist, crisp text. |
 | 2026-10-30 | All in-game text and repo docs in **English**. | Owner preference; wider audience. |
+| 2026-10-30 | Adopt only selected parts of Claude Code Game Studios (MIT): the Godot engine reference, the parse-check script, and the "run and observe" rule. Not the full 49-agent framework. | Its own measurement showed heavier process produced more docs, not a better game; the full template conflicts with this repo's layout. |
+| 2026-10-30 | Every task ends with `tools/check.sh` (parse check) and, for anything visible, a retained screenshot from `tools/screenshot.sh` in `docs/qa/evidence/`. | `--import`/`--quit-after` exit 0 on parse errors; compiling doesn't prove it looks right. |
+| 2026-10-30 | Art is generated with **PixelLab** and **SpriteCook** (MCP from Claude Code for bulk, web/Aseprite for key characters), snapped to `assets/art/palette.png` and cleaned in Aseprite. | Solo developer; tools speed up volume, curation keeps consistency. |
+| 2026-10-30 | Character canvas 32×32 (or 32×40), enemy canvas 32×32 with the creature within ~26 px; hitboxes unchanged. | Matches PixelLab's fixed canvas sizes; no downscaling of pixel art. |
 
 ## Open questions
 

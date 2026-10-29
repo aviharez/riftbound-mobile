@@ -20,6 +20,7 @@ All in-game text, code, comments and docs are in **English**.
 - **Godot 4.7.2 stable**, GDScript only. Renderer: **Compatibility** (OpenGL ES 3 / WebGL 2) for broad Android support.
 - Targets: Android first, iOS later (needs a Mac to build).
 - Do not upgrade the engine version or change the renderer without asking.
+- **Check `docs/engine-reference/godot/` before writing Godot API calls.** Godot 4.5–4.7 changed APIs that your training data may not know. Start with `deprecated-apis.md` and `breaking-changes.md`, then the relevant `modules/*.md`.
 
 ## GDScript 4 rules (avoid Godot 3 habits)
 
@@ -50,6 +51,9 @@ scripts/     .gd files mirroring scenes/; scripts/data/ = Resource classes; scri
 data/        .tres data: elements/, evolutions/, items/, enemies/, balance/
 assets/      art/ (sprites, vfx, tiles, ui, portraits), audio/, fonts/
 docs/        design and technical docs (English)
+  engine-reference/godot/   Godot 4.4–4.7 API changes and best practices (check before using an API)
+  qa/evidence/              screenshots proving each milestone was run and observed
+tools/       check.sh (parse check), screenshot.sh (run and capture), godot_parse_check.gd
 prototype/   HTML reference prototype (do not ship)
 ```
 
@@ -58,13 +62,23 @@ prototype/   HTML reference prototype (do not ship)
 - Work **one milestone per session** from `docs/milestones.md`. Read its acceptance criteria before coding; finish by checking each one.
 - When a gameplay rule or number changes, update `docs/combat-spec.md` and add a line to `docs/decisions.md` in the same change.
 - The HTML prototype is the behavioral reference. Its numbers are in 360-wide units; the spec has already converted them to 270-wide units (×0.75). Use the spec values.
-- Smoke check after changes (headless, catches parse and load errors):
-  ```
-  godot --headless --path . --import
-  godot --headless --path . --quit-after 120
-  ```
-  Report any `SCRIPT ERROR` / `ERROR` lines and fix them before finishing.
 - Commit in small, descriptive commits. Do not commit `.godot/`, export keystores or `export_credentials.cfg`.
+
+## Verification (required before finishing any task)
+
+1. **Parse check** — every script must load:
+   ```
+   tools/check.sh          # uses `godot` on PATH, or set GODOT=/path/to/godot
+   ```
+   Exit 1 / `PARSE FAIL` = fix before finishing. Note: `--import` and `--quit-after` exit 0 even on parse errors, so they are not a parse check.
+2. **Run and observe** — a parse check is not a run. Any change a player can see is launched and looked at before the task closes:
+   ```
+   tools/screenshot.sh <milestone>-<what> 1080x2400     # 20:9 phone, scale x4
+   tools/screenshot.sh <milestone>-<what> 1080x1920     # 16:9 phone, scale x3 (extra side space)
+   ```
+   Open the PNG with the Read tool and check it against the acceptance criteria. Keep it in `docs/qa/evidence/` (it is the evidence that the milestone was observed). Add `FRAMES=120` to capture later in the run, or pass a scene path as the third argument.
+3. **Logic with clear right answers** (collision math, card candidate rules, fusion results, XP curve) gets a unit test once a test framework is added (gdUnit4, ask first).
+4. Feel (controls, juice, performance) can only be judged on a real phone: list what the owner should test on device.
 
 ## Don'ts
 

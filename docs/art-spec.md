@@ -33,8 +33,8 @@ Therefore: **side walls must extend at least 45 px beyond each side of the playf
 
 | Asset | Canvas | Notes |
 |---|---|---|
-| Player character (Lyra etc.) | 24 × 32 | body ~20 × 28; idle 4f, run 6f, cast 4f, hurt 2f |
-| Enemy (mite, shard, brute) | 24 × 24 | idle 4f, hit flash via shader, death = VFX |
+| Player character (Lyra etc.) | 32 × 32 (or 32 × 40) | body ~20 × 28, feet at the bottom center; idle 4f, run 6f, cast 4f, hurt 2f |
+| Enemy (mite, shard, brute) | 32 × 32 | creature kept within ~26 × 26 (hitbox stays 24 × 24); idle 4f, hit flash via shader, death = VFX |
 | Boss | 54 × 54 | idle 6f, attack/telegraph 6f |
 | Baby ball | 2 × 2 | white, no glow |
 | Element ball | 3 × 3 core + 5 × 5 glow | element color |
@@ -47,6 +47,8 @@ Therefore: **side walls must extend at least 45 px beyond each side of the playf
 | Ultimate / boss VFX | 64 × 64 – 96 × 96 | 8–10 frames |
 
 Pivot: feet for characters, center for enemies, balls and VFX.
+
+Canvas sizes are chosen to match AI pixel-art tools (PixelLab's instant character only accepts exactly 32 × 32 or 32 × 40). A sprite may be drawn slightly larger than its hitbox; the hitbox numbers in combat-spec do not change. Enemy cells are 30 wide, so creatures must stay under ~26 px to avoid overlapping neighbors.
 
 ## 4. Palette and readability
 
@@ -76,7 +78,27 @@ Heaviness comes from timing and contrast, not from particle count or bloom.
 - Anime portraits/CGs: imported with linear filtering and mipmaps; used only in the UI layer.
 - Character consistency: Lyra (auburn-red hair, amber eyes, navy uniform with gold trim, fire), Selene (silver-blue hair, icy blue eyes, silver accents, ice), Noah (dark green hair, emerald eyes, green accents, nature).
 
-## 7. Import and files
+## 7. AI-assisted asset pipeline (PixelLab, SpriteCook)
+
+Both tools can be driven from Claude Code through MCP: **PixelLab** (remote MCP server `https://api.pixellab.ai/mcp`, bearer token from the account page, needs an active subscription; also web UI, Aseprite extension, API) and **SpriteCook** (Claude Code plugin from the `SpriteCook/claude-plugin` marketplace, account sign-in, credit based; exports sliced sheets and Godot packages). Set them up in the owner's Claude Code config, never commit tokens.
+
+| Asset type | Where to make it | Why |
+|---|---|---|
+| Main characters (Lyra, Selene, Noah), bosses | Tool web UI / Aseprite, curated by hand | Identity matters most; needs iteration and frame-by-frame cleanup |
+| Regular enemies, props, gems, icons, UI kit pieces | MCP from Claude Code, in batches | Volume; a consistent style reference keeps them together |
+| Tilesets, wall and floor textures | Tool tileset generators | Seamless tiling support |
+| VFX flipbooks | Tool animation + hand cleanup, or drawn | Must read at 1× and match timing in combat-spec §10 |
+| Anime portraits, dialogue CGs | Separate illustration pipeline | Not what these pixel tools are for |
+
+Rules for every generated asset:
+1. **Generate at the final canvas size** from §3. Never downscale pixel art; regenerate or redraw instead.
+2. **Snap to the project palette**: reduce colors to `assets/art/palette.png` (tool color reduction or Aseprite). Unsnapped assets drift and the arena stops reading as one world.
+3. **Keep a style reference** (one approved character + one approved enemy) and feed it to every generation of that category.
+4. **Clean up in Aseprite**: stray pixels, outline consistency, frame-to-frame jitter, pivot position.
+5. **Check in context**: place it in the arena and capture with `tools/screenshot.sh` at 1080×2400 before approving. Silhouette and contrast rules from §4 apply.
+6. **Record provenance** in `assets/art/CREDITS.md` (tool, date, prompt or reference, who cleaned it up). Check each tool's commercial-use terms for the plan in use, and plan for AI-content disclosure on stores that require it.
+
+## 8. Import and files
 
 - Pixel art: PNG, imported with **Filter: Nearest**, mipmaps off (project default texture filter is already Nearest).
 - Naming: `snake_case`, e.g. `assets/art/enemies/mite_idle.png` (horizontal strip), `assets/art/vfx/ember_burst_32.png`.

@@ -14,11 +14,11 @@ Portrait mobile pixel-art roguelite. Ricochet magic combat in a vertical Rift ar
 1. Open Godot → **Import** → select `project.godot`.
 2. Press **F5**. The desktop window is portrait; touch is emulated with the mouse.
 
-Headless smoke check (parse/load errors):
+Checks (set `GODOT=/path/to/godot` if it isn't on PATH):
 
 ```
-godot --headless --path . --import
-godot --headless --path . --quit-after 120
+tools/check.sh                                  # parse-check every script
+tools/screenshot.sh m0-bootstrap 1080x2400      # run, capture a frame to docs/qa/evidence/
 ```
 
 ## Docs
@@ -31,6 +31,8 @@ godot --headless --path . --quit-after 120
 | [`docs/art-spec.md`](docs/art-spec.md) | Resolution, scaling, sprite sizes, palette, VFX |
 | [`docs/milestones.md`](docs/milestones.md) | Build order and acceptance criteria |
 | [`docs/decisions.md`](docs/decisions.md) | Decision log and open questions |
+| [`docs/engine-reference/`](docs/engine-reference/) | Godot 4.4–4.7 API changes (from Claude Code Game Studios, MIT) |
+| [`assets/art/`](assets/art/) | Palette, art provenance |
 | [`prototype/`](prototype/) | HTML combat prototype (behavior reference) |
 
 ## Layout

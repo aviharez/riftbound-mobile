@@ -2,7 +2,10 @@
 
 Goal of M1–M6: a **combat vertical slice** that matches the HTML prototype's feel in Godot, with placeholder shapes. Art (M7) comes after the slice is fun. Academy, social and expedition systems come after that.
 
-Work one milestone per Claude Code session. A milestone is done only when every acceptance criterion is checked on a real Android phone (or the desktop build for criteria marked *desktop ok*).
+Work one milestone per Claude Code session. A milestone is done only when:
+1. `tools/check.sh` passes;
+2. screenshots of every visible change are captured with `tools/screenshot.sh` (1080×2400 and 1080×1920) and kept in `docs/qa/evidence/`;
+3. every acceptance criterion is checked on a real Android phone (feel, touch and performance cannot be judged from screenshots).
 
 ---
 
@@ -13,6 +16,7 @@ Work one milestone per Claude Code session. A milestone is done only when every 
 - `Main.screen_to_world()` for input conversion.
 - Data resource classes and initial `.tres` data (elements, recipes, items, enemies, balance). `Registry` autoload loads them.
 - Placeholder arena drawing (walls, rune line, move zone) to verify pixel-perfect scaling.
+- Tooling: `tools/check.sh`, `tools/screenshot.sh`, Godot engine reference, starter palette. Evidence: `docs/qa/evidence/m0-bootstrap-*.png`.
 
 ## M1 — Arena, controls, ball physics
 
