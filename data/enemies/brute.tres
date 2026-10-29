@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="EnemyData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/data/enemy_data.gd" id="1_script"]
+
+[resource]
+script = ExtResource("1_script")
+id = &"brute"
+display_name = "Rift Brute"
+hp_multiplier = 3.0
+spawn_chance_base = 0.1
+spawn_chance_per_wave = 0.01
+gem_drop = 3
+prism_chance = 0.12
+energy_on_kill = 6.0

@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="EnemyData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/data/enemy_data.gd" id="1_script"]
+
+[resource]
+script = ExtResource("1_script")
+id = &"shard"
+display_name = "Rift Shard"
+hp_multiplier = 0.8
+spawn_chance_base = 0.14
+gem_drop = 1
+energy_on_kill = 3.0
+death_blast_radius = 39.0
+death_blast_damage = 2

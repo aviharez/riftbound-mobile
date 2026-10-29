@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="ItemData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/data/item_data.gd" id="1_script"]
+
+[resource]
+script = ExtResource("1_script")
+id = &"apprentice_sparks"
+display_name = "Apprentice Sparks"
+description = "+2 baby balls per level."
+color = Color(1, 1, 1, 1)
+stat = &"baby_balls"
+value_per_level = 2.0
+max_level = 3

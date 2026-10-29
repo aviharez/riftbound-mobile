@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="ItemData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/data/item_data.gd" id="1_script"]
+
+[resource]
+script = ExtResource("1_script")
+id = &"siphon_field"
+display_name = "Siphon Field"
+description = "Gem pickup reach +2 per level."
+color = Color(0.498, 0.8784, 0.6588, 1)
+stat = &"gem_reach"
+value_per_level = 2.0
+max_level = 3

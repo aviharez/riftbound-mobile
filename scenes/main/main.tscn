@@ -1,0 +1,49 @@
+[gd_scene load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scripts/main/main.gd" id="1_main"]
+[ext_resource type="PackedScene" path="res://scenes/world/world.tscn" id="2_world"]
+
+[node name="Main" type="Node"]
+script = ExtResource("1_main")
+
+[node name="WorldContainer" type="SubViewportContainer" parent="."]
+texture_filter = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+stretch = true
+
+[node name="WorldViewport" type="SubViewport" parent="WorldContainer"]
+disable_3d = true
+handle_input_locally = false
+snap_2d_transforms_to_pixel = true
+snap_2d_vertices_to_pixel = true
+canvas_item_default_texture_filter = 0
+size = Vector2i(270, 560)
+render_target_update_mode = 4
+
+[node name="World" parent="WorldContainer/WorldViewport" instance=ExtResource("2_world")]
+
+[node name="UI" type="CanvasLayer" parent="."]
+
+[node name="Root" type="Control" parent="UI"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="DebugLabel" type="Label" parent="UI/Root"]
+layout_mode = 0
+offset_left = 4.0
+offset_top = 3.0
+offset_right = 266.0
+offset_bottom = 15.0
+theme_override_colors/font_color = Color(0.952941, 0.921569, 0.866667, 0.8)
+theme_override_font_sizes/font_size = 7
+text = "M0 bootstrap"

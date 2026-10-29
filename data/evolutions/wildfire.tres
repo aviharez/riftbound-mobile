@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="EvolutionRecipe" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/data/evolution_recipe.gd" id="1_script"]
+
+[resource]
+script = ExtResource("1_script")
+element_a = &"ember"
+element_b = &"verdant"
+result_id = &"wildfire"
+display_name = "Wildfire"
+description = "Fire spreads to nearby enemies; still siphons gems twice as well."
+core_color = Color(1, 0.9686, 0.7608, 1)
+glow_color = Color(1, 0.6902, 0.251, 1)
+effects = Array[StringName]([&"burn", &"spread", &"siphon"])

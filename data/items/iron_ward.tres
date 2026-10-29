@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="ItemData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/data/item_data.gd" id="1_script"]
+
+[resource]
+script = ExtResource("1_script")
+id = &"iron_ward"
+display_name = "Iron Ward"
+description = "+3 max HP per level and heal 3 HP on pick."
+color = Color(1, 0.5412, 0.6039, 1)
+stat = &"max_hp"
+value_per_level = 3.0
+max_level = 3

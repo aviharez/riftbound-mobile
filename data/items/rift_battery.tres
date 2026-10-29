@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="ItemData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/data/item_data.gd" id="1_script"]
+
+[resource]
+script = ExtResource("1_script")
+id = &"rift_battery"
+display_name = "Rift Battery"
+description = "Ultimate energy charges 30% faster per level."
+color = Color(1, 0.702, 0.2784, 1)
+stat = &"energy_gain"
+value_per_level = 0.3
+max_level = 3

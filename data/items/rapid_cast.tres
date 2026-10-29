@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="ItemData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/data/item_data.gd" id="1_script"]
+
+[resource]
+script = ExtResource("1_script")
+id = &"rapid_cast"
+display_name = "Rapid Cast"
+description = "Time between shots x0.88 per level."
+color = Color(0.902, 0.7412, 0.451, 1)
+stat = &"fire_interval_mult"
+value_per_level = 0.88
+max_level = 3

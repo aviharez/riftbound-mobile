@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="EvolutionRecipe" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/data/evolution_recipe.gd" id="1_script"]
+
+[resource]
+script = ExtResource("1_script")
+element_a = &"ember"
+element_b = &"frost"
+result_id = &"steam_burst"
+display_name = "Steam Burst"
+description = "Small explosion on every hit."
+core_color = Color(1, 1, 1, 1)
+glow_color = Color(0.8863, 0.9098, 0.9412, 1)
+effects = Array[StringName]([&"blast"])

@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="ElementData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/data/element_data.gd" id="1_script"]
+
+[resource]
+script = ExtResource("1_script")
+id = &"verdant"
+display_name = "Verdant"
+description = "Absorbs gems from farther away and carries twice as many."
+core_color = Color(0.9176, 1, 0.9373, 1)
+glow_color = Color(0.498, 0.8784, 0.6588, 1)
+effects = Array[StringName]([&"siphon"])
