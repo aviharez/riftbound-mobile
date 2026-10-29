@@ -85,7 +85,7 @@ Exploration: Expedition Board, Expedition Team, Expedition Result, Quest Journal
 
 ## Current phase
 
-**Combat vertical slice first** (`milestones.md` M1–M7). The 22 screens and meta systems follow once combat is proven fun on device.
+Combat slice (M1–M6) and core loop (M8) are built with placeholder art. Next: students (M9), expeditions (M10), dialogue & relationships (M11), library & quests (M12); then the art pass (M7). See `milestones.md`.
 
 ## Originality
 

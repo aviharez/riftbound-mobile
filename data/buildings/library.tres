@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="BuildingData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/data/building_data.gd" id="1_script"]
+
+[resource]
+script = ExtResource("1_script")
+id = &"library"
+display_name = "Library"
+description = "Shelves of half-burned tomes. Restored, its records help students learn faster."
+map_rect = Rect2(16, 150, 96, 76)
+roof_color = Color(0.3216, 0.4863, 0.4118, 1)
+max_level = 3
+starts_repaired = false
+costs = Array[Vector3i]([Vector3i(60, 25, 0), Vector3i(160, 60, 0), Vector3i(360, 120, 2)])
+bonus_stat = &"xp_mult"
+bonus_per_level = 0.1
+bonus_format = "+%s%% XP in runs"
+is_rift_gate = false

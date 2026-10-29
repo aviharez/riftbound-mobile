@@ -40,6 +40,7 @@ The Rift portal sits at the top center, behind the HUD band; enemies emerge from
 - `zone_tolerance` default 8 (settings 0–30).
 - Aim line: dotted line from the player to the first contact point (settings: +1 / +3 bounce preview, later an upgrade). Crosshair drawn at a fixed 35 from the player along the angle, with the angle in degrees.
 - Desktop/debug: WASD/arrows move, Q/E rotate aim, Space ultimate, Esc pause.
+- Initial aim 78° (`start_aim_deg`), slightly off vertical so the first shots don't loop up an empty column.
 
 ## 3. Balls
 
@@ -128,7 +129,7 @@ Area effects, chains and shard blasts are **queued and resolved next frame**.
 ## 7. Loadout and level up
 
 - **4 ball slots + 4 item slots.** Slot 1 starts with the character's element (Lyra = Ember, Selene = Frost, Noah = Verdant). The starting element can be fused like any other.
-- Level up pauses the game and offers **3 cards**; **2 rerolls per run**. Multiple pending level-ups chain one after another.
+- Level up pauses the game and offers **3 cards**; **2 rerolls per run** on a new save (base 1 + Rift Gate level; see economy-spec). Academy buildings add run bonuses: baby balls, max HP, XP %, ultimate charge %. Multiple pending level-ups chain one after another.
 - Candidate cards:
   - new element ball (if a ball slot is free and that element is not already in an unfused slot);
   - upgrade an owned ball (if level < 3);

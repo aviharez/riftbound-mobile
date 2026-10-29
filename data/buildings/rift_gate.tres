@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="BuildingData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/data/building_data.gd" id="1_script"]
+
+[resource]
+script = ExtResource("1_script")
+id = &"rift_gate"
+display_name = "Rift Gate"
+description = "The torn gate where the Rift broke through. Step inside to fight back."
+map_rect = Rect2(105, 40, 90, 70)
+roof_color = Color(0.4353, 0.2902, 0.902, 1)
+max_level = 3
+starts_repaired = true
+costs = Array[Vector3i]([Vector3i(0, 0, 0), Vector3i(150, 60, 0), Vector3i(400, 150, 2)])
+bonus_stat = &"rerolls"
+bonus_per_level = 1.0
+bonus_format = "%s level-up rerolls per run"
+is_rift_gate = true

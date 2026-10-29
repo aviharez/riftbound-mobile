@@ -24,6 +24,8 @@ extends Resource
 @export var aim_min_deg: float = 15.0
 @export var aim_max_deg: float = 165.0
 @export var crosshair_distance: float = 35.0
+## Initial aim, slightly off vertical so the first shots don't loop straight up an empty column.
+@export var start_aim_deg: float = 78.0
 
 @export_group("Balls")
 @export var ball_radius: float = 2.0
@@ -67,7 +69,8 @@ extends Resource
 @export var max_copies: int = 4
 @export var new_ball_damage: int = 2
 @export var cards_per_level: int = 3
-@export var rerolls_per_run: int = 2
+## Base rerolls; the Rift Gate adds one per level (Lv1 at start), so a new save has 2.
+@export var rerolls_per_run: int = 1
 ## Unfused ball upgrade odds. The remainder is "power +1".
 @export var upgrade_copy_chance: float = 0.4
 @export var upgrade_damage_chance: float = 0.3

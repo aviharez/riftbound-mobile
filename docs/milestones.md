@@ -1,6 +1,6 @@
 # Milestones
 
-Goal of M1–M6: a **combat vertical slice** that matches the HTML prototype's feel in Godot, with placeholder shapes. Art (M7) comes after the slice is fun. Academy, social and expedition systems come after that.
+Goal of M1–M6: a **combat vertical slice** that matches the HTML prototype's feel in Godot, with placeholder shapes. The owner chose to keep placeholder art and build the meta game next (M8 core loop, then M9–M12); the art pass (M7) comes after.
 
 Work one milestone per Claude Code session. A milestone is done only when:
 1. `tools/check.sh` passes;
@@ -13,7 +13,7 @@ Work one milestone per Claude Code session. A milestone is done only when:
 
 - Godot 4.7.2 project, Compatibility renderer, portrait.
 - Display pipeline: 270×560 base, `canvas_items` + `expand` + `integer`; world in a `SubViewport`, UI layer in the root viewport.
-- `Main.screen_to_world()` for input conversion.
+- `screen_to_world()` for input conversion (now on `BattleScreen`).
 - Data resource classes and initial `.tres` data (elements, recipes, items, enemies, balance). `Registry` autoload loads them.
 - Placeholder arena drawing (walls, rune line, move zone) to verify pixel-perfect scaling.
 - Tooling: `tools/check.sh`, `tools/screenshot.sh`, Godot engine reference, starter palette. Evidence: `docs/qa/evidence/m0-bootstrap-*.png`.
@@ -80,6 +80,33 @@ Build: hit-stop, trauma shake (toggle), flash shader, squash, rings, particles, 
 Accept:
 - [ ] Feels at least as good as the HTML prototype side by side.
 - [ ] Stable 60 fps in a 10-minute run at x3.
+
+## M8 — Core loop ✅ (2026-10-30, placeholder art)
+
+Title → walkable Academy hub → Rift battle → result with rewards → repair/upgrade buildings → stronger next run. Save/load. See `docs/economy-spec.md`.
+
+Accept:
+- [x] Rewards are banked on defeat and on retreat, and saved. *(verified off-device)*
+- [x] Repairs/upgrades spend resources, change the building on the map and apply their bonus to the next run. *(verified off-device)*
+- [x] Returning from a run lands the student at the Rift Gate. *(verified off-device)*
+- [ ] Walking and tapping buildings feel right on a phone.
+- [ ] Pacing: first repair after one run, all Lv1 after ~4–5 runs (playtest).
+
+## M9 — Students (roster)
+
+Selene and Noah playable with their own starting element and ultimate; roster and profile screens; character levels; unlocks tied to the Dormitory.
+
+## M10 — Expeditions
+
+Expedition board, team select, timers (real time), results with resources and story clues.
+
+## M11 — Dialogue and relationships
+
+Dialogue scenes (portrait placeholders), dormitory interactions, friendship levels; friendship unlocks duo evolutions.
+
+## M12 — Library and quests
+
+Research (passive bonuses), fusion recipe codex, quest journal.
 
 ## M7 — Art pass (vertical slice)
 

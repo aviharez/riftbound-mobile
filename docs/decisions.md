@@ -28,9 +28,16 @@ Newest at the bottom. When a decision changes, add a new entry instead of editin
 | 2026-10-30 | Game flow is a small state machine in `Main` (start, playing, paused, level up, fusion, over); overlays are built in code from one `UiTheme`. HUD buttons are drawn and hit-tested by Main instead of being `Button` nodes. | Touch events must not reach both a GUI button and the aim/move logic; one hit-test path avoids double handling. |
 | 2026-10-30 | Test tools: `tools/stress.sh` (simulation invariants) and `tools/capture_flow.sh` (screenshot of every screen), driven by runners loaded at runtime. | Lets Claude Code verify its own changes; `-s` scripts can't reference autoload-dependent classes statically. |
 
+| 2026-10-30 | Keep placeholder art; build the meta game before the art pass. Order: core loop (M8), then students, expeditions, dialogue & relationships, library & quests. | Owner decision. |
+| 2026-10-30 | Core loop: title → walkable academy (tap-to-walk) → Rift battle → result → repair/upgrade buildings whose levels give run bonuses. Five buildings: Rift Gate (rerolls), Library (XP), Dormitory (ultimate charge), Workshop (baby balls), Garden (max HP). | Every activity feeds the next run, per the game overview's loop. Numbers in economy-spec. |
+| 2026-10-30 | Base level-up rerolls 1 + Rift Gate level (Lv1 at start) = 2 on a new save. | Keeps the combat-spec value while letting the gate upgrade add more. |
+| 2026-10-30 | `GameState` autoload owns resources, buildings, stats, JSON save and scene changes. Test tools use a separate save file. | One place for persistent state; tests never wipe the player's progress. |
+
 ## Open questions
 
 - Fused ball count: max of parents (current) vs always 1.
 - XP curve and level-up frequency at x3 speed.
 - Final 4th base element (current: Storm) and final item pool.
 - Ultimates for Selene and Noah.
+- Retreat currently keeps 100% of rewards (`retreat_fraction`); maybe lower it so finishing a run matters.
+- Economy pacing needs playtesting (economy-spec targets).

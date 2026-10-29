@@ -6,7 +6,7 @@ extends Node
 
 const FRAMES := 3600
 
-var main: Main
+var main: BattleScreen
 var frames := 0
 var checks := 0
 var inside_wall := 0
@@ -16,7 +16,7 @@ var nan := 0
 
 
 func _ready() -> void:
-	main = get_tree().current_scene as Main
+	main = get_tree().current_scene as BattleScreen
 
 
 func _process(_delta: float) -> void:
@@ -29,9 +29,9 @@ func _process(_delta: float) -> void:
 	frames += 1
 	b.aim_at(Vector2(135.0 + sin(frames * 0.05) * 120.0, 100.0 + cos(frames * 0.03) * 80.0))
 	match main.state:
-		Main.State.LEVEL_UP: main._on_card_chosen(b.offer_cards()[0])
-		Main.State.FUSION: main._on_fusion_chosen(b.fusion_pairs()[0])
-		Main.State.OVER: _restart()
+		BattleScreen.State.LEVEL_UP: main._on_card_chosen(b.offer_cards()[0])
+		BattleScreen.State.FUSION: main._on_fusion_chosen(b.fusion_pairs()[0])
+		BattleScreen.State.OVER: _restart()
 	for ball: Ball in b.balls:
 		if ball.state != Ball.State.FLY:
 			continue

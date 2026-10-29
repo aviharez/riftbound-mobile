@@ -1,9 +1,9 @@
 extends Node
 ## Plays through every screen and saves a screenshot of each (run-and-observe evidence).
 ## Run via tools/capture_flow.sh (sets the window size; loaded at runtime by tools/run_runner.gd). Not part of the game.
-## Screens: start, play, level up, fusion, after fusion, pause, ultimate, many balls, game over.
+## Battle screens: play, level up, fusion, after fusion, pause, ultimate, many balls, result.
 
-var main: Main
+var main: BattleScreen
 var out_dir := "docs/qa/evidence"
 var prefix := "flow"
 var t := 0.0
@@ -17,7 +17,8 @@ func _ready() -> void:
 			out_dir = arg.trim_prefix("--out=")
 		elif arg.begins_with("--prefix="):
 			prefix = arg.trim_prefix("--prefix=")
-	main = get_tree().current_scene as Main
+	main = get_tree().current_scene as BattleScreen
+	prefix += "-battle"
 
 
 func shot(name: String) -> void:
@@ -38,21 +39,18 @@ func _process(delta: float) -> void:
 	var b := main.battle
 	match phase:
 		0:
-			if t > 0.8:
-				shot("01-start"); wait = 0.3; phase = 1
-		1:
-			main._start_run()
-			main._touch_down(0, Vector2(70, 250)); main._touches.erase(0)
-			phase = 2; t = 0.0
+			if t > 0.5:
+				main._touch_down(0, Vector2(70, 250)); main._touches.erase(0)
+				phase = 2; t = 0.0
 		2:
 			if t > 3.0:
 				shot("02-play"); b.speed = 3; phase = 3; t = 0.0
 		3:
 			match main.state:
-				Main.State.PLAYING:
+				BattleScreen.State.PLAYING:
 					b.aim_at(Vector2(135.0 + sin(t * 0.7) * 120.0, 200.0))
 					b.player.x = 135.0 + sin(t * 0.4) * 90.0
-				Main.State.LEVEL_UP:
+				BattleScreen.State.LEVEL_UP:
 					shot("03-level-up"); wait = 0.3; phase = 4
 		4:
 			main._on_card_chosen(_prefer(b.offer_cards(), [LevelCard.NEW_BALL]))
@@ -61,13 +59,13 @@ func _process(delta: float) -> void:
 			phase = 5
 		5:
 			match main.state:
-				Main.State.LEVEL_UP: main._on_card_chosen(_prefer(b.offer_cards(), [LevelCard.NEW_BALL, LevelCard.NEW_ITEM]))
-				Main.State.FUSION: main._on_fusion_kept()
-				Main.State.PLAYING:
+				BattleScreen.State.LEVEL_UP: main._on_card_chosen(_prefer(b.offer_cards(), [LevelCard.NEW_BALL, LevelCard.NEW_ITEM]))
+				BattleScreen.State.FUSION: main._on_fusion_kept()
+				BattleScreen.State.PLAYING:
 					if b.pending_levels == 0:
 						b.debug_max_balls(); b.debug_add_prism(); phase = 6
 		6:
-			if main.state == Main.State.FUSION:
+			if main.state == BattleScreen.State.FUSION:
 				shot("04-fusion"); wait = 0.3; phase = 7
 		7:
 			main._on_fusion_chosen(b.fusion_pairs()[0]); phase = 8; t = 0.0
@@ -97,7 +95,7 @@ func _process(delta: float) -> void:
 			b._damage_player(999); phase = 16; t = 0.0
 		16:
 			if t > 1.0:
-				shot("09-game-over"); wait = 0.3; phase = 17
+				shot("09-result"); wait = 0.3; phase = 17
 		17:
 			get_tree().quit(0)
 	return
@@ -106,9 +104,9 @@ func _process(delta: float) -> void:
 func _autoplay() -> void:
 	var b := main.battle
 	match main.state:
-		Main.State.PLAYING: b.aim_at(Vector2(135.0 + sin(t) * 100.0, 150.0))
-		Main.State.FUSION: main._on_fusion_kept()
-		Main.State.LEVEL_UP: main._on_card_chosen(b.offer_cards()[0])
+		BattleScreen.State.PLAYING: b.aim_at(Vector2(135.0 + sin(t) * 100.0, 150.0))
+		BattleScreen.State.FUSION: main._on_fusion_kept()
+		BattleScreen.State.LEVEL_UP: main._on_card_chosen(b.offer_cards()[0])
 
 
 func _prefer(cards: Array[LevelCard], kinds: Array[StringName]) -> LevelCard:

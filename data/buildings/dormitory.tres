@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="BuildingData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/data/building_data.gd" id="1_script"]
+
+[resource]
+script = ExtResource("1_script")
+id = &"dormitory"
+display_name = "Dormitory"
+description = "Where students rest. A warm room keeps their magic steady."
+map_rect = Rect2(188, 150, 96, 76)
+roof_color = Color(0.5412, 0.3529, 0.6196, 1)
+max_level = 3
+starts_repaired = false
+costs = Array[Vector3i]([Vector3i(50, 30, 0), Vector3i(140, 60, 0), Vector3i(320, 120, 1)])
+bonus_stat = &"energy_gain"
+bonus_per_level = 0.1
+bonus_format = "Ultimate charges %s%% faster"
+is_rift_gate = false

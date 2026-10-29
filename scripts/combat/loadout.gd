@@ -13,6 +13,7 @@ class Mods:
 	var baby_balls: int
 	var max_hp: int
 	var energy_gain: float
+	var xp_mult: float
 
 
 var balance: CombatBalance
@@ -20,11 +21,14 @@ var balls: Array[BallSlot] = []
 var items: Array[ItemSlot] = []
 ## Extra baby balls added by the debug menu.
 var debug_baby_balls: int = 0
+## Run bonuses from academy buildings (GameState.run_bonuses()): baby_balls, max_hp, xp_mult, energy_gain, rerolls.
+var meta: Dictionary = {}
 
 
-static func create(b: CombatBalance, starting_element: ElementData) -> Loadout:
+static func create(b: CombatBalance, starting_element: ElementData, run_bonuses: Dictionary = {}) -> Loadout:
 	var l := Loadout.new()
 	l.balance = b
+	l.meta = run_bonuses
 	l.balls.resize(b.ball_slots)
 	l.items.resize(b.item_slots)
 	if starting_element:
@@ -60,9 +64,10 @@ func mods() -> Mods:
 	m.gem_capacity = balance.gem_capacity + roundi(item_value(&"gem_capacity")) * item_level(&"gem_capacity")
 	m.gem_reach = balance.gem_reach + item_value(&"gem_reach") * float(item_level(&"gem_reach"))
 	m.catch_multiplier = balance.catch_multiplier + roundi(item_value(&"catch_multiplier")) * item_level(&"catch_multiplier")
-	m.baby_balls = balance.baby_ball_count + roundi(item_value(&"baby_balls")) * item_level(&"baby_balls") + debug_baby_balls
-	m.max_hp = balance.player_hp + roundi(item_value(&"max_hp")) * item_level(&"max_hp")
-	m.energy_gain = 1.0 + item_value(&"energy_gain") * float(item_level(&"energy_gain"))
+	m.baby_balls = balance.baby_ball_count + roundi(item_value(&"baby_balls")) * item_level(&"baby_balls") + debug_baby_balls + roundi(meta.get(&"baby_balls", 0.0))
+	m.max_hp = balance.player_hp + roundi(item_value(&"max_hp")) * item_level(&"max_hp") + roundi(meta.get(&"max_hp", 0.0))
+	m.energy_gain = 1.0 + item_value(&"energy_gain") * float(item_level(&"energy_gain")) + float(meta.get(&"energy_gain", 0.0))
+	m.xp_mult = 1.0 + float(meta.get(&"xp_mult", 0.0))
 	return m
 
 

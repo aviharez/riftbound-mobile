@@ -125,9 +125,10 @@ func setup(p_settings: PlayerSettings, p_font: Font) -> void:
 
 # ================================================================= run lifecycle
 
-func start_run(starting_element: StringName = &"ember") -> void:
+## `run_bonuses` comes from GameState.run_bonuses() (academy buildings).
+func start_run(starting_element: StringName = &"ember", run_bonuses: Dictionary = {}) -> void:
 	rng.randomize()
-	loadout = Loadout.create(balance, Registry.elements.get(starting_element))
+	loadout = Loadout.create(balance, Registry.elements.get(starting_element), run_bonuses)
 	mods = loadout.mods()
 	max_hp = mods.max_hp
 	hp = max_hp
@@ -144,7 +145,7 @@ func start_run(starting_element: StringName = &"ember") -> void:
 	level = 1
 	xp = 0
 	pending_levels = 0
-	rerolls = balance.rerolls_per_run
+	rerolls = balance.rerolls_per_run + roundi(run_bonuses.get(&"rerolls", 0.0))
 	prisms = 0
 	fusions = 0
 	shards = 0
@@ -157,7 +158,7 @@ func start_run(starting_element: StringName = &"ember") -> void:
 	_chains.clear()
 	fx.clear()
 	player = Vector2(Vector2(balance.world_size).x * 0.5, balance.player_max.y - 28.0)
-	aim_deg = 90.0
+	aim_deg = balance.start_aim_deg
 	_fire_timer = 0.0
 	hitstop = 0.0
 	trauma = 0.0
@@ -638,6 +639,7 @@ func _deliver(b: Ball, caught: bool) -> void:
 	if caught:
 		var bonus := balance.catch_xp_bonus_max if mods.catch_multiplier >= balance.catch_multiplier + 1 else balance.catch_xp_bonus
 		n = ceili(float(b.gems) * bonus)
+	n = ceili(float(n) * mods.xp_mult)
 	b.gems = 0
 	_gain_xp(n)
 	fx.number(player + Vector2(rng.randf_range(-5, 5), -22), "+%d XP" % n, COL_GEM)

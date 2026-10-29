@@ -1,18 +1,23 @@
 extends Node
 ## Loads game data resources from res://data at startup.
-## Usage: Registry.balance.ball_speed, Registry.elements[&"ember"], Registry.find_recipe(&"ember", &"frost").
+## Usage: Registry.balance.ball_speed, Registry.elements[&"ember"], Registry.find_recipe(&"ember", &"frost"),
+## Registry.economy.run_rewards(...), Registry.buildings[&"library"].
 
 const BALANCE_PATH := "res://data/balance/combat_balance.tres"
 const ELEMENTS_DIR := "res://data/elements"
 const EVOLUTIONS_DIR := "res://data/evolutions"
 const ITEMS_DIR := "res://data/items"
 const ENEMIES_DIR := "res://data/enemies"
+const BUILDINGS_DIR := "res://data/buildings"
+const ECONOMY_PATH := "res://data/balance/economy_balance.tres"
 
 var balance: CombatBalance
 var elements: Dictionary[StringName, ElementData] = {}
 var evolutions: Array[EvolutionRecipe] = []
 var items: Dictionary[StringName, ItemData] = {}
 var enemies: Dictionary[StringName, EnemyData] = {}
+var economy: EconomyBalance
+var buildings: Dictionary[StringName, BuildingData] = {}
 
 
 func _ready() -> void:
@@ -20,6 +25,14 @@ func _ready() -> void:
 	if balance == null:
 		push_error("Registry: missing balance at %s" % BALANCE_PATH)
 		balance = CombatBalance.new()
+	economy = load(ECONOMY_PATH) as EconomyBalance
+	if economy == null:
+		push_error("Registry: missing economy at %s" % ECONOMY_PATH)
+		economy = EconomyBalance.new()
+	for res: Resource in _load_dir(BUILDINGS_DIR):
+		var bd := res as BuildingData
+		if bd:
+			buildings[bd.id] = bd
 	for res: Resource in _load_dir(ELEMENTS_DIR):
 		var e := res as ElementData
 		if e:

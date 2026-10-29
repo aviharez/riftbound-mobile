@@ -14,6 +14,15 @@ const PARCH := Color("F3EBDD")
 const MUTED := Color("a29db8")
 const LINE := Color("3b3654")
 const GEM := Color("7fe0a8")
+const SHARD := Color("a98bff")      # Mana Shards
+const MATERIAL := Color("b0a493")   # Ruins Materials
+const RELIC := Color("E6BD73")      # Ancient Relics
+const DANGER := Color("ff6b6b")
+const RESOURCE_NAMES: Array[String] = ["Mana Shards", "Ruins Materials", "Ancient Relics"]
+
+
+static func resource_colors() -> Array[Color]:
+	return [SHARD, MATERIAL, RELIC]
 
 static var _pixel_font: FontFile
 static var _body_font: FontFile

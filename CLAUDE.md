@@ -8,6 +8,7 @@ A portrait (9:16-ish) mobile pixel-art roguelite. Ricochet combat inspired by th
 
 - Game design overview: `docs/game-overview.md`
 - Combat rules and every tunable number: `docs/combat-spec.md` (source of truth for gameplay)
+- Meta economy, academy buildings, save: `docs/economy-spec.md`
 - Art and display rules: `docs/art-spec.md`
 - Build order and acceptance criteria: `docs/milestones.md`
 - Why things are the way they are: `docs/decisions.md`
@@ -39,9 +40,10 @@ All in-game text, code, comments and docs are in **English**.
 5. **Two render layers.**
    - The game world renders in a `SubViewport` at low resolution (pixel-perfect), shown scaled by an integer factor.
    - HUD, menus, text, portraits and anime illustrations render in the root viewport at native resolution (crisp).
-   - Input arrives in root coordinates. Convert to world coordinates with `Main.screen_to_world()`. Do not read input inside the SubViewport.
+   - Input arrives in root coordinates. Convert with the screen's `screen_to_world()` (`BattleScreen`, `AcademyMap`). Do not read input inside the SubViewport.
 6. **World coordinates are fixed.** The playfield is always 270×560 base units (see art-spec). Extra screen space only reveals decoration; it never changes gameplay distances.
-7. Autoloads stay few: `Registry` (loads data resources). Add new autoloads only when clearly global.
+7. Autoloads stay few: `Registry` (loads data resources) and `GameState` (resources, buildings, save, scene changes). Add new autoloads only when clearly global.
+8. Screens are separate scenes switched with `GameState.go_to()`: `scenes/title/`, `scenes/academy/`, `scenes/battle/`. Hand-off data between screens goes through `GameState`.
 
 ## Folder layout
 
@@ -94,4 +96,4 @@ prototype/   HTML reference prototype (do not ship)
 - Don't copy Ball x Pit's names, art, UI layout or text. Mechanics inspiration only.
 - Don't add third-party addons or plugins without asking.
 - Don't add glow/bloom post-processing to fake "heavy VFX"; follow the VFX rules in art-spec (contrast, hit-stop, flash, flipbooks).
-- Don't build academy, social or expedition systems before the combat vertical slice (M1–M6) is fun.
+- Don't let test tools touch the player's save: runners call `GameState.use_test_save()` (done by `tools/run_runner.gd`).

@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="BuildingData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/data/building_data.gd" id="1_script"]
+
+[resource]
+script = ExtResource("1_script")
+id = &"garden"
+display_name = "Garden"
+description = "Healing herbs grow again where the Rift scorched the soil."
+map_rect = Rect2(188, 470, 96, 72)
+roof_color = Color(0.3725, 0.6196, 0.4314, 1)
+max_level = 3
+starts_repaired = false
+costs = Array[Vector3i]([Vector3i(30, 20, 0), Vector3i(100, 50, 0), Vector3i(250, 100, 1)])
+bonus_stat = &"max_hp"
+bonus_per_level = 2.0
+bonus_format = "+%s max HP in runs"
+is_rift_gate = false
