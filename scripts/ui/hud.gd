@@ -53,8 +53,10 @@ func pause_rect() -> Rect2:
 
 
 func ult_center() -> Vector2:
+	# Right side, just above the stage: over the right wall band and the field edge, out of the
+	# student's movement area so it never sits under the thumb that moves.
 	var s := Vector2(Registry.balance.world_size)
-	return Vector2(s.x - 35.0, s.y - 56.0)
+	return Vector2(s.x - 24.0, Registry.balance.rune_line_y - 52.0)
 
 
 func _process(delta: float) -> void:

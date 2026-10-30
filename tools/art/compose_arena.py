@@ -79,38 +79,33 @@ floor[..., :3] *= 0.8          # mid-dark, so bright projectiles carry the colou
 paste(canvas, floor, WALL_L, CEIL)
 
 # ---------------------------------------------------------------- stage (fills the move zone)
-# Neat rectangular slabs (a built platform, unlike the cobbled floor), widened with a seam-matched band.
-bricks = load("stage_bricks.png")[48:48 + 110, 24:212]            # 188 wide, inside the image's frame
-band = 22
-c = min(range(10, 188 - band - 10), key=lambda c: np.abs(bricks[:, c:c + 2, :3] - bricks[:, c + band:c + band + 2, :3]).mean())
-bricks = np.concatenate([bricks[:, :c + band], bricks[:, c:c + band], bricks[:, c + band:]], axis=1)[:, :WALL_R - WALL_L]
-bricks = recolor_greys(bricks, 215, sat=0.1, val=1.05, max_s=1.0)
-paste(canvas, bricks[: 564 - RUNE], WALL_L, RUNE)
-gold, gold_dk = (214, 165, 92), (110, 76, 36)
-rect(canvas, WALL_L, RUNE - 1, WALL_R, RUNE, (20, 20, 32))           # gap behind the raised edge
-rect(canvas, WALL_L, RUNE, WALL_R, RUNE + 1, (176, 186, 206))        # lit lip of the raised stage
-shade(canvas, WALL_L, RUNE + 1, WALL_R, RUNE + 3, 0.85)
-for (x0, y0, x1, y1) in [(36, 461, 234, 462), (36, 461, 37, 564), (233, 461, 234, 564)]:
-    rect(canvas, x0, y0 + 1, x1, y1 + 1, gold_dk)
-    rect(canvas, x0, y0, x1, y1, gold)
-# Rune circle: two gold ellipses (a circle seen in 3/4 view) with eight rune marks between them.
-cx, cy = 135, 511
-def ellipse(rx, ry, col, thick=1.0):
-    for py in range(cy - ry - 2, cy + ry + 3):
-        for px in range(cx - rx - 2, cx + rx + 3):
-            d = ((px - cx) / rx) ** 2 + ((py - cy) / ry) ** 2
-            if abs(d - 1.0) < thick * 2.0 / max(rx, ry) * 1.5:
-                rect(canvas, px, py, px + 1, py + 1, col)
-for rx, ry in ((36, 21), (27, 15)):
-    ellipse(rx, ry + 1, gold_dk)
-    ellipse(rx, ry, gold)
-import math
-for i in range(8):
-    a = i * math.tau / 8 + math.tau / 16
-    px, py = round(cx + math.cos(a) * 31.5), round(cy + math.sin(a) * 18)
-    for dx, dy in ((0, -1), (-1, 0), (0, 0), (1, 0), (0, 1)):
-        rect(canvas, px + dx, py + dy, px + dx + 1, py + dy + 1, gold)
-ellipse(6, 3, gold)
+# Dark slate flagstones (a built dais, unlike the cobbled floor), mirror-tiled so every edge matches.
+slate = recolor_greys(load("stage_slate.png"), 225, sat=0.12, val=0.78, max_s=1.0)
+dais = np.tile(slate, (1, 2, 1))[: 564 - RUNE, : WALL_R - WALL_L].copy()
+# Raised edge without drawn lines: the platform's top rows catch the light, the floor in front darkens.
+for i, k in enumerate((1.45, 1.3, 1.15, 1.06)):
+    dais[i, :, :3] *= k
+paste(canvas, dais, WALL_L, RUNE)
+for i, k in enumerate((0.55, 0.7, 0.82, 0.92)):
+    shade(canvas, WALL_L, RUNE - 1 - i, WALL_R, RUNE - i, k)
+# Glowing magic circle where the student stands (lifted from a PixelLab render: bright, saturated pixels only).
+src = load("stage_circle.png")
+hsv = np.array([[colorsys.rgb_to_hsv(*(src[y, x, :3] / 255)) for x in range(src.shape[1])] for y in range(src.shape[0])])
+cyan = (hsv[..., 0] > 0.42) & (hsv[..., 0] < 0.62)
+goldh = (hsv[..., 0] > 0.07) & (hsv[..., 0] < 0.17)
+mask = (hsv[..., 1] > 0.45) & (hsv[..., 2] > 0.5) & (cyan | goldh)
+cy_, cx_ = [v.mean() for v in np.nonzero(mask & cyan)]   # the circle is the cyan part
+yy, xx = np.mgrid[0:src.shape[0], 0:src.shape[1]]
+mask &= ((xx - cx_) / 92.0) ** 2 + ((yy - cy_) / 50.0) ** 2 <= 1.0
+ys, xs = np.nonzero(mask)
+y0, y1, x0, x1 = ys.min(), ys.max() + 1, xs.min(), xs.max() + 1
+circle = np.zeros((y1 - y0, x1 - x0, 4))
+sub = mask[y0:y1, x0:x1]
+circle[sub] = src[y0:y1, x0:x1][sub]
+circle[sub, 3] = 230
+print("circle", circle.shape)
+circle = circle[:, : WALL_R - WALL_L - 4]
+paste(canvas, circle, 135 - circle.shape[1] // 2, min(512 - circle.shape[0] // 2, 564 - circle.shape[0]))
 
 # ---------------------------------------------------------------- curbs and shadows (exact boundaries)
 curb_hi, curb, curb_dk = (120, 130, 156), (70, 76, 98), (24, 24, 36)

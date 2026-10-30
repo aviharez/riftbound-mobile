@@ -201,7 +201,7 @@ Caps: particles 900, rings 120, damage numbers 120.
 
 - Top band: HP bar, level, kills, ball count, prisms (when > 0), wave number, time, speed x1/x2/x3, pause. Thin XP bar along the band's bottom edge.
 - Left wall: vertical wave progress toward the boss (crystal top, one marker per wave, boss icon at the bottom; turns red while the boss is alive).
-- Bottom right: ultimate button over the arena, with an energy ring and 4 charge diamonds; fades to 35% opacity when the player stands under it.
+- Right side, just above the stage (centre x 246, y rune line − 52): ultimate button over the right wall and field edge, with an energy ring and 4 charge diamonds; fades to 35% opacity when the player is within 32 of it.
 - Pause menu and level-up/fusion screens show the **4 ball + 4 item slots**.
 
 ## 12. Performance targets
