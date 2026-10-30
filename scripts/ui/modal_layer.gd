@@ -63,10 +63,13 @@ func _open() -> VBoxContainer:
 
 
 func _label(text: String, variation: String, wrap: bool = false) -> Label:
-	var l := Label.new()
+	# Titles and section headings are centred with gold flourishes (reference panels).
+	var l: Label = FlourishLabel.new() if variation == "Heading" or variation == "Title" else Label.new()
 	l.text = text
 	if variation != "":
 		l.theme_type_variation = variation
+	if variation == "Eyebrow" or variation == "Title" or variation == "Heading":
+		l.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	if wrap:
 		l.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		l.custom_minimum_size.x = PANEL_W - 24.0
@@ -155,8 +158,9 @@ func _card(color: Color, tag: String, title: String, desc: String, recipe: Strin
 	col.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	col.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	row.add_child(col)
-	var tag_l := _label(tag.to_upper(), "Heading")
+	var tag_l := _label(tag.to_upper(), "Eyebrow")
 	tag_l.add_theme_font_size_override("font_size", 6)
+	tag_l.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
 	col.add_child(tag_l)
 	col.add_child(_label(title, "CardTitle"))
 	if recipe != "":
@@ -170,6 +174,53 @@ func _card(color: Color, tag: String, title: String, desc: String, recipe: Strin
 	for c: Node in col.get_children():
 		(c as Control).mouse_filter = Control.MOUSE_FILTER_IGNORE
 	return panel
+
+
+## A resource icon (crystal / stone / medallion) on a small dark tile.
+func _res_icon(i: int, size: float) -> Control:
+	var c := Control.new()
+	c.custom_minimum_size = Vector2(size, size)
+	c.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	c.draw.connect(func() -> void:
+		Icons.resource(c, i, c.custom_minimum_size * 0.5, c.custom_minimum_size.x / 12.0))
+	return c
+
+
+## Reward tiles (reference: "Victory rewards"): a framed tile per resource with a big icon, "+N" and its name.
+func _reward_tiles(r: Vector3i) -> Control:
+	var row := HBoxContainer.new()
+	row.alignment = BoxContainer.ALIGNMENT_CENTER
+	row.add_theme_constant_override("separation", 6)
+	var any := false
+	for i in 3:
+		if r[i] <= 0:
+			continue
+		any = true
+		var col := VBoxContainer.new()
+		col.add_theme_constant_override("separation", 1)
+		var tile := PanelContainer.new()
+		tile.add_theme_stylebox_override("panel", UiTheme.card(false, UiTheme.resource_colors()[i]))
+		tile.custom_minimum_size = Vector2(52, 50)
+		var inner := VBoxContainer.new()
+		inner.alignment = BoxContainer.ALIGNMENT_CENTER
+		var ic := _res_icon(i, 24.0)
+		ic.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+		inner.add_child(ic)
+		var n := _label("+%d" % r[i], "CardTitle")
+		n.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		n.add_theme_color_override("font_color", UiTheme.PARCH)
+		n.add_theme_font_size_override("font_size", 9)
+		inner.add_child(n)
+		tile.add_child(inner)
+		col.add_child(tile)
+		var name := _label(UiTheme.RESOURCE_NAMES[i], "Tiny")
+		name.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		name.add_theme_color_override("font_color", UiTheme.MUTED)
+		col.add_child(name)
+		row.add_child(col)
+	if not any:
+		row.add_child(_label("Nothing this time", "Small"))
+	return row
 
 
 ## A small diamond on a dark tile, drawn with a Control so it stays crisp at any scale.
@@ -214,7 +265,7 @@ func _slots_view(loadout: Loadout) -> Control:
 func _slot_row(title: String) -> HBoxContainer:
 	var row := HBoxContainer.new()
 	row.add_theme_constant_override("separation", 3)
-	var l := _label(title, "Heading")
+	var l := _label(title, "Eyebrow")
 	l.add_theme_font_size_override("font_size", 6)
 	l.custom_minimum_size.x = 28.0
 	l.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
@@ -249,7 +300,7 @@ func _slot_cell(color: Color, title: String, level_text: String, maxed: bool, fu
 		n.add_theme_color_override("font_color", UiTheme.MUTED)
 	col.add_child(n)
 	if level_text != "":
-		var lv := _label(level_text, "Heading")
+		var lv := _label(level_text, "Eyebrow")
 		lv.add_theme_font_size_override("font_size", 6)
 		lv.add_theme_color_override("font_color", UiTheme.GOLD if maxed else UiTheme.CYAN)
 		lv.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
@@ -271,7 +322,7 @@ func _resource_row(r: Vector3i, plus: bool = false, have: Vector3i = Vector3i(-1
 		shown += 1
 		var chip := HBoxContainer.new()
 		chip.add_theme_constant_override("separation", 3)
-		chip.add_child(_gem_icon(colors[i], 12.0))
+		chip.add_child(_res_icon(i, 12.0))
 		var l := _label(("+%d" if plus else "%d") % amount, "CardTitle")
 		if have.x >= 0 and have[i] < amount:
 			l.add_theme_color_override("font_color", UiTheme.DANGER)

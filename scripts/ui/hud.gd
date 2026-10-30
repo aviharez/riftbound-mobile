@@ -18,22 +18,38 @@ var visible_size: Vector2 = Vector2(270, 560)
 ## Active touches for the debug overlay: id -> {pos: Vector2 (playfield), role: StringName}.
 var touches: Dictionary = {}
 var _font: Font
+var _display: Font
+var _body: Font
 var _time: float = 0.0
+var _panel: OrnateBox
+var _chip: OrnateBox
+var _btn: OrnateBox
+var _btn_on: OrnateBox
 
 
 func _ready() -> void:
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_font = UiTheme.pixel_font()
+	_display = UiTheme.display_font()
+	_body = UiTheme.body_font()
+	_panel = OrnateBox.make(OrnateBox.Kind.CARD, 0.0)
+	_panel.studs = false
+	_chip = OrnateBox.make(OrnateBox.Kind.PLAQUE, 0.0)
+	_btn = OrnateBox.make(OrnateBox.Kind.CHIP, 0.0)
+	_btn.border = Color(UiTheme.GOLD, 0.8)
+	_btn_on = _btn.tinted(UiTheme.GOLD)
+	_btn_on.top = Color("6a48d8")
+	_btn_on.bottom = Color("3d2596")
 
 
 func speed_rect() -> Rect2:
 	var w := float(Registry.balance.world_size.x)
-	return Rect2(Vector2(w - 60.0, 9.0), BUTTON_SIZE)
+	return Rect2(Vector2(w - 56.0, 7.0), BUTTON_SIZE + Vector2(0, 4))
 
 
 func pause_rect() -> Rect2:
 	var w := float(Registry.balance.world_size.x)
-	return Rect2(Vector2(w - 33.0, 9.0), BUTTON_SIZE)
+	return Rect2(Vector2(w - 30.0, 7.0), BUTTON_SIZE + Vector2(0, 4))
 
 
 func ult_center() -> Vector2:
@@ -70,32 +86,84 @@ func _text(at: Vector2, s: String, c: Color, width: float = -1.0, align: Horizon
 
 func _draw_band() -> void:
 	var b := battle
-	draw_rect(Rect2(-offset.x, 0, visible_size.x, BAND_H), UiTheme.INK)
-	draw_rect(Rect2(-offset.x, BAND_H, visible_size.x, 2), Color("0b1a13"))
-	draw_rect(Rect2(-offset.x, BAND_H, visible_size.x * float(b.xp) / float(b.xp_needed()), 2), UiTheme.GEM)
-	draw_rect(Rect2(-offset.x, BAND_H + 2.0, visible_size.x, 1), Color(UiTheme.GOLD, 0.5))
-	# HP
-	_text(Vector2(8, 15), "HP", UiTheme.PARCH)
-	draw_rect(Rect2(22, 9, 50, 5), Color("2a1520"))
-	draw_rect(Rect2(22, 9, roundf(50.0 * float(b.hp) / float(b.max_hp)), 5), Color("ff5a6a") if b.hp <= 3 else Color("e0566a"))
-	if b.prisms > 0:
-		_text(Vector2(78, 15), "PRISM %d" % b.prisms, PRISM_COLORS[int(_time * 6.0) % PRISM_COLORS.size()])
-	_text(Vector2(8, 28), "LV %d" % b.level, UiTheme.GEM)
-	_text(Vector2(42, 28), "KILL %d" % b.kills, UiTheme.MUTED)
-	_text(Vector2(90, 28), "BALLS %d" % b.balls.size(), UiTheme.MUTED)
-	# Wave + time
-	_text(Vector2(120, 15), "WAVE %02d" % b.wave, UiTheme.GOLD, 80.0, HORIZONTAL_ALIGNMENT_CENTER)
+	var ci := get_canvas_item()
+	# Band background: deep indigo fading down, with a gold rule.
+	var band := Rect2(-offset.x, 0, visible_size.x, BAND_H)
+	draw_polygon(PackedVector2Array([band.position, Vector2(band.end.x, 0), band.end, Vector2(band.position.x, band.end.y)]),
+		PackedColorArray([Color("0d0c1a"), Color("0d0c1a"), Color(0.07, 0.065, 0.14, 0.92), Color(0.07, 0.065, 0.14, 0.92)]))
+	draw_line(Vector2(band.position.x, BAND_H + 0.5), Vector2(band.end.x, BAND_H + 0.5), Color(UiTheme.GOLD, 0.55), 1.0)
+
+	# Portrait in a gold ring.
+	var pc := Vector2(17, 17)
+	draw_circle(pc, 14.0, Color("0b0a16"))
+	if b.character and b.character.sprite_sheet:
+		var head := SpriteKit.head_rect(b.character.sprite_sheet)
+		draw_texture_rect_region(b.character.sprite_sheet, Rect2(pc - Vector2(9, 9), Vector2(18, 18)), head)
+	draw_arc(pc, 13.5, 0.0, TAU, 40, UiTheme.GOLD, 1.5, true)
+	draw_arc(pc, 15.5, 0.0, TAU, 40, Color(UiTheme.GOLD, 0.35), 1.0, true)
+	_diamond(pc + Vector2(0, 15.5), 2.5, UiTheme.VIOLET, UiTheme.GOLD)
+
+	# HP / level panel.
+	var pr := Rect2(30, 5, 66, 24)
+	_panel.draw(ci, pr)
+	var hp_frac := float(b.hp) / float(b.max_hp)
+	_heart(Vector2(36, 11.5))
+	draw_rect(Rect2(41, 9, 51, 5), Color("2a1220"))
+	draw_rect(Rect2(41, 9, roundf(51.0 * hp_frac), 5), Color("ff5a6a") if b.hp <= 3 else Color("d8435a"))
+	draw_rect(Rect2(41, 9, roundf(51.0 * hp_frac), 1), Color(1, 1, 1, 0.25))
+	_btext(Vector2(41, 22), "%d / %d" % [b.hp, b.max_hp], UiTheme.PARCH, 6)
+	draw_string(_display, Vector2(34, 26.5), "Lv. %d" % b.level, HORIZONTAL_ALIGNMENT_LEFT, -1, 6, UiTheme.GOLD)
+	var xp_frac := float(b.xp) / float(b.xp_needed())
+	draw_rect(Rect2(58, 23, 34, 3), Color("0c1a2a"))
+	draw_rect(Rect2(58, 23, roundf(34.0 * xp_frac), 3), Color("4fb4ff"))
+
+	# Wave plaque: WAVE NN, timer and kills.
+	var wr := Rect2(100, 4, 74, 27)
+	_chip.draw(ci, wr)
+	draw_string(_display, Vector2(wr.position.x, 15), "WAVE %02d" % b.wave, HORIZONTAL_ALIGNMENT_CENTER, wr.size.x, 9, UiTheme.GOLD)
 	var t := int(b.run_time)
-	_text(Vector2(120, 28), "%d:%02d" % [floori(b.run_time / 60.0), t % 60], UiTheme.MUTED, 80.0, HORIZONTAL_ALIGNMENT_CENTER)
+	_clock(Vector2(112, 23))
+	_btext(Vector2(117, 26), "%d:%02d" % [floori(b.run_time / 60.0), t % 60], UiTheme.PARCH, 7)
+	_skull(Vector2(142, 23))
+	_btext(Vector2(147, 26), str(b.kills), UiTheme.PARCH, 7)
+	if b.prisms > 0:
+		_diamond(Vector2(181, 12), 3.5, PRISM_COLORS[int(_time * 6.0) % PRISM_COLORS.size()], UiTheme.GOLD)
+		_btext(Vector2(186, 15), "x%d" % b.prisms, UiTheme.PARCH, 7)
+	_btext(Vector2(178, 27), "%d balls" % b.balls.size(), UiTheme.MUTED, 6)
+
 	# Buttons
 	_button(speed_rect(), "x%d" % b.speed, b.speed > 1)
 	_button(pause_rect(), "II", false)
+	draw_string(_display, Vector2(pause_rect().position.x - 4.0, pause_rect().end.y + 6.0), "PAUSE", HORIZONTAL_ALIGNMENT_CENTER, pause_rect().size.x + 8.0, 5, Color(UiTheme.GOLD, 0.8))
+
+
+func _btext(at: Vector2, s: String, c: Color, size: int = 7) -> void:
+	draw_string(_body, at, s, HORIZONTAL_ALIGNMENT_LEFT, -1, size, c)
+
+
+func _heart(c: Vector2) -> void:
+	var col := Color("ff5a6a")
+	draw_circle(c + Vector2(-1.3, -0.8), 1.7, col)
+	draw_circle(c + Vector2(1.3, -0.8), 1.7, col)
+	draw_colored_polygon(PackedVector2Array([c + Vector2(-3, -0.3), c + Vector2(3, -0.3), c + Vector2(0, 3)]), col)
+
+
+func _clock(c: Vector2) -> void:
+	draw_arc(c, 2.6, 0.0, TAU, 16, UiTheme.PARCH, 0.8, true)
+	draw_line(c, c + Vector2(0, -1.8), UiTheme.PARCH, 0.8)
+	draw_line(c, c + Vector2(1.3, 0), UiTheme.PARCH, 0.8)
+
+
+func _skull(c: Vector2) -> void:
+	draw_circle(c + Vector2(0, -0.6), 2.5, UiTheme.PARCH)
+	draw_rect(Rect2(c.x - 1.5, c.y + 1.0, 3, 1.8), UiTheme.PARCH)
+	draw_circle(c + Vector2(-0.9, -0.6), 0.7, Color("0d0c1a"))
+	draw_circle(c + Vector2(0.9, -0.6), 0.7, Color("0d0c1a"))
 
 
 func _button(r: Rect2, label: String, active: bool) -> void:
-	draw_rect(r, Color("3a2a6e") if active else UiTheme.INK_2)
-	draw_rect(r, Color(UiTheme.GOLD, 0.7), false, 1.0)
-	_text(Vector2(r.position.x, r.position.y + 11.0), label, UiTheme.PARCH, r.size.x, HORIZONTAL_ALIGNMENT_CENTER)
+	(_btn_on if active else _btn).draw(get_canvas_item(), r)
+	draw_string(_display, Vector2(r.position.x, r.position.y + r.size.y * 0.5 + 3.5), label, HORIZONTAL_ALIGNMENT_CENTER, r.size.x, 9, UiTheme.PARCH)
 
 
 func _diamond(c: Vector2, r: float, fill: Color, stroke: Color = Color(0, 0, 0, 0)) -> void:
@@ -142,34 +210,56 @@ func _draw_ult() -> void:
 	var ready := b.energy >= bal.energy_max
 	var frac := b.energy / bal.energy_max
 	var near := b.player.distance_to(c) < 32.0
-	var alpha := 0.35 if near else 0.92
+	var alpha := 0.35 if near else 0.95
+	var elem := b.ultimate_color()
 	if ready:
-		for i in 3:
-			draw_circle(c, r + 9.0 - float(i) * 3.0, Color(1.0, 0.55, 0.24, 0.08 * alpha))
-	draw_circle(c, r + 2.0, Color(0.04, 0.04, 0.09, 0.85 * alpha))
-	draw_circle(c, r - 1.0, Color(Color("3a2a6e") if ready else Color("1d1d33"), alpha))
-	draw_arc(c, r + 1.0, 0.0, TAU, 40, Color(UiTheme.GOLD, 0.25 * alpha), 2.0)
+		var pulse := 0.5 + 0.5 * sin(_time * 6.0)
+		for i in 4:
+			draw_circle(c, r + 10.0 - float(i) * 2.5, Color(elem, (0.05 + 0.04 * pulse) * alpha))
+	# Body: dark disc with a soft inner glow in the element colour.
+	draw_circle(c, r + 2.5, Color(0.03, 0.03, 0.07, 0.9 * alpha))
+	for i in 5:
+		var k := float(i) / 4.0
+		var col := Color("17152e").lerp(elem.darkened(0.45) if ready else Color("262340"), k)
+		draw_circle(c, (r - 1.0) * (1.0 - k * 0.55), Color(col, alpha))
+	# Ornate ring: gold double line with four diamonds.
+	draw_arc(c, r + 1.5, 0.0, TAU, 48, Color(UiTheme.GOLD, 0.55 * alpha), 1.0, true)
+	draw_arc(c, r + 3.5, 0.0, TAU, 48, Color(UiTheme.GOLD, 0.35 * alpha), 1.0, true)
 	if frac > 0.0:
-		var ring_col := (Color("ffd27a") if int(_time * 6.0) % 2 == 0 else UiTheme.GOLD) if ready else UiTheme.CYAN
-		draw_arc(c, r + 1.0, -PI * 0.5, -PI * 0.5 + TAU * frac, 40, Color(ring_col, alpha), 2.0)
-	var f := float(int(_time * 10.0) % 2) if ready else 0.0
-	var flame := b.ultimate_color() if ready else Color("5d5068")
-	draw_rect(Rect2(c.x - 4, c.y - 1, 8, 7), Color(flame, alpha))
-	draw_rect(Rect2(c.x - 2, c.y - 5 - f, 5, 5), Color(flame, alpha))
-	draw_rect(Rect2(c.x - 1, c.y - 8 - f, 2, 3), Color(flame, alpha))
-	draw_rect(Rect2(c.x - 1, c.y + 1, 3, 4), Color(Color("ffd27a") if ready else Color("7d7088"), alpha))
-	# Center the name under the button, but keep it inside the playfield (long names like VERDANT BLOOM).
+		var ring_col := (Color("ffe3a3") if int(_time * 6.0) % 2 == 0 else UiTheme.GOLD) if ready else UiTheme.CYAN
+		draw_arc(c, r + 2.5, -PI * 0.5, -PI * 0.5 + TAU * frac, 48, Color(ring_col, alpha), 2.0, true)
+	for a: float in [0.0, PI * 0.5, PI, PI * 1.5]:
+		_diamond(c + Vector2.from_angle(a) * (r + 3.0), 2.2, Color(UiTheme.VIOLET, alpha), Color(UiTheme.GOLD, alpha))
+	_flame(c + Vector2(0, 1), 7.5, elem if ready else Color("6a6080"), alpha)
+	# Name under the button, kept inside the playfield.
 	var ult_name := b.character.ultimate_name.to_upper() if b.character else "ULTIMATE"
-	var tw := _font.get_string_size(ult_name, HORIZONTAL_ALIGNMENT_LEFT, -1, 8).x
+	var tw := _display.get_string_size(ult_name, HORIZONTAL_ALIGNMENT_LEFT, -1, 7).x
 	var tx := minf(c.x - tw * 0.5, float(Registry.balance.world_size.x) - tw - 3.0)
-	_text(Vector2(tx, c.y + r + 10.0), ult_name, Color(UiTheme.GOLD if ready else Color("bdb7d0"), alpha))
+	draw_string_outline(_display, Vector2(tx, c.y + r + 12.0), ult_name, HORIZONTAL_ALIGNMENT_LEFT, -1, 7, 2, Color(0, 0, 0, 0.7 * alpha))
+	draw_string(_display, Vector2(tx, c.y + r + 12.0), ult_name, HORIZONTAL_ALIGNMENT_LEFT, -1, 7, Color(UiTheme.GOLD if ready else Color("cfc8e0"), alpha))
 	for i in 4:
 		var on := frac >= float(i + 1) / 4.0 - 0.0001
-		var dc := Vector2(c.x - 12.0 + float(i) * 8.0, c.y + r + 16.0)
+		var dc := Vector2(c.x - 12.0 + float(i) * 8.0, c.y + r + 18.0)
 		if on:
 			_diamond(dc, 2.5, Color(Color("ffd27a") if ready else UiTheme.CYAN, alpha))
 		else:
 			_diamond(dc, 2.5, Color(0.04, 0.04, 0.09, 0.85 * alpha), Color(UiTheme.MUTED, 0.6 * alpha))
+
+
+## A smooth flame (teardrop with an inner core), flickering.
+func _flame(c: Vector2, h: float, col: Color, alpha: float) -> void:
+	var f := sin(_time * 14.0) * 0.6
+	var outer := PackedVector2Array()
+	var inner := PackedVector2Array()
+	for i in 17:
+		var t := float(i) / 16.0 * TAU
+		var w := sin(t * 0.5)
+		var x := sin(t) * h * 0.55 * (0.6 + 0.4 * w)
+		var y := -cos(t) * h * (0.75 if cos(t) > 0.0 else 0.5) * (1.0 + (0.18 if cos(t) > 0.0 else 0.0))
+		outer.append(c + Vector2(x + (f if y < 0.0 else 0.0), y))
+		inner.append(c + Vector2(x * 0.5, y * 0.55 + h * 0.18))
+	draw_colored_polygon(outer, Color(col, alpha))
+	draw_colored_polygon(inner, Color(col.lightened(0.55), alpha))
 
 
 func _draw_popups() -> void:
@@ -179,6 +269,6 @@ func _draw_popups() -> void:
 		var k := p.t / p.max_t
 		var a := k / 0.15 if k < 0.15 else ((1.0 - k) / 0.3 if k > 0.7 else 1.0)
 		var y := 180.0 + float(i) * 16.0 - roundf(k * 12.0)
-		_text(Vector2(1, y + 1), p.text, Color(0, 0, 0, a), w, HORIZONTAL_ALIGNMENT_CENTER, 12)
-		_text(Vector2(0, y), p.text, Color(p.color, a), w, HORIZONTAL_ALIGNMENT_CENTER, 12)
+		draw_string_outline(_display, Vector2(0, y), p.text, HORIZONTAL_ALIGNMENT_CENTER, w, 11, 3, Color(0.05, 0.02, 0.12, a))
+		draw_string(_display, Vector2(0, y), p.text, HORIZONTAL_ALIGNMENT_CENTER, w, 11, Color(p.color, a))
 		i += 1

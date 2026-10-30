@@ -106,8 +106,15 @@ func show_result(battle: Battle, rewards: Vector3i, retreated: bool) -> void:
 	var box := _open()
 	box.add_child(_label("Retreated" if retreated else "Run over", "Eyebrow"))
 	box.add_child(_label("Back to the Academy" if retreated else "The line has fallen", "Title"))
+	if battle.character and battle.character.sprite_sheet:
+		var p := Portrait.make(battle.character, 96.0, false, false)
+		p.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+		box.add_child(p)
+		var ribbon := _label("Wave %d reached" % battle.wave, "CardTitle")
+		ribbon.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		box.add_child(ribbon)
 	box.add_child(_label("Rewards", "Heading"))
-	box.add_child(_resource_row(rewards, true))
+	box.add_child(_reward_tiles(rewards))
 	var grid := GridContainer.new()
 	grid.columns = 2
 	grid.add_theme_constant_override("h_separation", 12)

@@ -251,13 +251,7 @@ func _draw_building(b: BuildingData) -> void:
 	# Name plate + status.
 	var label := b.display_name.to_upper()
 	var status := "RUINED" if ruined else "LV%d" % lv
-	draw_string(font, Vector2(x - 20, y + h + 16), label, HORIZONTAL_ALIGNMENT_CENTER, w + 40, 8, UiTheme.PARCH)
-	draw_string(font, Vector2(x - 20, y + h + 25), status, HORIZONTAL_ALIGNMENT_CENTER, w + 40, 8, UiTheme.DANGER if ruined else UiTheme.GOLD)
-	# "!" when the next level is affordable.
-	if GameState.can_upgrade(b.id):
-		var bp := Vector2(x + w - 4, y - 6 + roundf(sin(_time * 4.0) * 2.0))
-		draw_circle(bp, 6.0, UiTheme.GOLD)
-		draw_string(font, bp + Vector2(-6, 3), "!", HORIZONTAL_ALIGNMENT_CENTER, 12, 8, UiTheme.INK)
+	_plaque(Vector2(x + w * 0.5, y + h + 12.0), label, status, ruined, GameState.can_upgrade(b.id))
 
 
 func _draw_gate(b: BuildingData, lv: int) -> void:
@@ -289,3 +283,25 @@ func _draw_avatar() -> void:
 	draw_rect(Rect2(p.x - 3, p.y - 9 - bob, 7, 3), student.hair_color)
 	draw_rect(Rect2(p.x - 3 if _facing > 0.0 else p.x + 2, p.y - 7 - bob, 2, 6), student.hair_color)
 	draw_rect(Rect2(p.x + (2 if _facing > 0.0 else -3), p.y - 5 - bob, 1, 1), Color("3a2a1e"))
+
+
+## Name plaque under a building (reference: hub labels): dark plate, gold edge, a gem, the level line,
+## and a bobbing red "!" badge when the next level is affordable. Pixel art, whole-pixel positions.
+func _plaque(center: Vector2, label: String, status: String, ruined: bool, badge: bool) -> void:
+	var tw := font.get_string_size(label, HORIZONTAL_ALIGNMENT_LEFT, -1, 8).x
+	var w := roundf(tw + 18.0)
+	var r := Rect2(roundf(center.x - w * 0.5), roundf(center.y - 6.0), w, 12.0)
+	draw_rect(r.grow(1.0), Color("07060d"))
+	draw_rect(r, Color("1b1934"))
+	draw_rect(Rect2(r.position, Vector2(r.size.x, 1)), Color(UiTheme.GOLD, 0.8))
+	draw_rect(Rect2(r.position + Vector2(0, r.size.y - 1.0), Vector2(r.size.x, 1)), Color(UiTheme.GOLD, 0.5))
+	var g := r.position + Vector2(6, 6)
+	draw_colored_polygon(PackedVector2Array([g + Vector2(0, -3), g + Vector2(3, 0), g + Vector2(0, 3), g + Vector2(-3, 0)]), Color("8b6cf0") if not ruined else Color("5a5470"))
+	draw_string(font, Vector2(r.position.x + 11.0, r.position.y + 9.0), label, HORIZONTAL_ALIGNMENT_LEFT, -1, 8, UiTheme.PARCH)
+	draw_string(font, Vector2(r.position.x - 20.0, r.end.y + 9.0), status, HORIZONTAL_ALIGNMENT_CENTER, r.size.x + 40.0, 8, UiTheme.DANGER if ruined else UiTheme.GOLD)
+	if badge:
+		var bp := Vector2(r.end.x, r.position.y - 1.0 + roundf(sin(_time * 4.0)))
+		draw_circle(bp, 5.0, Color("07060d"))
+		draw_circle(bp, 4.0, Color("e0485a"))
+		draw_rect(Rect2(bp.x - 0.5, bp.y - 2.5, 1, 3), Color.WHITE)
+		draw_rect(Rect2(bp.x - 0.5, bp.y + 1.5, 1, 1), Color.WHITE)

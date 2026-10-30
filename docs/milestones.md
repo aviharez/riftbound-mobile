@@ -146,7 +146,10 @@ Done (PixelLab, see `assets/art/CREDITS.md`):
 - [x] Mite, shard, brute sprites, centred on their 24 px hitboxes. Hit flash is a cached white silhouette; spawn fades in instead of scaling.
 - [x] Arena floor from a PixelLab tileset, recoloured to low-saturation blue-grey; dim props on the ceiling ledge and in the move zone.
 
-Still to do: boss (54 px), walk/idle/cast animations, ball/gem/prism sprites, VFX flipbooks, wall and Rift art, HUD skin, academy buildings.
+- [x] UI restyle after the owner's mockups: ornate panels and buttons, Cinzel headings, battle HUD (portrait ring, HP/XP, wave plaque, round ultimate), academy HUD (resource pills, quest tracker, icon nav with badges), building plaques, reward tiles, dialogue plaque.
+- [x] VFX: additive glow layer (ball halos and trails, flares, lightning glow, torches, rune circle), outlined crit numbers, portal shader, dithered vignette, gothic walls with banners and torches.
+
+Still to do: boss (54 px), walk/idle/cast animations, ball/gem/prism sprites, explosion flipbooks, academy building sprites, scene illustrations.
 
 ## Later
 

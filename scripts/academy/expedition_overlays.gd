@@ -104,7 +104,7 @@ func show_result(id: StringName, result: Dictionary) -> void:
 	box.add_child(_label("Expedition complete" if ok else "They came back early", "Title"))
 	box.add_child(_label("The team found what they were looking for." if ok else "It was too dangerous. They saved what they could.", "", true))
 	box.add_child(_label("Rewards", "Heading"))
-	box.add_child(_resource_row(result.rewards, true))
+	box.add_child(_reward_tiles(result.rewards))
 	if result.rare:
 		var r := _label("Rare find: an Ancient Relic!", "CardTitle")
 		r.add_theme_color_override("font_color", UiTheme.RELIC)

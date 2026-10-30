@@ -35,6 +35,16 @@ class Number:
 	var color: Color
 	var t: float = 0.0
 	var max_t: float = 0.6
+	var crit: bool = false
+
+
+## A 4-point star flash (hits, kills), drawn by the additive glow layer.
+class Flare:
+	var pos: Vector2
+	var color: Color
+	var size: float
+	var t: float = 0.0
+	var life: float = 0.18
 
 
 var balance: CombatBalance
@@ -43,10 +53,19 @@ var _particles: Array[Particle] = []
 var _rings: Array[Ring] = []
 var _bolts: Array[Bolt] = []
 var _numbers: Array[Number] = []
+var flares: Array[Flare] = []
+var glow: FxGlow
 var _rng := RandomNumberGenerator.new()
 
 
+func _ready() -> void:
+	glow = FxGlow.new()
+	glow.fx = self
+	add_child(glow)
+
+
 func clear() -> void:
+	flares.clear()
 	_particles.clear()
 	_rings.clear()
 	_bolts.clear()
@@ -103,14 +122,33 @@ func bolt(from: Vector2, to: Vector2, color: Color) -> void:
 	_bolts.append(b)
 
 
-func number(at: Vector2, text: String, color: Color) -> void:
+func number(at: Vector2, text: String, color: Color, crit: bool = false) -> void:
 	if _numbers.size() >= balance.max_damage_numbers:
 		return
 	var n := Number.new()
 	n.pos = at
 	n.text = text
 	n.color = color
+	n.crit = crit
+	if crit:
+		n.max_t = 0.8
 	_numbers.append(n)
+
+
+func flare(at: Vector2, color: Color, size: float = 5.0, life: float = 0.18) -> void:
+	if flares.size() >= balance.max_flares:
+		return
+	var f := Flare.new()
+	f.pos = at
+	f.color = color
+	f.size = size
+	f.life = life
+	flares.append(f)
+
+
+## Live bolts, for the glow layer.
+func bolts() -> Array[Bolt]:
+	return _bolts
 
 
 func step(dt: float) -> void:
@@ -131,6 +169,9 @@ func step(dt: float) -> void:
 		n.t += dt
 		n.pos.y -= 16.0 * dt
 	_numbers = _numbers.filter(func(n: Number) -> bool: return n.t < n.max_t)
+	for f: Flare in flares:
+		f.t += dt
+	flares = flares.filter(func(f: Flare) -> bool: return f.t < f.life)
 
 
 func _process(_delta: float) -> void:
@@ -155,7 +196,16 @@ func _draw() -> void:
 		var a := clampf(p.life / p.max_life * 1.4, 0.0, 1.0)
 		draw_rect(Rect2(p.pos.round(), Vector2(p.size, p.size)), Color(p.color, p.color.a * a))
 	for n: Number in _numbers:
-		var a := 1.0 - n.t / n.max_t
-		var at := n.pos.round() + Vector2(-20.0, 0.0)
-		draw_string(font, at + Vector2(1, 1), n.text, HORIZONTAL_ALIGNMENT_CENTER, 40.0, 8, Color(0, 0, 0, a * 0.8))
-		draw_string(font, at, n.text, HORIZONTAL_ALIGNMENT_CENTER, 40.0, 8, Color(n.color, a))
+		var k := n.t / n.max_t
+		var a := 1.0 - k * k
+		var at := n.pos.round() + Vector2(-24.0, 0.0)
+		var outline := Color(0.08, 0.02, 0.12, a)
+		var sz := 8
+		if n.crit:
+			# Pop in big, then settle (whole font sizes only).
+			sz = 16 if n.t < 0.12 else 8
+			if n.t < 0.12:
+				at.y -= 4.0
+		for o: Vector2 in [Vector2(-1, 0), Vector2(1, 0), Vector2(0, -1), Vector2(0, 1), Vector2(1, 1)]:
+			draw_string(font, at + o, n.text, HORIZONTAL_ALIGNMENT_CENTER, 48.0, sz, outline)
+		draw_string(font, at, n.text, HORIZONTAL_ALIGNMENT_CENTER, 48.0, sz, Color(n.color, a))

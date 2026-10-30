@@ -37,7 +37,7 @@ tools/screenshot.sh test 1080x2400              # single frame of the start scre
 | [`docs/decisions.md`](docs/decisions.md) | Decision log and open questions |
 | [`docs/engine-reference/`](docs/engine-reference/) | Godot 4.4–4.7 API changes (from Claude Code Game Studios, MIT) |
 | [`assets/art/`](assets/art/) | Palette, art provenance |
-| [`assets/fonts/`](assets/fonts/) | Silkscreen and Pixelify Sans (SIL Open Font License, licenses alongside) |
+| [`assets/fonts/`](assets/fonts/) | Silkscreen, Pixelify Sans and Cinzel (SIL Open Font License, licenses alongside) |
 | [`prototype/`](prototype/) | HTML combat prototype (behavior reference) |
 
 ## Layout

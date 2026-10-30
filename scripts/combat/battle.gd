@@ -775,9 +775,11 @@ func _hit_enemy(e: Enemy, dmg: int, charged: bool, src: BallSlot, is_burn: bool 
 	if not charged:
 		sparks = [Color.WHITE, src.glow_color if src else Color("e8e8f0")]
 	fx.burst(c + Vector2(rng.randf_range(-5, 5), rng.randf_range(-5, 5)), sparks, 3, 55.0, 0.25)
+	if not is_burn:
+		fx.flare(c + Vector2(rng.randf_range(-4, 4), rng.randf_range(-4, 4)), COL_GOLD if charged else (src.glow_color if src else Color.WHITE), 7.0 if charged else 4.0)
 	if settings.damage_numbers:
-		var col := COL_GOLD if charged else (Color("ff9a5a") if is_burn else COL_PARCH)
-		fx.number(Vector2(c.x + rng.randf_range(-6, 6), e.pos.y + 10.0), str(dmg), col)
+		var col := Color("ffb347") if charged else (Color("ff9a5a") if is_burn else COL_PARCH)
+		fx.number(Vector2(c.x + rng.randf_range(-6, 6), e.pos.y + 10.0), str(dmg), col, charged)
 	if src:
 		_apply_effects(e, dmg, src)
 	if e.hp <= 0:
@@ -835,6 +837,7 @@ func _kill(e: Enemy) -> void:
 		bosses += 1
 		fx.burst(c, [Color("ff6b6b"), Color("6b4aa8"), Color("E6BD73"), Color.WHITE], 90, 170.0, 0.9, 2.0)
 		fx.ring(c, 68.0, Color("ff6b6b"), 0.5)
+		fx.flare(c, Color("ffe3a3"), 24.0, 0.4)
 		fx.ring(c, 41.0, Color("E6BD73"), 0.4)
 		hitstop = balance.hitstop_boss
 		trauma = 1.0
@@ -842,6 +845,8 @@ func _kill(e: Enemy) -> void:
 	else:
 		var big := e.data.hp_multiplier >= 2.0
 		fx.burst(c, _enemy_colors(e.data.id), 26 if big else 16, 90.0, 0.6, 2.0)
+		fx.burst(c, [Color("2a1650"), Color("4b2a86")], 10 if big else 6, 50.0, 0.5, 2.0)
+		fx.flare(c, Color("c9b6ff"), 12.0 if big else 9.0, 0.24)
 		fx.ring(c, 26.0 if big else 17.0, COL_CYAN if e.data.death_blast_radius > 0.0 else Color("a98bff"))
 		hitstop = minf(balance.hitstop_cap, hitstop + balance.hitstop_kill)
 		trauma = minf(1.0, trauma + (0.25 if big else 0.1))

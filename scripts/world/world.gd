@@ -32,11 +32,56 @@ var _props: Array = [
 
 ## Visible area in playfield coordinates. Set by Main whenever the screen size changes.
 var visible_rect: Rect2 = Rect2(0, 0, 270, 560)
+var _portal: ColorRect
+var _vignette: ColorRect
+
+
+func _ready() -> void:
+	var b := Registry.balance
+	# Rift portal (shader) behind the enemies, centred on the ceiling.
+	_portal = ColorRect.new()
+	_portal.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_portal.size = Vector2(96, 40)
+	_portal.position = Vector2(float(b.world_size.x) * 0.5 - 48.0, b.ceiling_y - 14.0)
+	var pm := ShaderMaterial.new()
+	pm.shader = preload("res://assets/shaders/portal.gdshader")
+	_portal.material = pm
+	add_child(_portal)
+	move_child(_portal, 0)
+	# Dithered vignette over everything in the world.
+	_vignette = ColorRect.new()
+	_vignette.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	var vm := ShaderMaterial.new()
+	vm.shader = preload("res://assets/shaders/vignette.gdshader")
+	_vignette.material = vm
+	_vignette.z_index = 2
+	add_child(_vignette)
+	_layout_overlays()
 
 
 func set_visible_rect(r: Rect2) -> void:
 	visible_rect = r
+	_layout_overlays()
 	queue_redraw()
+
+
+func _layout_overlays() -> void:
+	if _vignette:
+		_vignette.position = visible_rect.position
+		_vignette.size = visible_rect.size
+
+
+## Torch positions on the walls (playfield coordinates); FxGlow lights them.
+func torch_points() -> Array[Vector2]:
+	var b := Registry.balance
+	var wall := float(b.wall_width)
+	var out: Array[Vector2] = []
+	var y := b.ceiling_y + 70.0
+	while y < b.rune_line_y:
+		out.append(Vector2(wall * 0.5, y))
+		out.append(Vector2(float(b.world_size.x) - wall * 0.5, y))
+		y += 130.0
+	return out
 
 
 func _draw() -> void:
@@ -45,14 +90,10 @@ func _draw() -> void:
 	var wall := float(b.wall_width)
 	var field := Rect2(wall, 0.0, size.x - wall * 2.0, size.y)
 
-	# Extra visible area + walls: stone blocks.
+	# Extra visible area + walls: gothic stone with offset blocks, banners and torches.
 	draw_rect(visible_rect, COL_OUTER)
-	var y := floorf(visible_rect.position.y / 12.0) * 12.0
-	while y < visible_rect.end.y:
-		var c := COL_WALL_A if int(y / 12.0) % 2 == 0 else COL_WALL_B
-		draw_rect(Rect2(visible_rect.position.x, y + 1.0, field.position.x - visible_rect.position.x - 1.0, 10.0), c)
-		draw_rect(Rect2(field.end.x + 1.0, y + 1.0, visible_rect.end.x - field.end.x - 1.0, 10.0), c)
-		y += 12.0
+	_draw_wall(Rect2(visible_rect.position.x, visible_rect.position.y, field.position.x - visible_rect.position.x, visible_rect.size.y), false)
+	_draw_wall(Rect2(field.end.x, visible_rect.position.y, visible_rect.end.x - field.end.x, visible_rect.size.y), true)
 
 	# Field floor: 16 px tiles, desaturated so projectiles carry the color.
 	var ty := 0
@@ -99,3 +140,51 @@ func _draw() -> void:
 		draw_rect(Rect2(x, b.rune_line_y - 2.0, 1.0, 5.0), COL_RUNE)
 		draw_rect(Rect2(x - 2.0, b.rune_line_y, 5.0, 1.0), COL_RUNE)
 		x += 34.0
+
+
+## A wall strip: stone blocks in staggered courses with a lit inner edge, banners and torch sconces.
+func _draw_wall(r: Rect2, right_side: bool) -> void:
+	if r.size.x <= 0.0:
+		return
+	var b := Registry.balance
+	var y := floorf(r.position.y / 8.0) * 8.0
+	var row := 0
+	while y < r.end.y:
+		var off := 4.0 if row % 2 == 0 else 0.0
+		var x := r.position.x - off
+		while x < r.end.x:
+			var shade := COL_WALL_A if absi(hash(Vector2i(int(x), int(y)))) % 3 != 0 else COL_WALL_B
+			var bx := maxf(x, r.position.x)
+			var bw := minf(x + 9.0, r.end.x) - bx
+			if bw > 0.0:
+				draw_rect(Rect2(bx, y + 1.0, bw, 7.0), shade)
+				draw_rect(Rect2(bx, y + 1.0, bw, 1.0), Color(shade.lightened(0.12)))
+			x += 10.0
+		y += 8.0
+		row += 1
+	# Inner edge facing the arena: lit stone trim.
+	var edge_x := r.position.x if right_side else r.end.x - 2.0
+	draw_rect(Rect2(edge_x, b.ceiling_y, 2.0, r.end.y - b.ceiling_y), Color("2a2b3c"))
+	# Banners between torches (navy with gold trim and a violet gem), only where the wall is wide enough.
+	var cx := r.position.x + r.size.x * 0.5 if r.size.x < 30.0 else (r.position.x + 7.0 if right_side else r.end.x - 7.0)
+	var by := b.ceiling_y + 132.0
+	while by < b.rune_line_y - 40.0:
+		var bw := 9.0
+		var bx := roundf(cx - bw * 0.5)
+		draw_rect(Rect2(bx - 1.0, by - 1.0, bw + 2.0, 1.0), Color("8a6a3a"))
+		draw_rect(Rect2(bx, by, bw, 22.0), Color("1f2a5c"))
+		draw_rect(Rect2(bx, by, 1.0, 22.0), Color(UiTheme.GOLD, 0.6))
+		draw_rect(Rect2(bx + bw - 1.0, by, 1.0, 22.0), Color(UiTheme.GOLD, 0.6))
+		draw_colored_polygon(PackedVector2Array([Vector2(bx, by + 22.0), Vector2(bx + bw, by + 22.0), Vector2(bx + bw * 0.5, by + 26.0)]), Color("1f2a5c"))
+		draw_rect(Rect2(bx + 3.0, by + 8.0, 3.0, 3.0), Color("8b6cf0"))
+		draw_rect(Rect2(bx + 4.0, by + 7.0, 1.0, 5.0), Color("8b6cf0"))
+		by += 260.0
+	for tp: Vector2 in torch_points():
+		if (tp.x > float(b.world_size.x) * 0.5) != right_side:
+			continue
+		var t := tp.round()
+		draw_rect(Rect2(t.x - 2.0, t.y + 2.0, 5.0, 2.0), Color("5a4a3a"))
+		draw_rect(Rect2(t.x - 1.0, t.y + 4.0, 3.0, 3.0), Color("3a2e26"))
+		var fl := float(int(Time.get_ticks_msec() / 90) % 2)
+		draw_rect(Rect2(t.x - 1.0, t.y - 1.0 - fl, 3.0, 3.0 + fl), Color("ff8a3d"))
+		draw_rect(Rect2(t.x, t.y - fl, 1.0, 2.0), Color("ffe3a3"))

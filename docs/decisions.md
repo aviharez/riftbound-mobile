@@ -41,6 +41,9 @@ Newest at the bottom. When a decision changes, add a new entry instead of editin
 | 2026-10-30 | Research is bought instantly and lasts forever; topics are gated by Library level. One new stat, `reward_mult`, boosts run shards and materials (not relics). | Gives the Library a second purpose besides its XP bonus, without another timer on top of expeditions. |
 | 2026-10-30 | Quests read existing counters instead of listening for events; "Stories" tab renamed "Journal" with Quests / Bonds / Clues tabs. | No hooks to forget in other systems; earlier progress counts. Five bottom tabs stay readable on a phone. |
 | 2026-10-30 | Recipes are recorded through a `Battle.fused` signal handled by `BattleScreen`. | Keeps combat code free of save state, so stress tests stay pure. |
+| 2026-10-30 | UI restyled after the owner's mockup set: ornate code-drawn frames (`OrnateBox`), Cinzel for titles/buttons, Pixelify Sans kept for body text and numbers. | Owner: the mockups set layout and design, fonts may differ. A serif display font fits the gothic academy; a thin serif body would be hard to read on phones. Drawn in code so it is crisp at every resolution and needs no texture assets. |
+| 2026-10-30 | VFX "glow" is per-object additive light at world resolution (pixel discs, lines, flares) plus two pixel-quantised shaders (portal, dithered vignette). Still no full-screen bloom. | Matches the mockups' glowing trails without breaking art-spec §5's no-bloom rule or the pixel grid. |
+| 2026-10-30 | Where the mockups differ from earlier decisions, the decisions win: ultimate bottom-right, no virtual joystick. | Both were explicit owner choices during the control design. |
 
 ## Open questions
 

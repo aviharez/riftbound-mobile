@@ -22,6 +22,7 @@ var _root: Control
 var _left: Portrait
 var _right: Portrait
 var _name: Label
+var _plate: PanelContainer
 var _text: Label
 var _hint: Label
 var _choices: VBoxContainer
@@ -79,7 +80,8 @@ func _next() -> void:
 func _say(line: String) -> void:
 	var who := DialogueData.speaker_of(line)
 	var c := Registry.character(who) if who != &"narrator" else null
-	_name.text = c.display_name.get_slice(" ", 0) if c else ""
+	_name.text = c.display_name.get_slice(" ", 0).to_upper() if c else ""
+	_plate.visible = c != null
 	_name.add_theme_color_override("font_color", c.hair_color.lightened(0.35) if c else UiTheme.MUTED)
 	_text.text = DialogueData.text_of(line)
 	_text.add_theme_color_override("font_color", UiTheme.PARCH if c else Color(UiTheme.MUTED, 1.0).lightened(0.2))
@@ -101,7 +103,8 @@ func _finish_typing() -> void:
 
 func _ask() -> void:
 	_asked = true
-	_name.text = "You"
+	_name.text = "YOU"
+	_plate.visible = true
 	_name.add_theme_color_override("font_color", UiTheme.GOLD)
 	_text.text = _dialogue.choice_prompt if _dialogue.choice_prompt != "" else "What do you say?"
 	_text.visible_characters = -1
@@ -181,6 +184,33 @@ func _build() -> void:
 	bg.set_anchors_preset(Control.PRESET_FULL_RECT)
 	bg.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_root.add_child(bg)
+	# Gothic arched windows with moonlight: a placeholder backdrop until scene illustrations exist.
+	var arches := Control.new()
+	arches.set_anchors_preset(Control.PRESET_FULL_RECT)
+	arches.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	arches.draw.connect(func() -> void:
+		var w := arches.size.x
+		var n := 3
+		for i in n:
+			var cw := w / float(n)
+			var x := cw * float(i) + cw * 0.2
+			var aw := cw * 0.6
+			var top := 70.0
+			var bottom := arches.size.y * 0.62
+			var pts := PackedVector2Array()
+			pts.append(Vector2(x, bottom))
+			pts.append(Vector2(x, top + aw * 0.5))
+			for k in 9:
+				var t := float(k) / 8.0
+				pts.append(Vector2(x + aw * t, top + aw * 0.5 - sin(t * PI) * aw * 0.75))
+			pts.append(Vector2(x + aw, bottom))
+			arches.draw_colored_polygon(pts, Color(0.22, 0.17, 0.42, 0.35))
+			arches.draw_line(Vector2(x + aw * 0.5, top), Vector2(x + aw * 0.5, bottom), Color(0.04, 0.04, 0.09, 0.8), 2.0)
+			arches.draw_line(Vector2(x, top + aw), Vector2(x + aw, top + aw), Color(0.04, 0.04, 0.09, 0.8), 2.0)
+			var outline := pts.duplicate()
+			outline.append(pts[0])
+			arches.draw_polyline(outline, Color(UiTheme.GOLD, 0.25), 1.0, true))
+	_root.add_child(arches)
 	# A soft band of the scene's light behind the portraits.
 	var band := ColorRect.new()
 	band.color = Color(UiTheme.VIOLET, 0.08)
@@ -233,7 +263,9 @@ func _build() -> void:
 	_place_portraits.call_deferred()
 
 	var box := PanelContainer.new()
-	box.add_theme_stylebox_override("panel", UiTheme.box(UiTheme.INK, Color(UiTheme.GOLD, 0.7), 1, 8))
+	var frame := OrnateBox.make(OrnateBox.Kind.PANEL, 10.0)
+	frame.content_margin_top = 12.0
+	box.add_theme_stylebox_override("panel", frame)
 	box.set_anchors_preset(Control.PRESET_BOTTOM_WIDE)
 	box.offset_top = -BOX_H
 	box.offset_left = 6.0
@@ -245,9 +277,20 @@ func _build() -> void:
 	col.add_theme_constant_override("separation", 4)
 	col.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	box.add_child(col)
+	# Speaker name on a plaque sitting on the box's top edge (reference dialogue scene).
+	_plate = PanelContainer.new()
+	_plate.add_theme_stylebox_override("panel", OrnateBox.make(OrnateBox.Kind.PLAQUE, 3.0))
+	_plate.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_plate.set_anchors_preset(Control.PRESET_BOTTOM_LEFT)
+	_plate.offset_left = 16.0
+	_plate.offset_top = -BOX_H - 9.0
+	_plate.offset_bottom = -BOX_H + 7.0
+	_plate.grow_vertical = Control.GROW_DIRECTION_BEGIN
 	_name = Label.new()
-	_name.theme_type_variation = "Heading"
-	col.add_child(_name)
+	_name.theme_type_variation = "CardTitle"
+	_name.custom_minimum_size.x = 56.0
+	_name.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	_plate.add_child(_name)
 	_text = Label.new()
 	_text.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	_text.size_flags_vertical = Control.SIZE_EXPAND_FILL
@@ -263,9 +306,12 @@ func _build() -> void:
 	_hint.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
 	_hint.add_theme_color_override("font_color", UiTheme.MUTED)
 	col.add_child(_hint)
+	_root.add_child(_plate)
 	# Choices need more room than a line of text: grow the box upward while they are shown.
 	_choices.visibility_changed.connect(func() -> void:
 		box.offset_top = -BOX_H - (80.0 if _choices.visible else 0.0)
+		_plate.offset_top = box.offset_top - 9.0
+		_plate.offset_bottom = box.offset_top + 7.0
 		_text.size_flags_vertical = Control.SIZE_SHRINK_BEGIN if _choices.visible else Control.SIZE_EXPAND_FILL)
 
 

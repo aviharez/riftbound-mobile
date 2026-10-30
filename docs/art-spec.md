@@ -71,7 +71,36 @@ Heaviness comes from timing and contrast, not from particle count or bloom.
 7. Shaders allowed: hit flash, dissolve on death, palette swap for element variants, Rift portal distortion. Avoid full-screen glow/bloom.
 8. All VFX snap to the world pixel grid. No rotated or sub-pixel scaled pixel art (it creates "mixels").
 
+### Implemented VFX (M7)
+
+- **Additive glow layer** (`FxGlow`, child of `Fx`, `CanvasItemMaterial` add blend): ball halos (pixel discs) and glowing trails, chain-lightning glow, star flares on hits and kills, torch light, the rune circle at the student's feet. Per-object light at world resolution, not a full-screen bloom.
+- **Flares**: 4-point stars, capped by `CombatBalance.max_flares`.
+- **Damage numbers**: outlined; charged hits are orange "crits" that pop in at 2x for a moment.
+- **Death**: element burst + dark violet chunks + a flare.
+- **Rift portal**: `assets/shaders/portal.gdshader`, a swirl quantised to five colour steps; it runs in the world SubViewport, so every fragment is one world pixel.
+- **Vignette**: `assets/shaders/vignette.gdshader`, Bayer 4x4 dithered so the falloff stays pixel art.
+- **Arena dressing**: gothic stone walls, banners and torch sconces drawn by `World`; extra side space on 16:9 phones shows more of them.
+
 ## 6. UI and illustrations
+
+### Design language (from the owner's mockup set, 2026-10-30)
+
+The mockups (AI-generated references kept by the owner, not in the repo) set layout and mood. Fonts and exact colours are ours.
+
+| Element | Look | Code |
+|---|---|---|
+| Panels | Indigo gradient, gold outer line + thin inner line, violet diamond studs on the corners, a cyan gem top-centre | `OrnateBox` (PANEL) — the theme's PanelContainer style |
+| Buttons | Hexagonal ends. Primary: violet gradient, gold edge, glow on hover. Secondary: dark navy, gold edge | `OrnateBox` (BUTTON_PRIMARY / BUTTON) |
+| Cards, chips, rows | Same frame without studs; cyan border + glow when active/selected | `UiTheme.box()`, `UiTheme.card()` |
+| Titles, headings | Centred serif capitals with gold line flourishes | `FlourishLabel`, `UiTheme.display_font()` (Cinzel Bold) |
+| Body text, numbers | Pixelify Sans (legible at small sizes, ties UI to the pixel world) | theme default font |
+| Toggles, sliders | Arcane Cyan | `UiTheme.toggle_icon()`, HSlider styles |
+| Rewards | Framed tiles with a large resource icon, "+N" and the name | `ModalLayer._reward_tiles()`, `Icons.resource()` |
+| Battle HUD | Portrait ring; HP (red) + level/XP (blue) panel; WAVE plaque with timer and kills; ornate speed/pause; round ultimate with ring diamonds and pips | `Hud` |
+| Academy HUD | Portrait ring + restoration %; resource pills; quest tracker pill; icon nav bar with active glow and red "!" badges; building name plaques on the map | `AcademyHud`, `Icons`, `AcademyMap._plaque()` |
+| Dialogue | Speaker plaque on the text box's top edge, ribbon choices, Skip; gothic arched windows until scene art exists | `DialoguePlayer` |
+
+Kept from earlier owner decisions instead of the mockups: the ultimate button stays bottom-right, and there is no virtual joystick (relative drag in the move zone).
 
 - UI follows the design tokens: dark navy panels, restrained gold borders, violet primary buttons, cyan active states.
 - Pixel font for HUD numbers and labels (integer sizes only); a clean readable font for longer text and dialogue.

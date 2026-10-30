@@ -122,6 +122,8 @@ extends Resource
 @export var max_particles: int = 900
 @export var max_rings: int = 120
 @export var max_damage_numbers: int = 120
+## Star flares on hits and kills (additive glow layer).
+@export var max_flares: int = 48
 
 
 ## XP required to go from `level` to `level + 1`.
