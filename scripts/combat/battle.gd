@@ -525,8 +525,9 @@ func _spawn_boss(top: float) -> void:
 	var e := Enemy.new()
 	e.data = _boss_data
 	e.size = balance.cell_size * float(_boss_data.size_cells - 1) + balance.enemy_size
-	var col := int(balance.grid_columns / 2.0) - 1
-	e.pos = Vector2(float(balance.wall_width) + float(col) * balance.cell_size + (balance.cell_size - balance.enemy_size) * 0.5, top + (balance.cell_size - balance.enemy_size) * 0.5)
+	# Centred on the field, whatever the column count (7 columns = between cells, which is fine for a boss).
+	var field_w := float(balance.grid_columns) * balance.cell_size
+	e.pos = Vector2(float(balance.wall_width) + (field_w - e.size) * 0.5, top + (balance.cell_size - balance.enemy_size) * 0.5)
 	e.max_hp = _boss_data.hp_for_wave(wave, balance)
 	e.hp = e.max_hp
 	enemies.append(e)
@@ -1131,6 +1132,10 @@ func _draw_enemy_sprite(e: Enemy) -> void:
 	var bob := roundf(sin(e.phase))
 	var pos := (e.pos + Vector2(e.size, e.size) * 0.5 - sz * 0.5).round() + Vector2(0.0, bob)
 	var a := clampf(e.spawn, 0.0, 1.0)
+	# Contact shadow so the creature sits on the 3/4 floor of the painted arena.
+	var foot := (e.pos + Vector2(e.size * 0.5, e.size - 1.0)).round()
+	draw_rect(Rect2(foot.x - 8.0, foot.y, 16.0, 2.0), Color(0, 0, 0, 0.35 * a))
+	draw_rect(Rect2(foot.x - 6.0, foot.y - 1.0, 12.0, 4.0), Color(0, 0, 0, 0.2 * a))
 	draw_texture(SpriteKit.white(tex) if e.flash > 0.0 else tex, pos, Color(1, 1, 1, a))
 	if e.hp < e.max_hp and e.flash <= 0.0:
 		var x := roundf(e.pos.x)

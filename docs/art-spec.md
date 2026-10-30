@@ -71,6 +71,22 @@ Heaviness comes from timing and contrast, not from particle count or bloom.
 7. Shaders allowed: hit flash, dissolve on death, palette swap for element variants, Rift portal distortion. Avoid full-screen glow/bloom.
 8. All VFX snap to the world pixel grid. No rotated or sub-pixel scaled pixel art (it creates "mixels").
 
+### Painted arena (M7)
+
+`assets/art/arena/rift_arena.png` covers world x −45…315, y −116…564 (`World.ARENA_ORIGIN`). Pipeline:
+1. PixelLab Pro image, 180×336.
+2. `image_to_pixelart` (faithful) redraws it at native 270×504. Pass the PixelLab download URL as `image_url`: their server fetches it, so the blocked sandbox doesn't have to.
+3. A floor band is repeated so the stage top lands on the rune line (y 455).
+4. Side strips are mirrored, and sky fills the area above, so wide or tall screens never show an empty edge.
+
+What `World` adds on top:
+- Torch and brazier positions (`ARENA_TORCHES`), which FxGlow lights.
+- The portal shader at 55% opacity over the painted portal (`ARENA_PORTAL`), to animate it.
+
+Enemies draw a contact shadow so they sit on the 3/4 floor.
+
+To redo it at higher quality on a paid plan, generate the full 270×600 directly with the owner's mockup as a reference image.
+
 ### Implemented VFX (M7)
 
 - **Additive glow layer** (`FxGlow`, child of `Fx`, `CanvasItemMaterial` add blend): ball halos (pixel discs) and glowing trails, chain-lightning glow, star flares on hits and kills, torch light, the rune circle at the student's feet. Per-object light at world resolution, not a full-screen bloom.

@@ -5,16 +5,16 @@ extends Resource
 
 @export_group("World")
 @export var world_size: Vector2i = Vector2i(270, 560)
-@export var wall_width: int = 15
+@export var wall_width: int = 30
 @export var hud_band_height: int = 36
 @export var ceiling_y: float = 38.0
-@export var grid_columns: int = 8
+@export var grid_columns: int = 7
 @export var cell_size: float = 30.0
 @export var enemy_size: float = 24.0
 @export var first_row_y: float = 40.0
 @export var rune_line_y: float = 455.0
-@export var player_min: Vector2 = Vector2(22.0, 466.0)
-@export var player_max: Vector2 = Vector2(248.0, 548.0)
+@export var player_min: Vector2 = Vector2(37.0, 466.0)
+@export var player_max: Vector2 = Vector2(233.0, 548.0)
 @export var lost_below_y: float = 563.0
 
 @export_group("Controls")

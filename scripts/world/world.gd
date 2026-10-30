@@ -30,6 +30,17 @@ var _props: Array = [
 	[preload("res://assets/art/props/crystals.png"), Vector2(200, 6), 0.55],
 ]
 
+## Painted arena (PixelLab Pro, redrawn at native 270 px, floor extended; see assets/art/CREDITS.md).
+## Covers world x -45..315 and y -116..564; its stage starts exactly at the rune line (y 455).
+## Null = the older code-drawn arena below.
+@export var arena_backdrop: Texture2D = preload("res://assets/art/arena/rift_arena.png")
+const ARENA_ORIGIN := Vector2(-45, -116)
+## Torches and braziers in the painted arena (world coordinates), lit by FxGlow.
+const ARENA_TORCHES: Array[Vector2] = [Vector2(86, 114), Vector2(183, 114), Vector2(48, 135), Vector2(221, 135),
+	Vector2(31, 183), Vector2(237, 183), Vector2(20, 500), Vector2(249, 500)]
+## The painted portal's swirl, animated by the portal shader on top.
+const ARENA_PORTAL := Rect2(113, 52, 44, 56)
+
 ## Visible area in playfield coordinates. Set by Main whenever the screen size changes.
 var visible_rect: Rect2 = Rect2(0, 0, 270, 560)
 var _portal: ColorRect
@@ -41,10 +52,15 @@ func _ready() -> void:
 	# Rift portal (shader) behind the enemies, centred on the ceiling.
 	_portal = ColorRect.new()
 	_portal.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	_portal.size = Vector2(96, 40)
-	_portal.position = Vector2(float(b.world_size.x) * 0.5 - 48.0, b.ceiling_y - 14.0)
+	if arena_backdrop:
+		_portal.size = ARENA_PORTAL.size
+		_portal.position = ARENA_PORTAL.position
+	else:
+		_portal.size = Vector2(96, 40)
+		_portal.position = Vector2(float(b.world_size.x) * 0.5 - 48.0, b.ceiling_y - 14.0)
 	var pm := ShaderMaterial.new()
 	pm.shader = preload("res://assets/shaders/portal.gdshader")
+	pm.set_shader_parameter(&"opacity", 0.55 if arena_backdrop else 1.0)
 	_portal.material = pm
 	add_child(_portal)
 	move_child(_portal, 0)
@@ -73,6 +89,8 @@ func _layout_overlays() -> void:
 
 ## Torch positions on the walls (playfield coordinates); FxGlow lights them.
 func torch_points() -> Array[Vector2]:
+	if arena_backdrop:
+		return ARENA_TORCHES
 	var b := Registry.balance
 	var wall := float(b.wall_width)
 	var out: Array[Vector2] = []
@@ -85,6 +103,11 @@ func torch_points() -> Array[Vector2]:
 
 
 func _draw() -> void:
+	if arena_backdrop:
+		# Sky colour above the painting on very tall screens, then the painted arena.
+		draw_rect(visible_rect, Color("10101c"))
+		draw_texture(arena_backdrop, ARENA_ORIGIN)
+		return
 	var b := Registry.balance
 	var size := Vector2(b.world_size)
 	var wall := float(b.wall_width)

@@ -13,16 +13,16 @@ The playfield is a fixed 270×560 rectangle. Larger screens show extra decoratio
 | Element | Value |
 |---|---|
 | World size | 270 × 560 |
-| Side walls | 15 wide each; field spans x = 15 … 255 (240 wide) |
+| Side walls | 30 wide each; field spans x = 30 … 240 (210 wide) — room for the dungeon walls in the arena art |
 | HUD band (UI overlays world) | y = 0 … 36 |
 | Ceiling (balls bounce) | y = 38 |
-| Enemy grid | 8 columns × 30 cell; enemy body 24×24 centered in its cell |
+| Enemy grid | 7 columns × 30 cell; enemy body 24×24 centered in its cell |
 | First enemy row (top) | y = 40 |
 | Rune line (danger line / move-zone top) | y = 455 |
 | Move zone | y = 455 … 560 |
-| Player clamp | x = 22 … 248, y = 466 … 548 |
+| Player clamp | x = 37 … 233, y = 466 … 548 |
 | Ball "lost below" line | y > 563 → ball returns to player |
-| Boss | 2×2 cells = 54×54, columns 4–5 (index 3–4) |
+| Boss | 2×2 cells = 54×54, centred on the field |
 
 The Rift portal sits at the top center, behind the HUD band; enemies emerge from it.
 
@@ -57,7 +57,7 @@ The Rift portal sits at the top center, behind the HUD band; enemies emerge from
 ### 3.3 Movement and collision
 - Collision radius **2** for every ball (visual size differs, see art-spec).
 - Substep so no step exceeds 2 units.
-- Walls: reflect x at x = 17 / 253; ceiling: reflect y at y = 40.
+- Walls: reflect x at x = 32 / 238; ceiling: reflect y at y = 40.
 - Enemies: circle vs AABB. Normal = from closest point to center (inside → axis of least penetration). Reflect velocity only if moving into the surface; push out by radius + 0.3. One enemy hit per substep.
 - After every substep keep |vy| ≥ 20% of speed (avoid near-horizontal loops), preserving the sign.
 - `bounces` counts wall and enemy contacts.

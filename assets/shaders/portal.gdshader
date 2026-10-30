@@ -6,6 +6,7 @@ uniform vec4 col_dark : source_color = vec4(0.09, 0.04, 0.22, 1.0);
 uniform vec4 col_mid : source_color = vec4(0.43, 0.29, 0.90, 1.0);
 uniform vec4 col_hi : source_color = vec4(0.82, 0.72, 1.0, 1.0);
 uniform float speed = 2.2;
+uniform float opacity = 1.0;
 
 void fragment() {
 	vec2 uv = UV * 2.0 - 1.0;
@@ -17,5 +18,5 @@ void fragment() {
 	vec3 c = mix(col_dark.rgb, col_mid.rgb, smoothstep(0.0, 0.6, q));
 	c = mix(c, col_hi.rgb, step(0.79, q) * 0.7);
 	float alpha = step(r, 1.0) * clamp(q * 1.6, 0.0, 0.85);
-	COLOR = vec4(c, alpha);
+	COLOR = vec4(c, alpha * opacity);
 }
