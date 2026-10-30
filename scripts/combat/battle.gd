@@ -1169,34 +1169,66 @@ func _draw_drops() -> void:
 		draw_rect(Rect2(p.x, p.y, 1, 1), Color.WHITE if int(d.age * 3.0) % 4 == 0 else Color("d6ffe6"))
 
 
+## Pixel discs by diameter: width of each row, top to bottom.
+const DISC_ROWS := {
+	3: [1, 3, 1],
+	5: [3, 5, 5, 5, 3],
+	7: [3, 5, 7, 7, 7, 5, 3],
+	9: [5, 7, 9, 9, 9, 9, 9, 7, 5],
+	11: [5, 7, 9, 11, 11, 11, 11, 11, 9, 7, 5],
+}
+
+
+func _disc(c: Vector2, d: int, col: Color) -> void:
+	var rows: Array = DISC_ROWS[d]
+	var top := c.y - float(d / 2)
+	for i in d:
+		var w: int = rows[i]
+		draw_rect(Rect2(c.x - float(w / 2), top + float(i), float(w), 1.0), col)
+
+
+## Baby balls: small, pale, outlined, faint short trail, no glow. Element balls: bigger, filled with the
+## element colour around a bright core, with a long tapering trail of that colour (and a halo in FxGlow).
+## Fused balls: bigger again with a pulsing ring. All are outlined in near-black so they read on grey stone.
 func _draw_ball(b: Ball) -> void:
 	var returning := b.state == Ball.State.RETURN
 	var glow: Color = COL_GOLD if b.charged else (b.slot.glow_color if b.slot else Color(0.9, 0.9, 0.94))
+	var fade := 0.45 if returning else 1.0
 	var n := b.trail.size()
-	for i in n:
-		var a := float(i + 1) / float(n + 1) * (0.12 if returning else (0.5 if b.slot else 0.22))
-		var sz := 2.0 if (b.slot and i * 2 > n) else 1.0
-		draw_rect(Rect2(b.trail[i].round() - Vector2(floorf(sz * 0.5), floorf(sz * 0.5)), Vector2(sz, sz)), Color(glow, a))
 	var p := b.pos.round()
-	if returning:
-		draw_rect(Rect2(p - Vector2(1, 1), Vector2(2, 2)), Color(0.9, 0.9, 0.94, 0.35))
-		return
 	if b.slot == null:
-		draw_rect(Rect2(p - Vector2(1, 1), Vector2(2, 2)), COL_GOLD if b.charged else Color("e6e6ee"))
-	elif b.slot.fused:
-		var f := float(int(run_time * 12.0) % 2)
-		draw_rect(Rect2(p - Vector2(4 + f, 4 + f), Vector2(9 + 2 * f, 9 + 2 * f)), Color(glow, 0.35))
-		draw_rect(Rect2(p - Vector2(3, 3), Vector2(7, 7)), Color(glow, 0.8))
-		draw_rect(Rect2(p - Vector2(2, 2), Vector2(5, 5)), Color("fff3c4") if b.charged else b.slot.core_color)
+		for i in range(maxi(0, n - 3), n):
+			draw_rect(Rect2(b.trail[i].round() - Vector2.ONE, Vector2(2, 2)), Color(glow, 0.16 * fade))
+		_disc(p, 7, Color(0.04, 0.04, 0.08, 0.85 * fade))
+		_disc(p, 5, Color(COL_GOLD if b.charged else Color("c9c9d6"), fade))
+		_disc(p, 3, Color(Color("fff3c4") if b.charged else Color("eeeef4"), fade))
+		draw_rect(Rect2(p + Vector2(-1, -1), Vector2.ONE), Color(1, 1, 1, fade))
 	else:
-		draw_rect(Rect2(p - Vector2(2, 2), Vector2(5, 5)), Color(glow, 0.6))
-		draw_rect(Rect2(p - Vector2(1, 1), Vector2(3, 3)), Color("fff3c4") if b.charged else b.slot.core_color)
+		for i in n:
+			var k := float(i + 1) / float(n + 1)
+			var sz := 5.0 if k > 0.7 else (3.0 if k > 0.4 else 1.0)
+			draw_rect(Rect2(b.trail[i].round() - Vector2(floorf(sz * 0.5), floorf(sz * 0.5)), Vector2(sz, sz)), Color(glow, (0.15 + 0.45 * k) * fade))
+		var core: Color = Color("fff3c4") if b.charged else b.slot.core_color
+		var outline := Color(glow.darkened(0.8), 0.9 * fade)
+		if b.slot.fused:
+			var pulse := int(run_time * 10.0) % 2 == 0
+			_disc(p, 11, outline)
+			_disc(p, 9, Color(glow, fade))
+			_disc(p, 7, Color(glow.lightened(0.35) if pulse else glow, fade))
+			_disc(p, 5, Color(core, fade))
+		else:
+			_disc(p, 9, outline)
+			_disc(p, 7, Color(glow, fade))
+			_disc(p, 5, Color(core, fade))
+		draw_rect(Rect2(p + Vector2(-1, -1), Vector2.ONE), Color(1, 1, 1, 0.9 * fade))
+	if returning:
+		return
 	if b.gems > 0:
 		for i in mini(b.gems, 6):
 			var a := run_time * 8.0 + float(i) * 1.05
-			draw_rect(Rect2((p + Vector2(cos(a), sin(a)) * 4.0).round(), Vector2.ONE), COL_GEM)
+			draw_rect(Rect2((p + Vector2(cos(a), sin(a)) * 7.0).round(), Vector2.ONE), COL_GEM)
 	if b.prism:
-		draw_rect(Rect2(p + Vector2(-1, -6), Vector2(3, 3)), PRISM_COLORS[int(run_time * 10.0) % PRISM_COLORS.size()])
+		draw_rect(Rect2(p + Vector2(-1, -10), Vector2(3, 3)), PRISM_COLORS[int(run_time * 10.0) % PRISM_COLORS.size()])
 
 
 func _draw_aim() -> void:
@@ -1209,8 +1241,12 @@ func _draw_aim() -> void:
 	var size_y := float(balance.world_size.y)
 	if _columns.size() != balance.grid_columns:
 		_rebuild_columns()
+	# Marching dashes, outlined so they read on any floor; each bounce dims the next leg.
+	var dist := 0.0
+	var march := fmod(run_time * 30.0, 9.0)
 	for i in 700:
 		probe.pos += probe.vel * 2.0
+		dist += 2.0
 		var hit := _walls(probe, r)
 		if not hit and probe.pos.y < balance.rune_line_y:
 			var col := _column_of(probe.pos.x)
@@ -1224,12 +1260,20 @@ func _draw_aim() -> void:
 				if hit:
 					break
 		if hit:
-			draw_rect(Rect2(probe.pos.round() - Vector2.ONE, Vector2(3, 3)), Color(COL_PARCH, 0.8))
+			var q := probe.pos.round()
+			var bright := 1.0 / (1.0 + float(bounces) * 0.9)
+			_disc(q, 5, Color(0.04, 0.04, 0.08, 0.7 * bright))
+			_disc(q, 3, Color(COL_PARCH, bright))
 			bounces += 1
 			if bounces > settings.aim_preview_bounces:
 				break
-		elif i % 3 == 0:
-			draw_rect(Rect2(probe.pos.round(), Vector2.ONE), Color(COL_CYAN, 0.55 / (1.0 + float(bounces) * 1.2)))
+		elif fmod(dist - march + 900.0, 9.0) < 5.0 and dist > 6.0:
+			var a := 1.0 / (1.0 + float(bounces) * 0.9)
+			# 2 px dash with a dark edge below and to the right.
+			for q: Vector2 in [probe.pos.round(), (probe.pos - probe.vel).round()]:
+				draw_rect(Rect2(q + Vector2(0, 1), Vector2(3, 2)), Color(0.03, 0.03, 0.08, 0.6 * a))
+			for q: Vector2 in [probe.pos.round(), (probe.pos - probe.vel).round()]:
+				draw_rect(Rect2(q - Vector2(1, 0), Vector2(2, 2)), Color(Color("7ff0ff"), a))
 		if probe.pos.y > size_y:
 			break
 	var c := (player + Vector2(0, -3) + dir * balance.crosshair_distance).round()

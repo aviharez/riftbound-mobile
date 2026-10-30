@@ -1,7 +1,8 @@
 """Assemble the battle arena backdrop with exact gameplay geometry (art-spec "Arena").
 
 Sources (PixelLab, see assets/art/CREDITS.md) live in assets/art/arena/src/. Geometry comes from CombatBalance:
-walls at x 30 / 240, ceiling y 38, rune line / stage top y 455, visible world x -45..315, y -116..564.
+walls at x 30 / 240, ceiling y 38, rune line / stage top y 455. The canvas covers world x -120..390, y -260..564:
+enough for every phone and 4:3 tablet at the integer scale GameState picks (the screen is always filled).
 Boundaries are straight stone curbs drawn here, so the art never suggests a different bounce line.
 
 Usage: python3 tools/art/compose_arena.py  ->  assets/art/arena/rift_arena.png (+ prints torch points)
@@ -12,8 +13,8 @@ from PIL import Image
 
 ROOT = "assets/art/arena/"
 WALL_L, WALL_R, CEIL, RUNE = 30, 240, 38, 455
-OX, OY = -45, -116            # canvas origin in world units
-W, H = 360, 680               # world x -45..315, y -116..564
+OX, OY = -120, -260           # canvas origin in world units
+W, H = 510, 824               # world x -120..390, y -260..564
 
 def load(p):
     return np.asarray(Image.open(ROOT + "src/" + p).convert("RGBA")).astype(np.float64)
@@ -65,16 +66,44 @@ best = min(range(0, 240 - 168), key=lambda r: np.abs(strip[r:r + 3, :, :3] - str
 tall = np.concatenate([strip[:best + 168], strip[best:best + 168], strip[best + 168:]], axis=0)
 left = np.concatenate([tall[:, ::-1][:, :27], tall], axis=1)[:, -75:]     # 75 wide: world -45..30
 right = np.roll(left[:, ::-1], -250, axis=0)                              # mirrored; torches land mid-arena
-paste(canvas, left, -45, -116)
-paste(canvas, right, 240, -116)
+# Taller screens: more of the seam-matched brick band above y -116.
+extra = OY - (-116)
+band = strip[best:best + 168]
+top = np.concatenate([band] * (1 + (-extra) // 168), axis=0)[extra:]
+top = np.concatenate([top[:, ::-1][:, :27], top], axis=1)[:, -75:]
+left = np.concatenate([top, left], axis=0)
+right = np.concatenate([top[:, ::-1], right], axis=0)
+# Wider screens: plain brick (no torches or banners to repeat) outside the wall bands, darker so it recedes.
+plain = np.concatenate([band] * (H // 168 + 1), axis=0)[:H]
+plain = np.concatenate([plain[:, ::-1][:, :27], plain], axis=1)[:, -75:]
+outer_l = plain.copy(); outer_l[..., :3] *= 0.55
+outer_r = plain[:, ::-1].copy(); outer_r[..., :3] *= 0.55
+paste(canvas, outer_l, -120, OY)
+paste(canvas, outer_r, 315, OY)
+paste(canvas, left, -45, OY)
+paste(canvas, right, 240, OY)
 # top wall behind the HUD: plain bricks tiled across
 brick = strip[10:10 + 48, :48]
 for x in range(30, 240, 48):
-    for y in range(-116, CEIL, 48):
-        paste(canvas, brick[: min(48, CEIL - y), : min(48, 240 - x)], x, y)
+    for y in range(CEIL - 48 * ((CEIL - OY) // 48 + 1), CEIL, 48):
+        part = brick[max(0, OY - y): min(48, CEIL - y), : min(48, 240 - x)]
+        paste(canvas, part, x, max(y, OY))
 
 # ---------------------------------------------------------------- floor
-floor = load("floor.png")[30:30 + (RUNE - CEIL), 25:25 + (WALL_R - WALL_L)]
+# The source has a compass decal mid-floor (owner: no magic circles). Rebuild it from its own stone rows:
+# rows run between full-width mortar lines, so whole rows can be dropped and reordered without seams.
+# The three rows holding the decal are replaced by other rows, mirrored so repeats don't read as copies.
+src = load("floor.png")
+MORTAR = [30, 64, 97, 131, 164, 199, 236, 271, 307, 341, 376, 410, 445, 480]
+def row(i, flip=False):
+    r = src[MORTAR[i]:MORTAR[i + 1]]
+    return r[:, ::-1] if flip else r
+rows = [row(0), row(1), row(2), row(3), row(4), row(10, True), row(2, True), row(4, True),
+        row(8), row(9), row(10), row(11), row(12)]
+floor = np.concatenate(rows, axis=0)
+assert floor.shape[0] >= RUNE - CEIL, floor.shape
+src_w0 = (src.shape[1] - (WALL_R - WALL_L)) // 2
+floor = floor[: RUNE - CEIL, src_w0: src_w0 + (WALL_R - WALL_L)].copy()
 floor[..., :3] *= 0.8          # mid-dark, so bright projectiles carry the colour (art-spec §4)
 paste(canvas, floor, WALL_L, CEIL)
 
@@ -116,5 +145,5 @@ for x, y in zip(xs, ys):
         clusters.append([x, y, 1])
 for c in clusters:
     wx, wy = round(c[0] / c[2]) + OX, round(c[1] / c[2]) + OY
-    if c[2] >= 14 and (20 <= wx < WALL_L or WALL_R < wx <= 250):
+    if c[2] >= 14 and (wx < WALL_L or wx > WALL_R):
         print("torch", wx, wy, c[2])

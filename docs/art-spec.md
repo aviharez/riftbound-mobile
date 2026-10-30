@@ -14,7 +14,8 @@ Pixel art is the playable world; anime illustration carries character identity a
 - **Base resolution: 270 × 560** (world units = world pixels).
 - Project settings: stretch mode `canvas_items`, aspect `expand`, scale mode `integer`, portrait orientation.
 - The world `SubViewport` matches the visible area in base units, so it is rendered pixel-perfect and scaled by the same integer factor. UI drawn in the root viewport uses the same base units but text and illustrations stay sharp.
-- `aspect = expand` reveals extra space instead of black bars. The 270×560 playfield is centered horizontally and anchored to the bottom; extra width shows more wall, extra height shows more of the Rift above.
+- On its own, `integer` scaling letterboxes: a 1284 px wide phone gets ×4 (1080 px) and black bars on all sides, because `expand` is applied before the scale is floored. `GameState.fit_screen()` fixes this by setting the window's `content_scale_size` to screen ÷ k, where k is the largest whole factor at which 270×560 fits. Godot then picks exactly k and the base area covers the whole screen, with no bars. (Movie Maker captures the viewport, not the window, so `tools/screenshot.sh` never showed the bars.)
+- The extra space is revealed rather than filled with bars. The 270×560 playfield is centered horizontally and anchored to the bottom; extra width shows more wall, extra height shows more of the Rift above.
 
 Scale factor on common phones:
 
@@ -36,9 +37,9 @@ Therefore: **side walls must extend at least 45 px beyond each side of the playf
 | Player character (Lyra etc.) | 32 × 32 (or 32 × 40) | body ~20 × 28, feet at the bottom center; idle 4f, run 6f, cast 4f, hurt 2f |
 | Enemy (mite, shard, brute) | 32 × 32 | creature kept within ~26 × 26 (hitbox stays 24 × 24); idle 4f, hit flash via shader, death = VFX |
 | Boss | 54 × 54 | idle 6f, attack/telegraph 6f |
-| Baby ball | 2 × 2 | white, no glow |
-| Element ball | 3 × 3 core + 5 × 5 glow | element color |
-| Fused ball | 5 × 5 core + 7 × 7 glow | distinct shape/trail, not only color |
+| Baby ball | 7 px disc (1 px dark outline, 5 px pale grey, 3 px white core) | no glow, faint 3-point trail |
+| Element ball | 9 px disc (dark outline in the element hue, 7 px element colour, 5 px bright core) | additive halo, long tapering trail in the element colour |
+| Fused ball | 11 px disc with a pulsing ring | bigger halo; distinct size, not only color |
 | XP gem | 5 × 5 | green diamond |
 | Rift Prism | 7 × 9 | rainbow cycle |
 | Floor tile | 16 × 16 | field = 15 × 16 tiles wide |
@@ -67,13 +68,14 @@ Heaviness comes from timing and contrast, not from particle count or bloom.
 3. Small screen shake (trauma model), always whole-pixel offsets, toggleable.
 4. Flipbook explosions drawn at world resolution, not generic particles.
 5. Short trails on projectiles so ricochet paths are readable.
+   Baby and element balls must tell apart at a glance by **size, glow and trail**, not colour alone. Every ball has a near-black outline so it reads on grey stone. The aim preview is bright cyan marching dashes with a dark edge (not white, which is the baby-ball colour), with an outlined dot at each bounce.
 6. Damage numbers in a pixel font, crits/charged in gold.
 7. Shaders allowed: hit flash, dissolve on death, palette swap for element variants, Rift portal distortion. Avoid full-screen glow/bloom.
 8. All VFX snap to the world pixel grid. No rotated or sub-pixel scaled pixel art (it creates "mixels").
 
 ### Arena (M7)
 
-`assets/art/arena/rift_arena.png` is assembled by `tools/art/compose_arena.py` from PixelLab textures in `assets/art/arena/src/`. It covers world x −45…315, y −116…564 (`World.ARENA_ORIGIN`).
+`assets/art/arena/rift_arena.png` is assembled by `tools/art/compose_arena.py` from PixelLab textures in `assets/art/arena/src/`. It covers world x −120…390, y −260…564 (`World.ARENA_ORIGIN`), enough for every phone and 4:3 tablet at the integer scale `GameState` picks; outside the wall bands it continues as darker plain brick. The source floor's compass decal is removed by reordering whole stone rows (no circles or decals anywhere on the playfield).
 
 Rules, from owner feedback (the art must never contradict the gameplay):
 - **Boundaries are exact and straight.** Stone curbs sit on the bounce lines: walls at x = 30 / 240, ceiling at y = 38. Shadow falls onto the floor. Nothing sticks out of a wall into the field.

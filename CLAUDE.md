@@ -59,7 +59,7 @@ assets/      art/ (sprites, vfx, tiles, ui, portraits), audio/, fonts/
 docs/        design and technical docs (English)
   engine-reference/godot/   Godot 4.4–4.7 API changes and best practices (check before using an API)
   qa/evidence/              screenshots proving each milestone was run and observed
-tools/       check.sh (parse check), stress.sh (simulation invariants), screenshot.sh and capture_flow.sh (run and capture)
+tools/       check.sh (parse check), stress.sh (simulation invariants), fit.sh (no letterbox at phone/tablet sizes), screenshot.sh and capture_flow.sh (run and capture)
              run_runner.gd + runners/ (test drivers loaded at runtime, so they can use the Registry autoload)
 prototype/   HTML reference prototype (do not ship)
 ```
@@ -87,6 +87,7 @@ prototype/   HTML reference prototype (do not ship)
 3. **Simulation invariants** — after touching ball, enemy or collision code:
    ```
    tools/stress.sh         # headless, 3600 frames at x3 with 60+ balls; must print PASS
+   tools/fit.sh            # after display/scaling changes: whole-number scale, no black bars; must print PASS
    ```
 4. **Every screen at once** — after UI or flow changes, regenerate the evidence set and look at it:
    ```

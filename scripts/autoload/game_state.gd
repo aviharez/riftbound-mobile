@@ -60,6 +60,24 @@ var academy_spawn: Vector2 = Vector2.INF
 func _ready() -> void:
 	if not load_game():
 		reset()
+	get_tree().root.size_changed.connect(fit_screen)
+	fit_screen()
+
+
+## Fills the whole screen at a whole-number pixel scale (art-spec §2). Plain `integer` scaling floors the
+## factor after `expand` and letterboxes the rest; instead the base size is grown to screen / k, where k is
+## the largest factor at which the 270x560 playfield fits, so Godot picks exactly k and leaves no bars.
+func fit_screen() -> void:
+	var win := get_tree().root
+	var px := Vector2(win.size)
+	var base := Vector2(ProjectSettings.get_setting("display/window/size/viewport_width"),
+		ProjectSettings.get_setting("display/window/size/viewport_height"))
+	var want := Vector2i(base)
+	if px.x >= base.x and px.y >= base.y:
+		var k := floorf(minf(px.x / base.x, px.y / base.y))
+		want = Vector2i(floori(px.x / k), floori(px.y / k))
+	if win.content_scale_size != want:
+		win.content_scale_size = want
 
 
 func has_save() -> bool:

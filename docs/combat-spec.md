@@ -55,7 +55,7 @@ The Rift portal sits at the top center, behind the HUD band; enemies emerge from
 - Launch from player + 4.5 along the aim, speed **420**.
 
 ### 3.3 Movement and collision
-- Collision radius **2** for every ball (visual size differs, see art-spec).
+- Collision radius **3** for every ball (was 2: balls read too small on a phone). Visual diameter: baby 7 px, element 9 px, fused 11 px including a 1 px dark outline (art-spec "Projectiles"). With enemies 24 px in 30 px cells the 6 px gap no longer lets a ball slip between two neighbours.
 - Substep so no step exceeds 2 units.
 - Walls: reflect x at x = 32 / 238; ceiling: reflect y at y = 40.
 - Enemies: circle vs AABB. Normal = from closest point to center (inside → axis of least penetration). Reflect velocity only if moving into the surface; push out by radius + 0.3. One enemy hit per substep.

@@ -46,6 +46,9 @@ Newest at the bottom. When a decision changes, add a new entry instead of editin
 | 2026-10-30 | Where the mockups differ from earlier decisions, the decisions win: ultimate bottom-right, no virtual joystick. | Both were explicit owner choices during the control design. |
 | 2026-10-30 | Arena narrowed to 7 enemy columns with 30 px walls (field x 30–240, was 8 columns / 15 px). | Owner choice: the mockup's dungeon look needs real wall space on 20:9 phones. Fewer enemies per row; balance to re-check in playtests. |
 | 2026-10-30 | The arena is a composite of PixelLab textures with geometry set by script: straight curbs on the exact bounce lines, the Rift as a tear in the floor, a full-width stage. (Replaces a one-image painted arena the owner rejected.) | Art must not contradict gameplay: uneven edges suggest wrong bounces, enemies over a gate look like walking on walls, a narrow stage felt cramped. |
+| 2026-10-30 | No circles or decals on the playfield: the stage decal and the floor's compass are both removed. | Owner dislikes the magic circle. |
+| 2026-10-30 | `GameState.fit_screen()` grows the base size to screen ÷ k, so integer scaling fills the screen instead of letterboxing. The arena backdrop now covers world x −120…390, y −260…564. Checked by `tools/fit.sh`. | The owner's phone showed black bars on all sides: Godot floors the integer scale after `expand`. Screenshots never showed it because Movie Maker captures the viewport. |
+| 2026-10-30 | Ball collision radius 2 → 3. Balls drawn at 7 / 9 / 11 px (baby / element / fused) with dark outlines; only element and fused balls glow. Aim preview: bright cyan 2 px marching dashes with a dark edge. | Owner: balls too small, baby vs element balls not distinguishable, aim line unclear. Drawing balls larger than their hitbox would make hits look wrong, so the hitbox grew too. Side effect: balls can no longer slip through the 6 px gap between neighbouring enemies (playtest). |
 
 ## Open questions
 

@@ -28,7 +28,7 @@ extends Resource
 @export var start_aim_deg: float = 78.0
 
 @export_group("Balls")
-@export var ball_radius: float = 2.0
+@export var ball_radius: float = 3.0
 @export var ball_speed: float = 420.0
 @export var return_speed: float = 710.0
 @export var max_substep: float = 2.0

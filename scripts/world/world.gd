@@ -31,13 +31,14 @@ var _props: Array = [
 ]
 
 ## Arena backdrop assembled by tools/art/compose_arena.py from PixelLab textures (see assets/art/CREDITS.md).
-## Covers world x -45..315 and y -116..564. Its boundaries are exact: straight curbs on the walls (x 30 / 240)
+## Covers world x -120..390 and y -260..564 (every phone and 4:3 tablet at GameState's integer scale). Its boundaries are exact: straight curbs on the walls (x 30 / 240)
 ## and the ceiling (y 38), and a full-width stage from the rune line (y 455). Null = the code-drawn arena below.
 @export var arena_backdrop: Texture2D = preload("res://assets/art/arena/rift_arena.png")
-const ARENA_ORIGIN := Vector2(-45, -116)
+const ARENA_ORIGIN := Vector2(-120, -260)
 ## Torches and braziers in the painted arena (world coordinates), lit by FxGlow.
 const ARENA_TORCHES: Array[Vector2] = [Vector2(245, 151), Vector2(245, 211), Vector2(245, 282),
-	Vector2(24, 401), Vector2(24, 461), Vector2(24, 532)]
+	Vector2(309, 151), Vector2(309, 211), Vector2(309, 282),
+	Vector2(24, 401), Vector2(24, 461), Vector2(24, 532), Vector2(-40, 401), Vector2(-40, 461), Vector2(-40, 532)]
 ## The Rift tear in the floor at the top of the arena, where the creatures crawl out.
 const ARENA_RIFT := Rect2(97, 39, 76, 24)
 
