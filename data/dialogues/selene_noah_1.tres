@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="DialogueData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/data/dialogue_data.gd" id="1_script"]
+
+[resource]
+script = ExtResource("1_script")
+id = &"selene_noah_1"
+bond_id = &"selene_noah"
+bond_level_required = 0
+title = "Margins"
+location = "Library ruins, rainy afternoon"
+lines = Array[String](["narrator: Selene is sorting salvaged books into precise stacks. Noah is talking quietly to a fern that grows out of a broken shelf.", "selene: Must you?", "noah: She likes it. Her leaves were curling before. Look at them now.", "selene: Plants don't respond to conversation. They respond to humidity and light.", "noah: Then why does every plant in the academy lean away from the Rift Gate?", "selene: ...They do?", "noah: Every single one. Since the night of the Riftfall."])
+choice_prompt = "What do you say?"
+choices = Array[Dictionary]([{"text": "Selene, that sounds like data to me.", "points": 2, "reply": ["selene: It does. Noah, I need a map of every plant on the grounds.", "noah: I already have one. I drew it for fun."]}, {"text": "Maybe you're both right in different ways.", "points": 1, "reply": ["selene: That is not how being right works.", "noah: It's how plants work."]}, {"text": "The fern does look happier.", "points": 0, "reply": ["noah: See?", "selene: It looks like a fern."]}])
+ending = Array[String](["narrator: Selene doesn't say anything else, but she moves her stack of books so the fern gets more light."])

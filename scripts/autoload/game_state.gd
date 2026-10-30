@@ -6,6 +6,7 @@ signal resources_changed
 signal building_changed(id: StringName)
 signal student_changed(id: StringName)
 signal expeditions_changed
+signal bonds_changed
 
 const SAVE_PATH := "user://save.json"
 const TEST_SAVE_PATH := "user://save_test.json"
@@ -33,6 +34,12 @@ var selected_student: StringName = &"lyra"
 var expeditions_active: Dictionary = {}
 ## How many story clues each expedition has revealed.
 var clues_found: Dictionary[StringName, int] = {}
+## Total friendship points per bond id.
+var bond_points: Dictionary[StringName, int] = {}
+## Dialogue scenes already watched (can be replayed from Stories).
+var scenes_seen: Array[StringName] = []
+## `runs` when the last new scene was watched; the next one opens after EconomyBalance.runs_per_scene more runs.
+var last_scene_run: int = 0
 
 ## Screen hand-off (not saved): rewards of the run that just ended, shown on the result screen.
 var last_rewards: Vector3i = Vector3i.ZERO
@@ -76,6 +83,9 @@ func reset() -> void:
 	selected_student = Registry.characters[0].id if not Registry.characters.is_empty() else &"lyra"
 	expeditions_active.clear()
 	clues_found.clear()
+	bond_points.clear()
+	scenes_seen.clear()
+	last_scene_run = 0
 	resources_changed.emit()
 
 
@@ -151,6 +161,7 @@ func run_bonuses() -> Dictionary:
 	var lv := student_level(c.id)
 	out[&"max_hp"] = float(out[&"max_hp"]) + float(c.hp_bonus(lv))
 	out[&"start_damage"] = float(c.start_damage_bonus(lv))
+	out[&"duo_recipes"] = unlocked_duo_recipes()
 	return out
 
 
@@ -333,10 +344,18 @@ func claim_expedition(id: StringName) -> Dictionary:
 		if n < e.clues.size():
 			clue = e.clues[n]
 			clues_found[id] = n + 1
+	var bond_ups: Array[Dictionary] = []
+	var team: Array = rec.team
+	for i in team.size():
+		for j in range(i + 1, team.size()):
+			var bo := Registry.bond_between(team[i], team[j])
+			if bo:
+				var up := add_bond_points(bo.id, Registry.economy.bond_expedition_points)
+				bond_ups.append(up)
 	expeditions_active.erase(id)
 	expeditions_changed.emit()
 	save_game()
-	return {"success": success, "rare": rec.rare, "rewards": r, "clue": clue, "team": rec.team}
+	return {"success": success, "rare": rec.rare, "rewards": r, "clue": clue, "team": rec.team, "bonds": bond_ups}
 
 
 ## Debug: make a running expedition finish now.
@@ -344,6 +363,123 @@ func debug_finish_expedition(id: StringName) -> void:
 	if expeditions_active.has(id):
 		expeditions_active[id].end = now() - 1.0
 		expeditions_changed.emit()
+
+
+# ---------------------------------------------------------------- bonds
+
+func bond_level(id: StringName) -> int:
+	var pts: int = bond_points.get(id, 0)
+	var lv := 0
+	for t: int in Registry.economy.bond_thresholds:
+		if pts >= t:
+			lv += 1
+	return lv
+
+
+func bond_max_level() -> int:
+	return Registry.economy.bond_thresholds.size()
+
+
+## Vector2i(points into the current level, points the level needs). (0, 0) at max level.
+func bond_progress(id: StringName) -> Vector2i:
+	var th := Registry.economy.bond_thresholds
+	var lv := bond_level(id)
+	if lv >= th.size():
+		return Vector2i.ZERO
+	var pts: int = bond_points.get(id, 0)
+	var floor_pts := th[lv - 1] if lv > 0 else 0
+	return Vector2i(pts - floor_pts, th[lv] - floor_pts)
+
+
+## Both students are at the academy.
+func bond_active(b: BondData) -> bool:
+	return is_student_unlocked(b.student_a) and is_student_unlocked(b.student_b)
+
+
+func duo_unlocked(b: BondData) -> bool:
+	return bond_level(b.id) >= Registry.economy.duo_bond_level
+
+
+func unlocked_duo_recipes() -> Array[StringName]:
+	var out: Array[StringName] = []
+	for b: BondData in Registry.bonds:
+		if duo_unlocked(b):
+			out.append(b.duo_recipe)
+	return out
+
+
+## Adds points and returns {bond, points, old_level, new_level, duo (recipe id unlocked now, or &"")}.
+func add_bond_points(id: StringName, points: int) -> Dictionary:
+	var b := Registry.bond(id)
+	var old := bond_level(id)
+	var had_duo := b != null and duo_unlocked(b)
+	bond_points[id] = int(bond_points.get(id, 0)) + maxi(0, points)
+	var now_lv := bond_level(id)
+	var duo: StringName = &""
+	if b and not had_duo and duo_unlocked(b):
+		duo = b.duo_recipe
+	bonds_changed.emit()
+	return {"bond": id, "points": points, "old_level": old, "new_level": now_lv, "duo": duo}
+
+
+## The next unseen scene for a bond whose level requirement is met, or null.
+func next_scene(b: BondData) -> DialogueData:
+	for d: DialogueData in Registry.dialogues_for(b.id):
+		if scenes_seen.has(d.id):
+			continue
+		return d if bond_level(b.id) >= d.bond_level_required else null
+	return null
+
+
+## True when enough Rift runs happened since the last new scene.
+func scene_time_ready() -> bool:
+	return runs - last_scene_run >= Registry.economy.runs_per_scene
+
+
+## Why this bond has no scene to watch now, or "" if it can play one.
+func scene_lock_reason(b: BondData) -> String:
+	if building_level(&"dormitory") < 1:
+		return "Repair the Dormitory first"
+	if not bond_active(b):
+		return "Both students must be at the academy"
+	if student_busy(b.student_a) or student_busy(b.student_b):
+		return "One of them is away on an expedition"
+	var scenes := Registry.dialogues_for(b.id)
+	var all_seen := true
+	for d: DialogueData in scenes:
+		if not scenes_seen.has(d.id):
+			all_seen = false
+			if bond_level(b.id) < d.bond_level_required:
+				return "Next scene at bond Lv%d (expeditions together help)" % d.bond_level_required
+			break
+	if all_seen:
+		return "All scenes seen"
+	if not scene_time_ready():
+		return "Come back after your next Rift run"
+	return ""
+
+
+func available_scene_count() -> int:
+	var n := 0
+	for b: BondData in Registry.bonds:
+		if scene_lock_reason(b) == "":
+			n += 1
+	return n
+
+
+## Marks a scene watched and pays its bond points. Replays pay nothing. Returns add_bond_points() or {}.
+func finish_scene(id: StringName, choice_index: int) -> Dictionary:
+	var d := Registry.dialogue(id)
+	if d == null or scenes_seen.has(id):
+		return {}
+	var pts := Registry.economy.bond_scene_points
+	if choice_index >= 0 and choice_index < d.choices.size():
+		pts += int(d.choices[choice_index].get("points", 0))
+	scenes_seen.append(id)
+	last_scene_run = runs
+	var result := add_bond_points(d.bond_id, pts)
+	save_game()
+	return result
 
 
 # ---------------------------------------------------------------- runs
@@ -383,6 +519,9 @@ func save_game() -> void:
 		"selected_student": String(selected_student),
 		"expeditions": _expedition_dict(),
 		"clues": _clue_dict(),
+		"bonds": _bond_dict(),
+		"scenes_seen": scenes_seen.map(func(x: StringName) -> String: return String(x)),
+		"last_scene_run": last_scene_run,
 	}
 	var f := FileAccess.open(save_path, FileAccess.WRITE)
 	if f == null:
@@ -434,11 +573,27 @@ func load_game() -> bool:
 	var cl: Dictionary = d.get("clues", {})
 	for key: String in cl:
 		clues_found[StringName(key)] = int(cl[key])
+	var bd: Dictionary = d.get("bonds", {})
+	for key: String in bd:
+		if Registry.bond(StringName(key)):
+			bond_points[StringName(key)] = maxi(0, int(bd[key]))
+	for sid: Variant in d.get("scenes_seen", []):
+		var dn := StringName(str(sid))
+		if Registry.dialogue(dn) and not scenes_seen.has(dn):
+			scenes_seen.append(dn)
+	last_scene_run = int(d.get("last_scene_run", 0))
 	var sel := StringName(str(d.get("selected_student", selected_student)))
 	if student_levels.has(sel) and is_student_unlocked(sel) and not student_busy(sel):
 		selected_student = sel
 	resources_changed.emit()
 	return true
+
+
+func _bond_dict() -> Dictionary:
+	var out := {}
+	for id: StringName in bond_points:
+		out[String(id)] = bond_points[id]
+	return out
 
 
 func _student_dict() -> Dictionary:

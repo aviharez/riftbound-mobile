@@ -13,6 +13,7 @@ var _resources: HBoxContainer
 var _prompt: Button
 var _prompt_id: StringName = &""
 var _expedition_button: Button
+var _stories_button: Button
 var _badge_timer: float = 0.0
 
 
@@ -58,7 +59,7 @@ func _ready() -> void:
 	var row := HBoxContainer.new()
 	row.add_theme_constant_override("separation", 2)
 	nav.add_child(row)
-	for tab: Array in [[&"academy", "Academy", true], [&"rift", "Rift", true], [&"characters", "Students", true], [&"expeditions", "Expedition", true], [&"stories", "Stories", false]]:
+	for tab: Array in [[&"academy", "Academy", true], [&"rift", "Rift", true], [&"characters", "Students", true], [&"expeditions", "Expedition", true], [&"stories", "Stories", true]]:
 		var b := Button.new()
 		b.text = tab[1] if tab[2] else "%s\nsoon" % tab[1]
 		b.size_flags_horizontal = Control.SIZE_EXPAND_FILL
@@ -70,6 +71,8 @@ func _ready() -> void:
 		var id: StringName = tab[0]
 		if id == &"expeditions":
 			_expedition_button = b
+		elif id == &"stories":
+			_stories_button = b
 		b.pressed.connect(func() -> void: nav_pressed.emit(id))
 		row.add_child(b)
 
@@ -137,3 +140,9 @@ func _process(delta: float) -> void:
 	else:
 		_expedition_button.text = "Expedition"
 		_expedition_button.remove_theme_color_override("font_color")
+	var scenes := GameState.available_scene_count()
+	_stories_button.text = "Stories\nnew scene" if scenes > 0 else "Stories"
+	if scenes > 0:
+		_stories_button.add_theme_color_override("font_color", UiTheme.GOLD)
+	else:
+		_stories_button.remove_theme_color_override("font_color")

@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="BondData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/data/bond_data.gd" id="1_script"]
+
+[resource]
+script = ExtResource("1_script")
+id = &"lyra_selene"
+student_a = &"lyra"
+student_b = &"selene"
+duo_recipe = &"frostfire_waltz"
+description = "Fire that never waits and frost that always plans. If they ever move in step, nothing in the Rift will keep up."

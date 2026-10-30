@@ -11,6 +11,8 @@ const ENEMIES_DIR := "res://data/enemies"
 const BUILDINGS_DIR := "res://data/buildings"
 const CHARACTERS_DIR := "res://data/characters"
 const EXPEDITIONS_DIR := "res://data/expeditions"
+const BONDS_DIR := "res://data/bonds"
+const DIALOGUES_DIR := "res://data/dialogues"
 const ECONOMY_PATH := "res://data/balance/economy_balance.tres"
 
 var balance: CombatBalance
@@ -24,6 +26,10 @@ var buildings: Dictionary[StringName, BuildingData] = {}
 var characters: Array[CharacterData] = []
 ## Expedition locations, in board order (by duration).
 var expeditions: Array[ExpeditionData] = []
+## Student pairs, in file order.
+var bonds: Array[BondData] = []
+## Dialogue scenes, sorted by bond then required level.
+var dialogues: Array[DialogueData] = []
 
 
 func _ready() -> void:
@@ -49,6 +55,19 @@ func _ready() -> void:
 		if ex:
 			expeditions.append(ex)
 	expeditions.sort_custom(func(a: ExpeditionData, b: ExpeditionData) -> bool: return a.duration_seconds < b.duration_seconds)
+	for res: Resource in _load_dir(BONDS_DIR):
+		var bo := res as BondData
+		if bo:
+			bonds.append(bo)
+	for res: Resource in _load_dir(DIALOGUES_DIR):
+		var dl := res as DialogueData
+		if dl:
+			var problem := dl.validate()
+			if problem != "":
+				push_error("Registry: dialogue %s: %s" % [dl.id, problem])
+			dialogues.append(dl)
+	dialogues.sort_custom(func(a: DialogueData, b: DialogueData) -> bool:
+		return a.bond_level_required < b.bond_level_required if a.bond_id == b.bond_id else String(a.bond_id) < String(b.bond_id))
 	for res: Resource in _load_dir(ELEMENTS_DIR):
 		var e := res as ElementData
 		if e:
@@ -69,10 +88,54 @@ func _ready() -> void:
 
 
 ## Recipe for two unfused base elements, or null for a generic fusion.
-func find_recipe(a: StringName, b: StringName) -> EvolutionRecipe:
+## Duo evolutions whose result_id is in `unlocked_duos` win over the normal recipe; locked ones are skipped.
+func find_recipe(a: StringName, b: StringName, unlocked_duos: Array = []) -> EvolutionRecipe:
+	var normal: EvolutionRecipe = null
 	for r: EvolutionRecipe in evolutions:
-		if r.matches(a, b):
+		if not r.matches(a, b):
+			continue
+		if r.duo_bond != &"":
+			if unlocked_duos.has(r.result_id):
+				return r
+		elif normal == null:
+			normal = r
+	return normal
+
+
+func recipe(result_id: StringName) -> EvolutionRecipe:
+	for r: EvolutionRecipe in evolutions:
+		if r.result_id == result_id:
 			return r
+	return null
+
+
+func bond(id: StringName) -> BondData:
+	for b: BondData in bonds:
+		if b.id == id:
+			return b
+	return null
+
+
+func bond_between(a: StringName, b: StringName) -> BondData:
+	for bo: BondData in bonds:
+		if bo.involves(a, b):
+			return bo
+	return null
+
+
+## Scenes of a bond, in play order.
+func dialogues_for(bond_id: StringName) -> Array[DialogueData]:
+	var out: Array[DialogueData] = []
+	for d: DialogueData in dialogues:
+		if d.bond_id == bond_id:
+			out.append(d)
+	return out
+
+
+func dialogue(id: StringName) -> DialogueData:
+	for d: DialogueData in dialogues:
+		if d.id == id:
+			return d
 	return null
 
 

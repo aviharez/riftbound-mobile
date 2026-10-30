@@ -114,9 +114,17 @@ Accept:
 - [x] Claiming pays rewards (half on failure), may add a relic, and reveals the next clue on success. *(verified off-device)*
 - [ ] Durations and rewards feel worth it next to a Rift run (playtest).
 
-## M11 — Dialogue and relationships
+## M11 — Dialogue and relationships ✅ (2026-10-30, placeholder art)
 
-Dialogue scenes (portrait placeholders), dormitory interactions, friendship levels; friendship unlocks duo evolutions.
+Dialogue scenes (portrait placeholders), dormitory interactions, friendship levels; friendship unlocks duo evolutions. See `docs/relationship-spec.md`.
+
+Accept:
+- [x] Three pair bonds with three scenes each, unlocked by bond level, one new scene per Rift run. *(verified off-device)*
+- [x] Scenes play with portraits, typewriter text, a choice and its reply; skip and back work. *(verified off-device)*
+- [x] Scenes and shared expeditions add bond points; bond Lv3 unlocks the pair's duo evolution. *(verified off-device)*
+- [x] An unlocked duo evolution replaces the normal recipe in the Rift, with its bonus stats. *(verified off-device)*
+- [x] Stories tab lists bonds, replays watched scenes and shows expedition clues. *(verified off-device)*
+- [ ] Scene text reads well on a phone, and the pacing (one scene per run) feels right (playtest).
 
 ## M12 — Library and quests
 

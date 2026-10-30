@@ -7,8 +7,13 @@ extends Node
 @onready var hud: AcademyHud = $UI/Root/AcademyHud
 @onready var overlays: AcademyOverlays = $UI/Root/AcademyOverlays
 @onready var expeditions: ExpeditionOverlays = $UI/Root/ExpeditionOverlays
+@onready var stories: StoriesOverlays = $UI/Root/StoriesOverlays
+@onready var dialogue: DialoguePlayer = $UI/Root/DialoguePlayer
 
 var _press_pos: Vector2 = Vector2.INF
+## Scene being played and whether it is a replay (replays pay no bond points).
+var _playing: StringName = &""
+var _replay: bool = false
 
 
 func _ready() -> void:
@@ -23,6 +28,10 @@ func _ready() -> void:
 	overlays.student_upgrade_pressed.connect(func(id: StringName) -> void:
 		GameState.upgrade_student(id)
 		overlays.show_profile(id))
+	overlays.talk_pressed.connect(func(id: StringName) -> void: _play_scene(id, false))
+	stories.replay_pressed.connect(func(id: StringName) -> void: _play_scene(id, true))
+	stories.dormitory_pressed.connect(func() -> void: _open_building(&"dormitory"))
+	dialogue.finished.connect(_on_scene_finished)
 	get_viewport().size_changed.connect(_layout)
 	_layout()
 
@@ -36,14 +45,16 @@ func _process(_delta: float) -> void:
 
 
 func _modal_open() -> bool:
-	return overlays.is_open() or expeditions.is_open()
+	return overlays.is_open() or expeditions.is_open() or stories.is_open() or dialogue.is_open()
 
 
 func _notification(what: int) -> void:
 	if what == NOTIFICATION_WM_GO_BACK_REQUEST:
-		if _modal_open():
-			overlays.close()
-			expeditions.close()
+		if dialogue.is_open():
+			dialogue.close()  # leaving a scene early doesn't count it as watched
+			_playing = &""
+		elif _modal_open():
+			_close_modals()
 		else:
 			GameState.go_to(GameState.SCENE_TITLE)
 
@@ -69,7 +80,7 @@ func _unhandled_input(event: InputEvent) -> void:
 func _open_building(id: StringName) -> void:
 	if id == &"":
 		return
-	expeditions.close()
+	_close_modals()
 	overlays.show_building(id)
 
 
@@ -94,11 +105,44 @@ func _on_nav(tab: StringName) -> void:
 		&"rift":
 			_enter_rift()
 		&"academy":
-			overlays.close()
-			expeditions.close()
+			_close_modals()
 		&"characters":
-			expeditions.close()
+			_close_modals()
 			overlays.show_roster()
 		&"expeditions":
-			overlays.close()
+			_close_modals()
 			expeditions.show_board()
+		&"stories":
+			_close_modals()
+			stories.show_stories()
+
+
+func _close_modals() -> void:
+	overlays.close()
+	expeditions.close()
+	stories.close()
+
+
+func _play_scene(id: StringName, replay: bool) -> void:
+	var d := Registry.dialogue(id)
+	if d == null:
+		return
+	_close_modals()
+	_playing = id
+	_replay = replay
+	dialogue.play(d)
+
+
+func _on_scene_finished(choice_index: int) -> void:
+	var id := _playing
+	_playing = &""
+	if id == &"":
+		return
+	if _replay:
+		stories.show_stories()
+		return
+	var result := GameState.finish_scene(id, choice_index)
+	if result.is_empty():
+		_open_building(&"dormitory")
+	else:
+		stories.show_bond_result(Registry.dialogue(id), result)

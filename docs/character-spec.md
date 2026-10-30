@@ -38,4 +38,4 @@ All ultimates cost a full energy bar (combat-spec §9).
 
 ## Later
 
-Relationships and dialogue (M11) build on these students; friendship-gated duo evolutions (e.g. Lyra + Selene) are planned there.
+Bonds between pairs of students, Dormitory scenes and duo evolutions: see `relationship-spec.md`.

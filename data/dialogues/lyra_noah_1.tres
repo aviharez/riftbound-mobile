@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="DialogueData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/data/dialogue_data.gd" id="1_script"]
+
+[resource]
+script = ExtResource("1_script")
+id = &"lyra_noah_1"
+bond_id = &"lyra_noah"
+bond_level_required = 0
+title = "Ash and Seedlings"
+location = "The garden, afternoon"
+lines = Array[String](["narrator: Lyra skids to a stop at the edge of the garden. Behind her, a neat row of seedlings has been flattened by her boots.", "lyra: Oh no. Noah, I'm sorry, I was cutting through, I didn't see...", "noah: It's okay. Look.", "narrator: Noah kneels and lifts one bent stem. It is already turning back toward the sun.", "noah: Fireweed. It's the first thing that grows after a fire. It's tougher than it looks.", "lyra: Like after the Riftfall?", "noah: The whole garden burned. These came up two weeks later. I didn't plant them. They just came back."])
+choice_prompt = "What do you say?"
+choices = Array[Dictionary]([{"text": "Maybe the academy is like that too.", "points": 2, "reply": ["noah: I think so. It just needs someone to keep showing up.", "lyra: Then I'll show up. And I'll walk around the seedlings."]}, {"text": "Lyra, help him replant the row.", "points": 1, "reply": ["lyra: Right. Okay. Show me how. Gently, I promise.", "noah: Gently is the hardest part."]}, {"text": "They're just weeds, though.", "points": 0, "reply": ["noah: So am I, according to the old gardener.", "lyra: He's joking. I think he's joking."]}])
+ending = Array[String](["narrator: Lyra spends the rest of the afternoon on her knees in the dirt, unusually quiet. Noah hums the whole time."])

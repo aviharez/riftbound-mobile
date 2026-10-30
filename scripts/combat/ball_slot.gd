@@ -56,6 +56,8 @@ static func fuse(a: BallSlot, b: BallSlot, recipe: EvolutionRecipe) -> BallSlot:
 		s.core_color = recipe.core_color
 		s.glow_color = recipe.glow_color
 		s.effects = recipe.effects.duplicate()
+		s.damage += recipe.bonus_damage
+		s.power += recipe.bonus_power
 	else:
 		s.id = StringName("fusion_%s_%s" % [a.id, b.id])
 		s.display_name = "%s × %s" % [a.display_name.get_slice(" ", 0), b.display_name.get_slice(" ", 0)]

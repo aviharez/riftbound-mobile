@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="DialogueData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/data/dialogue_data.gd" id="1_script"]
+
+[resource]
+script = ExtResource("1_script")
+id = &"lyra_selene_2"
+bond_id = &"lyra_selene"
+bond_level_required = 1
+title = "The East Wing"
+location = "The burned east wing, midnight"
+lines = Array[String](["narrator: Moonlight falls through the broken roof of the east wing. Lyra is sitting on a scorched beam. Selene arrives with a lantern.", "selene: I thought I'd find you here.", "lyra: I come back sometimes. I got four first-years out that night. There were five.", "selene: The fifth was found in the garden the next morning. Unhurt. She climbed out a window.", "lyra: ...Nobody told me that.", "selene: Nobody told anyone anything. I warned the Headmaster about the Rift readings for a month. He thanked me and filed my notes.", "lyra: So you were right all along, and nobody listened. That must have been awful.", "selene: Being right is useless if it doesn't change anything."])
+choice_prompt = "What do you say?"
+choices = Array[Dictionary]([{"text": "It's changing things now. You're both here, and you're both being heard.", "points": 2, "reply": ["selene: ...I suppose I am.", "lyra: I'm listening. Tell me about the readings. All of it."]}, {"text": "Lyra, you saved four people. That counts.", "points": 1, "reply": ["lyra: Five, apparently. Thanks to a window.", "selene: Four was still four."]}, {"text": "Maybe we should all get some sleep.", "points": 0, "reply": ["lyra: Sleep. Right.", "selene: She won't."]}])
+ending = Array[String](["narrator: They stay until the lantern burns out. Selene talks; for once, Lyra doesn't interrupt."])

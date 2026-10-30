@@ -91,7 +91,13 @@ func show_fusion(battle: Battle) -> void:
 		var b := battle.loadout.balls[pair.y]
 		var r := battle.loadout.fusion_result(pair)
 		var recipe := "%s Lv%d + %s Lv%d · becomes %d ball(s), Lv1" % [a.display_name, a.level, b.display_name, b.level, r.count]
-		box.add_child(_card(r.glow_color, "Evolution · recipe" if r.evolved else "Fusion · combined effects", r.display_name, r.description, recipe, r.evolved,
+		var rec := Registry.recipe(r.id) if r.evolved else null
+		var kind := "Fusion · combined effects"
+		if rec and rec.duo_bond != &"":
+			kind = "Duo evolution · bond"
+		elif r.evolved:
+			kind = "Evolution · recipe"
+		box.add_child(_card(r.glow_color, kind, r.display_name, r.description, recipe, r.evolved,
 			func() -> void: fusion_chosen.emit(pair)))
 	box.add_child(_button("Keep prism for later", "", func() -> void: fusion_kept.emit()))
 

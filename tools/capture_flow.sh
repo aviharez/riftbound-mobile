@@ -3,6 +3,7 @@
 #   loop:   title, academy, building panel, repair, restored academy, battle, result, back at the academy
 #   students: roster, profile, a student joins, Frost Nova, Verdant Bloom
 #   expeditions: board, team rule, team, away, academy badge, result with clue, board after
+#   bonds: dormitory, scene line/choice/reply, bond result, duo unlocked, expedition bond, stories
 #   battle: play, level up, fusion, pause, ultimate, many balls, result
 # Uses a throwaway save, never the player's.
 # Usage: tools/capture_flow.sh [prefix] [resolution]     e.g. tools/capture_flow.sh m6 1080x2400
@@ -20,4 +21,5 @@ printf '[display]\n\nwindow/size/window_width_override=%s\nwindow/size/window_he
 "$GODOT" --path . --windowed -s res://tools/run_runner.gd -- --runner=res://tools/runners/academy_runner.gd --scene=res://scenes/title/title_screen.tscn "--prefix=$PREFIX" 2>&1 | grep -E "SHOT|LOOP|SCRIPT ERROR|ERROR:|at:" || true
 "$GODOT" --path . --windowed -s res://tools/run_runner.gd -- --runner=res://tools/runners/students_runner.gd --scene=res://scenes/title/title_screen.tscn "--prefix=$PREFIX" 2>&1 | grep -E "SHOT|STUDENTS|SCRIPT ERROR|ERROR:|at:" || true
 "$GODOT" --path . --windowed -s res://tools/run_runner.gd -- --runner=res://tools/runners/expeditions_runner.gd --scene=res://scenes/title/title_screen.tscn "--prefix=$PREFIX" 2>&1 | grep -E "SHOT|EXPEDITIONS|SCRIPT ERROR|ERROR:|at:" || true
+"$GODOT" --path . --windowed -s res://tools/run_runner.gd -- --runner=res://tools/runners/bonds_runner.gd --scene=res://scenes/title/title_screen.tscn "--prefix=$PREFIX" 2>&1 | grep -E "SHOT|BONDS|SCRIPT ERROR|ERROR:|at:" || true
 "$GODOT" --path . --windowed -s res://tools/run_runner.gd -- --runner=res://tools/runners/flow_runner.gd "--prefix=$PREFIX" 2>&1 | grep -E "SHOT|SCRIPT ERROR|ERROR:|at:" || true

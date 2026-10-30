@@ -35,6 +35,19 @@ extends Resource
 ## Share of the rewards paid when an expedition fails.
 @export var expedition_fail_fraction: float = 0.5
 
+@export_group("Bonds")
+## Total bond points needed for bond level 1, 2, 3... (index 0 = Lv1). The size is the max bond level.
+## Capped at the duo level until more scenes exist (relationship-spec).
+@export var bond_thresholds: Array[int] = [3, 7, 12]
+## Points for finishing a Dormitory scene (the choice adds its own 0-2 on top).
+@export var bond_scene_points: int = 2
+## Points for every pair of students that came back from the same expedition.
+@export var bond_expedition_points: int = 1
+## Bond level that unlocks the pair's duo evolution.
+@export var duo_bond_level: int = 3
+## A new Dormitory scene becomes available after this many Rift runs since the last one.
+@export var runs_per_scene: int = 1
+
 @export_group("Academy hub")
 @export var hub_size: Vector2 = Vector2(300.0, 640.0)
 @export var hub_spawn: Vector2 = Vector2(150.0, 400.0)

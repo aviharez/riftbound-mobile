@@ -22,7 +22,7 @@ var items: Array[ItemSlot] = []
 ## Extra baby balls added by the debug menu.
 var debug_baby_balls: int = 0
 ## Run bonuses from academy buildings and the student's level (GameState.run_bonuses()):
-## baby_balls, max_hp, xp_mult, energy_gain, rerolls, start_damage.
+## baby_balls, max_hp, xp_mult, energy_gain, rerolls, start_damage, duo_recipes (unlocked duo evolution ids).
 var meta: Dictionary = {}
 
 
@@ -185,7 +185,8 @@ func fusion_result(pair: Vector2i) -> BallSlot:
 	var b := balls[pair.y]
 	var recipe: EvolutionRecipe = null
 	if not a.fused and not b.fused:
-		recipe = Registry.find_recipe(a.id, b.id)
+		var duos: Array = meta.get(&"duo_recipes", [])
+		recipe = Registry.find_recipe(a.id, b.id, duos)
 	return BallSlot.fuse(a, b, recipe)
 
 

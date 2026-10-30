@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="DialogueData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/data/dialogue_data.gd" id="1_script"]
+
+[resource]
+script = ExtResource("1_script")
+id = &"selene_noah_3"
+bond_id = &"selene_noah"
+bond_level_required = 2
+title = "Winter Garden"
+location = "The greenhouse, before dawn"
+lines = Array[String](["narrator: An early frost is coming. Noah is wrapping the youngest plants in cloth, one by one. Selene arrives with her sleeves rolled up.", "selene: Cloth won't be enough. Ice crystals form inside the leaves and tear them apart.", "noah: I know. I just didn't know what else to do.", "selene: Frost isn't only cold. If I shape it slowly, it insulates. Let me try.", "narrator: A thin shell of ice forms over the seedlings, clear as glass. Underneath, Noah's vines glow green and keep the roots warm.", "noah: Ice outside, life inside. It's like a little winter garden.", "selene: The vines are carrying my frost along their stems. Further than I could cast it.", "noah: They like you. I told you they listen."])
+choice_prompt = "What do you say?"
+choices = Array[Dictionary]([{"text": "Frost that protects instead of freezing. You two did that.", "points": 2, "reply": ["selene: Winter Garden. It's an accurate name.", "noah: It's a beautiful name. Those can be the same thing."]}, {"text": "Imagine those vines in the Rift.", "points": 1, "reply": ["selene: Vines that carry frost between targets. That would work.", "noah: They'd love to help."]}, {"text": "Can we go back to bed now?", "points": 0, "reply": ["noah: Five more pots.", "selene: Seven. I counted."]}])
+ending = Array[String](["narrator: The frost passes in the night. In the morning, every seedling is alive."])

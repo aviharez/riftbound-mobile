@@ -11,6 +11,13 @@ extends Resource
 @export var core_color: Color = Color.WHITE
 @export var glow_color: Color = Color.WHITE
 @export var effects: Array[StringName] = []
+@export_group("Duo evolution")
+## Non-empty = a duo evolution: only used once this bond reaches EconomyBalance.duo_bond_level,
+## and then it replaces the normal recipe for the same pair. See docs/relationship-spec.md.
+@export var duo_bond: StringName = &""
+## Added on top of the normal fusion stats.
+@export var bonus_damage: int = 0
+@export var bonus_power: int = 0
 
 
 func matches(a: StringName, b: StringName) -> bool:

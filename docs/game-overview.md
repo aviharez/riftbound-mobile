@@ -85,7 +85,7 @@ Exploration: Expedition Board, Expedition Team, Expedition Result, Quest Journal
 
 ## Current phase
 
-Combat slice (M1–M6), core loop (M8), students (M9) and expeditions (M10) are built with placeholder art. Next: dialogue & relationships (M11), library & quests (M12); then the art pass (M7). See `milestones.md`.
+Combat slice (M1–M6), core loop (M8), students (M9), expeditions (M10) and relationships (M11) are built with placeholder art. Next: library & quests (M12); then the art pass (M7). See `milestones.md`.
 
 ## Originality
 

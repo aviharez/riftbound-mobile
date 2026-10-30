@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="EvolutionRecipe" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/data/evolution_recipe.gd" id="1_script"]
+
+[resource]
+script = ExtResource("1_script")
+element_a = &"ember"
+element_b = &"frost"
+result_id = &"frostfire_waltz"
+display_name = "Frostfire Waltz"
+description = "Lyra and Selene's duo: burns, slows and bursts on every hit."
+core_color = Color(1, 1, 1, 1)
+glow_color = Color(0.957, 0.561, 0.808, 1)
+effects = Array[StringName]([&"burn", &"slow", &"blast"])
+duo_bond = &"lyra_selene"
+bonus_damage = 1
+bonus_power = 1

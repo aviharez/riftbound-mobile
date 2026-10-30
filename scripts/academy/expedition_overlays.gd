@@ -109,6 +109,22 @@ func show_result(id: StringName, result: Dictionary) -> void:
 		var r := _label("Rare find: an Ancient Relic!", "CardTitle")
 		r.add_theme_color_override("font_color", UiTheme.RELIC)
 		box.add_child(r)
+	var bonds: Array = result.get("bonds", [])
+	if not bonds.is_empty():
+		box.add_child(_label("Bonds", "Heading"))
+		for up: Dictionary in bonds:
+			var bo := Registry.bond(up.bond)
+			var text := "%s  +%d" % [bo.display_name(), int(up.points)]
+			if int(up.new_level) > int(up.old_level):
+				text += "  ·  bond Lv%d!" % int(up.new_level)
+			var bl := _label(text, "CardTitle")
+			bl.add_theme_color_override("font_color", Color("f08fb4"))
+			box.add_child(bl)
+			if StringName(up.duo) != &"":
+				var r := Registry.recipe(up.duo)
+				var dl := _label("Duo evolution unlocked: %s" % (r.display_name if r else String(up.duo)), "Small", true)
+				dl.add_theme_color_override("font_color", UiTheme.GOLD)
+				box.add_child(dl)
 	box.add_child(_label("Clue", "Heading"))
 	var clue: String = result.clue
 	if clue != "":

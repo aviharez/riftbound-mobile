@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="DialogueData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/data/dialogue_data.gd" id="1_script"]
+
+[resource]
+script = ExtResource("1_script")
+id = &"lyra_selene_1"
+bond_id = &"lyra_selene"
+bond_level_required = 0
+title = "Two Kinds of Brave"
+location = "Dormitory common room, late evening"
+lines = Array[String](["narrator: The common room still smells of smoke. Selene is waiting by the cold fireplace when Lyra walks in, boots muddy from the Rift.", "selene: You ran straight at the third wave again. No plan, no retreat path.", "lyra: And it worked. They're gone, aren't they?", "selene: This time. I've run the numbers. If the formation had split, you'd have been flanked from both sides.", "lyra: Numbers don't hold the line, Selene. People do.", "selene: People who ignore numbers don't hold anything for long.", "narrator: They both turn to you, as if you were the judge."])
+choice_prompt = "What do you say?"
+choices = Array[Dictionary]([{"text": "You both kept the academy standing. Maybe you need each other.", "points": 2, "reply": ["lyra: ...She did call the split before it happened. Last week.", "selene: And you were the only one who ran toward it. I noticed."]}, {"text": "Selene has a point, Lyra. A plan wouldn't hurt.", "points": 1, "reply": ["lyra: Fine. One plan. A short one.", "selene: I'll write it in large letters."]}, {"text": "I'm staying out of this one.", "points": 0, "reply": ["lyra: Coward.", "selene: Wise, actually."]}])
+ending = Array[String](["narrator: Selene leaves a folded page on the table on her way out. Lyra pretends not to read it, then reads it twice."])

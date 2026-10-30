@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="DialogueData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/data/dialogue_data.gd" id="1_script"]
+
+[resource]
+script = ExtResource("1_script")
+id = &"lyra_noah_3"
+bond_id = &"lyra_noah"
+bond_level_required = 2
+title = "Sunbloom"
+location = "The overgrown south lawn, noon"
+lines = Array[String](["noah: The dead brush on the south lawn is choking everything. It needs to burn, but carefully.", "lyra: Carefully is not really my style.", "noah: That's why I'll be right here. I'll keep the roots alive. You just burn what's already gone.", "narrator: Lyra raises her hand. The fire comes slowly this time, moving where Noah points, never past the green.", "noah: Left. Slower. Good. Now let it breathe.", "narrator: Where the flames pass, bright shoots push up through the ash, glowing faintly gold. The fire seems to feed them.", "lyra: Noah. Noah, are you seeing this? The fire is making them grow.", "noah: Not the fire. Us."])
+choice_prompt = "What do you say?"
+choices = Array[Dictionary]([{"text": "Fire that helps things grow. That's something new.", "points": 2, "reply": ["lyra: Sunbloom. Let's call it Sunbloom.", "noah: The garden likes that name. I can tell."]}, {"text": "Could that work against Rift creatures?", "points": 1, "reply": ["lyra: Burn them, feed us. I like it.", "noah: That's... one way to put it."]}, {"text": "Is the lawn supposed to be on fire?", "points": 0, "reply": ["noah: Only the brown parts.", "lyra: Mostly the brown parts."]}])
+ending = Array[String](["narrator: By evening, the south lawn is green for the first time since the Riftfall."])

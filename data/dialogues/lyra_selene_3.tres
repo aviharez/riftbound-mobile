@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="DialogueData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/data/dialogue_data.gd" id="1_script"]
+
+[resource]
+script = ExtResource("1_script")
+id = &"lyra_selene_3"
+bond_id = &"lyra_selene"
+bond_level_required = 2
+title = "In Step"
+location = "Courtyard, early morning"
+lines = Array[String](["narrator: A cloud of steam rolls across the courtyard. Somewhere inside it, Lyra is coughing and Selene is counting.", "selene: You cast on four. I said on three.", "lyra: You said three and then you breathed! That's basically four!", "selene: Fire and frost cancel out if they meet at the wrong moment. Steam is what failure looks like.", "lyra: Then let's fail better. Again.", "narrator: They try again. And again. On the ninth try, the flame doesn't die. It curls around a core of ice and spins.", "selene: ...It's stable. It's actually stable.", "lyra: It's dancing. Look at it. It's dancing!"])
+choice_prompt = "What do you say?"
+choices = Array[Dictionary]([{"text": "That's not luck. That's the two of you, in step.", "points": 2, "reply": ["selene: We'll need a name for it. Something precise.", "lyra: Frostfire Waltz. Final answer."]}, {"text": "Can you do that in the Rift?", "points": 1, "reply": ["lyra: Only one way to find out.", "selene: After breakfast. And a plan."]}, {"text": "You two set the hedge on fire. Twice.", "points": 0, "reply": ["lyra: It was frozen first. That's fair.", "selene: Noah will be furious."]}])
+ending = Array[String](["narrator: The spinning orb hangs in the air a moment longer, then melts into a ring of warm mist. Neither of them stops smiling."])

@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="EvolutionRecipe" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/data/evolution_recipe.gd" id="1_script"]
+
+[resource]
+script = ExtResource("1_script")
+element_a = &"ember"
+element_b = &"verdant"
+result_id = &"sunbloom"
+display_name = "Sunbloom"
+description = "Lyra and Noah's duo: spreading fire that bursts on hit and siphons gems twice as well."
+core_color = Color(1, 0.976, 0.82, 1)
+glow_color = Color(1, 0.82, 0.35, 1)
+effects = Array[StringName]([&"burn", &"spread", &"blast", &"siphon"])
+duo_bond = &"lyra_noah"
+bonus_damage = 1
+bonus_power = 0

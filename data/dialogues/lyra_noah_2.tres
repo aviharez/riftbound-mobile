@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="DialogueData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/data/dialogue_data.gd" id="1_script"]
+
+[resource]
+script = ExtResource("1_script")
+id = &"lyra_noah_2"
+bond_id = &"lyra_noah"
+bond_level_required = 1
+title = "Night Watch"
+location = "Dormitory roof, after midnight"
+lines = Array[String](["narrator: Lyra sits on the roof, watching the violet glow of the Rift Gate. Noah climbs up with two cups of tea.", "noah: Chamomile. And something from the garden I'm still naming.", "lyra: You should be asleep.", "noah: So should you. This is the fourth night.", "lyra: Every time I close my eyes I see the waves coming down. What if I'm not fast enough next time? What if someone gets hurt because I hesitated?", "noah: You've never hesitated in your life.", "lyra: That's what everyone thinks. That's the problem."])
+choice_prompt = "What do you say?"
+choices = Array[Dictionary]([{"text": "You don't have to be fearless. You just have to not be alone.", "points": 2, "reply": ["noah: I'll take the roof watch with you. Every night, if you want.", "lyra: ...Bring the nameless tea."]}, {"text": "Being scared means you care. That's not weakness.", "points": 1, "reply": ["lyra: It feels like weakness at three in the morning.", "noah: Everything does, at three in the morning."]}, {"text": "Try counting enemies instead of sheep.", "points": 0, "reply": ["lyra: That is the worst advice I've ever heard.", "noah: She's smiling, though."]}])
+ending = Array[String](["narrator: The tea goes cold. Neither of them goes inside until the sky turns grey."])

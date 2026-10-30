@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="DialogueData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/data/dialogue_data.gd" id="1_script"]
+
+[resource]
+script = ExtResource("1_script")
+id = &"selene_noah_2"
+bond_id = &"selene_noah"
+bond_level_required = 1
+title = "Readings"
+location = "Selene's room, night"
+lines = Array[String](["narrator: Noah's plant map is pinned beside Selene's old Rift readings. Red string connects them in a web.", "selene: Your plants lean the most on the nights my instruments spiked. Every time. The correlation is almost perfect.", "noah: So they knew. Before the Riftfall. They were trying to tell us.", "selene: Plants don't try. But they react to something my instruments only half measured.", "noah: The willow by the lake stopped leaning three days ago. Completely.", "selene: Three days ago is when the Rift went quiet. I thought it was a good sign.", "noah: What if it's the opposite? What if something is holding its breath?"])
+choice_prompt = "What do you say?"
+choices = Array[Dictionary]([{"text": "Then we watch together. Your instruments, his plants.", "points": 2, "reply": ["selene: A combined watch. Readings at dusk and dawn.", "noah: I'll bring tea. Lyra says it's mandatory now."]}, {"text": "We should tell everyone about this.", "points": 1, "reply": ["selene: When we have proof. I won't be ignored twice.", "noah: Then let's get proof."]}, {"text": "It's probably just a quiet week.", "points": 0, "reply": ["selene: Probably.", "noah: She doesn't believe that. Neither do I."]}])
+ending = Array[String](["narrator: The candle burns low. Selene adds a new line to her notes: willow, lake, still. Noah watches her underline it twice."])

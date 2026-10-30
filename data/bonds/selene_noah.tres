@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="BondData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/data/bond_data.gd" id="1_script"]
+
+[resource]
+script = ExtResource("1_script")
+id = &"selene_noah"
+student_a = &"selene"
+student_b = &"noah"
+duo_recipe = &"winter_garden"
+description = "Selene measures the Rift; Noah listens to it. Their notes rarely agree, and are right more often when they do."

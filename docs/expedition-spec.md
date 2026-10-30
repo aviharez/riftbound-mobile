@@ -29,6 +29,7 @@ The rare reward is +1 Ancient Relic and only rolls on a success. Each place has 
 - If the selected Rift student leaves, the first free student becomes selected. Busy students can't be selected.
 - The outcome (success, rare find) is rolled when the team leaves and stored in the save, so reloading can't reroll it. It is revealed only on return.
 - Failure pays `expedition_fail_fraction` (50%) of the rewards and no clue.
+- Every pair of students in the team gains bond points on return, success or not (relationship-spec). Clues are collected in the Stories tab.
 - Timers use the system clock (`Time.get_unix_time_from_system()`), so they keep running while the game is closed.
 
 ## UI
@@ -46,5 +47,4 @@ The rare reward is +1 Ancient Relic and only rolls on a success. Each place has 
 ## Not yet
 
 - Clock tampering: moving the device clock forward finishes expeditions early. Acceptable for an offline single-player game for now; revisit if expeditions ever feed anything competitive.
-- Clues are read on the result screen only; the Stories tab (M11) will collect them.
 - Notifications when a team returns (needs a local-notification plugin; ask first).

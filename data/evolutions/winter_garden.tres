@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="EvolutionRecipe" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/data/evolution_recipe.gd" id="1_script"]
+
+[resource]
+script = ExtResource("1_script")
+element_a = &"frost"
+element_b = &"verdant"
+result_id = &"winter_garden"
+display_name = "Winter Garden"
+description = "Selene and Noah's duo: frost-laced vines leap between enemies and slow them; siphons gems twice as well."
+core_color = Color(1, 1, 1, 1)
+glow_color = Color(0.55, 0.95, 0.8, 1)
+effects = Array[StringName]([&"slow", &"chain", &"chainSlow", &"siphon"])
+duo_bond = &"selene_noah"
+bonus_damage = 0
+bonus_power = 1

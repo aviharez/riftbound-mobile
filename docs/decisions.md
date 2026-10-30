@@ -36,6 +36,8 @@ Newest at the bottom. When a decision changes, add a new entry instead of editin
 | 2026-10-30 | Students: Lyra (start), Selene (Dormitory Lv1), Noah (Dormitory Lv2). Ultimates: Flame Orb, Frost Nova (slow everything + damage), Verdant Bloom (heal, collect all drops, hit enemies near the line). Levels 1–10 bought with resources: +1 max HP per level, +1 starting-ball damage at Lv4/7/10. | Gives the Dormitory a purpose and each student a distinct role (damage / control / support) as in the overview. |
 | 2026-10-30 | Expeditions: three real-time places (5/15/30 min). Success chance = team power / recommended (min 35%), element match ×1.5. Outcome rolled at departure and saved. Failure pays 50%, no clue. One student must stay home. | Real-time idle loop like the overview's "send expeditions"; rolling at departure stops save-scumming; the stay-home rule means the Rift is never blocked. Details in expedition-spec. |
 | 2026-10-30 | Expedition timers trust the system clock. | Offline single-player game; tamper protection isn't worth the complexity yet. |
+| 2026-10-30 | Relationships are bonds between pairs of students (not student-to-player). Points from Dormitory scenes (2 + choice 0–2) and shared expeditions (+1 per pair). Bond Lv3 (12 points) unlocks the pair's duo evolution, which replaces the normal recipe for that element pair for every student. | Matches the planned "duo evolutions (e.g. Lyra + Selene)"; ties M10 expeditions to M11; three best-choice scenes reach Lv3 exactly. |
+| 2026-10-30 | One new scene per Rift run; bonds capped at Lv3 until there are more scenes. | Keeps the Rift the heart of the loop; no empty levels that promise nothing. |
 
 ## Open questions
 
@@ -45,3 +47,4 @@ Newest at the bottom. When a decision changes, add a new entry instead of editin
 - Ultimates for Selene and Noah.
 - Retreat currently keeps 100% of rewards (`retreat_fraction`); maybe lower it so finishing a run matters.
 - Economy pacing needs playtesting (economy-spec targets).
+- Should a duo evolution need one of its two students in the run? Currently it works for anyone.

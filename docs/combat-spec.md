@@ -168,7 +168,15 @@ Area effects, chains and shard blasts are **queued and resolved next frame**.
 
 - Any other pair → **generic fusion**: union of both effect lists, name "A × B", color = average of both.
 - Fused balls can fuse again once they reach level 3 (always generic).
-- Planned (not decided): discovered recipes recorded in the Library; duo evolutions gated by character friendship.
+- **Duo evolutions** (M11): unlocked when a student pair reaches bond Lv3 (`EconomyBalance.duo_bond_level`); they then replace the normal recipe for that element pair in every run, whoever is playing. The run receives the unlocked ids as `run_bonuses.duo_recipes`.
+
+| Bond | Recipe | Result | Effects | Bonus |
+|---|---|---|---|---|
+| Lyra & Selene | Ember + Frost | Frostfire Waltz | burn, slow, blast | +1 damage, +1 power |
+| Lyra & Noah | Ember + Verdant | Sunbloom | burn, spread, blast, siphon | +1 damage |
+| Selene & Noah | Frost + Verdant | Winter Garden | slow, chain, chainSlow, siphon | +1 power |
+
+- Planned (not decided): discovered recipes recorded in the Library.
 
 ## 9. Ultimate
 
