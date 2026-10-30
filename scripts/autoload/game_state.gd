@@ -5,6 +5,7 @@ extends Node
 signal resources_changed
 signal building_changed(id: StringName)
 signal student_changed(id: StringName)
+signal expeditions_changed
 
 const SAVE_PATH := "user://save.json"
 const TEST_SAVE_PATH := "user://save_test.json"
@@ -27,6 +28,11 @@ var bosses_defeated: int = 0
 ## Student levels (1..max). Locked students keep level 1 until they join.
 var student_levels: Dictionary[StringName, int] = {}
 var selected_student: StringName = &"lyra"
+## Running expeditions: id -> {team: Array[StringName], start: float, end: float, success: bool, rare: bool}.
+## Outcomes are rolled when the expedition starts, so reopening the game can't change them.
+var expeditions_active: Dictionary = {}
+## How many story clues each expedition has revealed.
+var clues_found: Dictionary[StringName, int] = {}
 
 ## Screen hand-off (not saved): rewards of the run that just ended, shown on the result screen.
 var last_rewards: Vector3i = Vector3i.ZERO
@@ -68,6 +74,8 @@ func reset() -> void:
 	for c: CharacterData in Registry.characters:
 		student_levels[c.id] = 1
 	selected_student = Registry.characters[0].id if not Registry.characters.is_empty() else &"lyra"
+	expeditions_active.clear()
+	clues_found.clear()
 	resources_changed.emit()
 
 
@@ -170,7 +178,7 @@ func students_joining_at(dorm_level: int) -> Array[CharacterData]:
 
 
 func select_student(id: StringName) -> void:
-	if not is_student_unlocked(id):
+	if not is_student_unlocked(id) or student_busy(id):
 		return
 	selected_student = id
 	student_changed.emit(id)
@@ -198,6 +206,144 @@ func upgrade_student(id: StringName) -> bool:
 	student_changed.emit(id)
 	save_game()
 	return true
+
+
+# ---------------------------------------------------------------- expeditions
+
+func now() -> float:
+	return Time.get_unix_time_from_system()
+
+
+func expedition_unlocked(e: ExpeditionData) -> bool:
+	if e.unlock_building != &"" and building_level(e.unlock_building) < e.unlock_building_level:
+		return false
+	return best_wave >= e.unlock_best_wave
+
+
+func expedition_lock_reason(e: ExpeditionData) -> String:
+	if e.unlock_building != &"" and building_level(e.unlock_building) < e.unlock_building_level:
+		return "Restore the %s to Lv%d" % [Registry.buildings[e.unlock_building].display_name, e.unlock_building_level]
+	if best_wave < e.unlock_best_wave:
+		return "Reach wave %d in the Rift" % e.unlock_best_wave
+	return ""
+
+
+func student_busy(id: StringName) -> bool:
+	for exp_id: StringName in expeditions_active:
+		if (expeditions_active[exp_id].team as Array).has(id):
+			return true
+	return false
+
+
+func free_students() -> Array[CharacterData]:
+	var out: Array[CharacterData] = []
+	for c: CharacterData in Registry.characters:
+		if is_student_unlocked(c.id) and not student_busy(c.id):
+			out.append(c)
+	return out
+
+
+func team_power(e: ExpeditionData, team: Array[StringName]) -> float:
+	var eco := Registry.economy
+	var p := 0.0
+	for id: StringName in team:
+		var c := Registry.character(id)
+		var v := eco.expedition_power_base + eco.expedition_power_per_level * float(student_level(id))
+		if c.element_id == e.preferred_element:
+			v *= eco.expedition_element_match
+		p += v
+	return p
+
+
+func success_chance(e: ExpeditionData, team: Array[StringName]) -> float:
+	if team.is_empty():
+		return 0.0
+	return clampf(team_power(e, team) / e.recommended_power, Registry.economy.expedition_min_chance, 1.0)
+
+
+## Why this team can't go, or "" if it can.
+func expedition_team_problem(e: ExpeditionData, team: Array[StringName]) -> String:
+	if not expedition_unlocked(e):
+		return expedition_lock_reason(e)
+	if expeditions_active.has(e.id):
+		return "Already in progress"
+	if team.is_empty():
+		return "Pick at least one student"
+	if team.size() > e.max_team:
+		return "At most %d students" % e.max_team
+	if free_students().size() - team.size() < 1:
+		return "Someone has to stay to defend the academy"
+	return ""
+
+
+func start_expedition(id: StringName, team: Array[StringName]) -> bool:
+	var e := Registry.expedition(id)
+	if e == null or expedition_team_problem(e, team) != "":
+		return false
+	var success := randf() < success_chance(e, team)
+	var rare := success and randf() < e.rare_chance
+	var t := now()
+	var names: Array[StringName] = team.duplicate()
+	expeditions_active[id] = {"team": names, "start": t, "end": t + e.duration_seconds, "success": success, "rare": rare}
+	if names.has(selected_student):
+		var free := free_students()
+		if not free.is_empty():
+			selected_student = free[0].id
+			student_changed.emit(selected_student)
+	expeditions_changed.emit()
+	save_game()
+	return true
+
+
+func expedition_time_left(id: StringName) -> float:
+	if not expeditions_active.has(id):
+		return 0.0
+	return maxf(0.0, float(expeditions_active[id].end) - now())
+
+
+func is_expedition_ready(id: StringName) -> bool:
+	return expeditions_active.has(id) and expedition_time_left(id) <= 0.0
+
+
+func ready_expedition_count() -> int:
+	var n := 0
+	for id: StringName in expeditions_active:
+		if is_expedition_ready(id):
+			n += 1
+	return n
+
+
+## Pays out a finished expedition. Returns {success, rare, rewards: Vector3i, clue: String, team}.
+func claim_expedition(id: StringName) -> Dictionary:
+	if not is_expedition_ready(id):
+		return {}
+	var e := Registry.expedition(id)
+	var rec: Dictionary = expeditions_active[id]
+	var success: bool = rec.success
+	var r := e.rewards
+	if not success:
+		var f := Registry.economy.expedition_fail_fraction
+		r = Vector3i(roundi(r.x * f), roundi(r.y * f), roundi(r.z * f))
+	if rec.rare:
+		r += e.rare_reward
+	add_resources(r)
+	var clue := ""
+	if success:
+		var n: int = clues_found.get(id, 0)
+		if n < e.clues.size():
+			clue = e.clues[n]
+			clues_found[id] = n + 1
+	expeditions_active.erase(id)
+	expeditions_changed.emit()
+	save_game()
+	return {"success": success, "rare": rec.rare, "rewards": r, "clue": clue, "team": rec.team}
+
+
+## Debug: make a running expedition finish now.
+func debug_finish_expedition(id: StringName) -> void:
+	if expeditions_active.has(id):
+		expeditions_active[id].end = now() - 1.0
+		expeditions_changed.emit()
 
 
 # ---------------------------------------------------------------- runs
@@ -235,6 +381,8 @@ func save_game() -> void:
 		"stats": {"runs": runs, "best_wave": best_wave, "total_kills": total_kills, "bosses_defeated": bosses_defeated},
 		"students": _student_dict(),
 		"selected_student": String(selected_student),
+		"expeditions": _expedition_dict(),
+		"clues": _clue_dict(),
 	}
 	var f := FileAccess.open(save_path, FileAccess.WRITE)
 	if f == null:
@@ -272,8 +420,22 @@ func load_game() -> bool:
 		var sid := StringName(key)
 		if student_levels.has(sid):
 			student_levels[sid] = clampi(int(studs[key]), 1, Registry.character(sid).max_level)
+	var exps: Dictionary = d.get("expeditions", {})
+	for key: String in exps:
+		var eid := StringName(key)
+		if Registry.expedition(eid) == null:
+			continue
+		var rec: Dictionary = exps[key]
+		var team: Array[StringName] = []
+		for m: Variant in rec.get("team", []):
+			team.append(StringName(str(m)))
+		expeditions_active[eid] = {"team": team, "start": float(rec.get("start", 0.0)), "end": float(rec.get("end", 0.0)),
+			"success": bool(rec.get("success", false)), "rare": bool(rec.get("rare", false))}
+	var cl: Dictionary = d.get("clues", {})
+	for key: String in cl:
+		clues_found[StringName(key)] = int(cl[key])
 	var sel := StringName(str(d.get("selected_student", selected_student)))
-	if student_levels.has(sel) and is_student_unlocked(sel):
+	if student_levels.has(sel) and is_student_unlocked(sel) and not student_busy(sel):
 		selected_student = sel
 	resources_changed.emit()
 	return true
@@ -283,4 +445,22 @@ func _student_dict() -> Dictionary:
 	var out := {}
 	for id: StringName in student_levels:
 		out[String(id)] = student_levels[id]
+	return out
+
+
+func _expedition_dict() -> Dictionary:
+	var out := {}
+	for id: StringName in expeditions_active:
+		var rec: Dictionary = expeditions_active[id]
+		var team: Array[String] = []
+		for m: StringName in rec.team:
+			team.append(String(m))
+		out[String(id)] = {"team": team, "start": rec.start, "end": rec.end, "success": rec.success, "rare": rec.rare}
+	return out
+
+
+func _clue_dict() -> Dictionary:
+	var out := {}
+	for id: StringName in clues_found:
+		out[String(id)] = clues_found[id]
 	return out

@@ -46,6 +46,10 @@ Pacing target (to validate in playtests): the first repair after 1 run, all five
 
 Student level-ups are the second resource sink: (30 + 25L) shards and (10 + 6L) materials from level L, +1 relic from Lv7. Details in `character-spec.md`.
 
+## Expeditions
+
+Expeditions are the second resource source: 40–150 shards and 20–80 materials per trip (half on failure), relics from the hardest place and rare finds. Students away can't fight. Details in `expedition-spec.md`.
+
 ## Academy hub
 
 - Map 300 × 640 hub units, camera follows the student, rendered pixel-perfect like the arena.

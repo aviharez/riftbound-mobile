@@ -1,0 +1,21 @@
+[gd_resource type="Resource" script_class="ExpeditionData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/data/expedition_data.gd" id="1_script"]
+
+[resource]
+script = ExtResource("1_script")
+id = &"whispering_woods"
+display_name = "Whispering Woods"
+description = "The forest behind the academy has started to hum at night. Something from the Rift is nesting between the old trees."
+duration_seconds = 300.0
+threat = 1
+recommended_power = 10.0
+max_team = 2
+preferred_element = &"verdant"
+rewards = Vector3i(40, 20, 0)
+rare_chance = 0.1
+rare_reward = Vector3i(0, 0, 1)
+unlock_building = &""
+unlock_building_level = 0
+unlock_best_wave = 0
+clues = Array[String](["Scorched bark in perfect circles, as if something drew them with fire from the inside.", "A student badge half-buried in moss. The name is burned away, but the year is from before the Riftfall.", "The humming stops whenever someone says the Headmaster's name out loud."])

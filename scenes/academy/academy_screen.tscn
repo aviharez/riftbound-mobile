@@ -1,9 +1,10 @@
-[gd_scene load_steps=5 format=3]
+[gd_scene load_steps=6 format=3]
 
 [ext_resource type="Script" path="res://scripts/academy/academy_screen.gd" id="1_screen"]
 [ext_resource type="Script" path="res://scripts/academy/academy_map.gd" id="2_map"]
 [ext_resource type="Script" path="res://scripts/academy/academy_hud.gd" id="3_hud"]
 [ext_resource type="Script" path="res://scripts/academy/academy_overlays.gd" id="4_overlays"]
+[ext_resource type="Script" path="res://scripts/academy/expedition_overlays.gd" id="5_expeditions"]
 
 [node name="AcademyScreen" type="Node"]
 script = ExtResource("1_screen")
@@ -60,3 +61,13 @@ grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
 script = ExtResource("4_overlays")
+
+[node name="ExpeditionOverlays" type="Control" parent="UI/Root"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("5_expeditions")

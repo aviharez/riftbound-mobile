@@ -61,6 +61,8 @@ func show_roster() -> void:
 		var status := ""
 		if not unlocked:
 			status = "Joins when the Dormitory reaches Lv%d" % c.unlock_dormitory_level
+		elif GameState.student_busy(c.id):
+			status = "Away on an expedition"
 		elif c.id == GameState.selected_student:
 			status = "Selected · enters the Rift"
 		elif GameState.can_upgrade_student(c.id):
@@ -116,7 +118,9 @@ func show_profile(id: StringName) -> void:
 			if up.disabled:
 				up.text += " (not enough)"
 			box.add_child(up)
-		if id == GameState.selected_student:
+		if GameState.student_busy(id):
+			box.add_child(_label("%s is away on an expedition." % c.display_name.get_slice(" ", 0), "Small", true))
+		elif id == GameState.selected_student:
 			box.add_child(_label("Selected: %s enters the Rift next." % c.display_name.get_slice(" ", 0), "Small", true))
 		else:
 			box.add_child(_button("Select for the Rift", "Primary", func() -> void: student_select_pressed.emit(id)))

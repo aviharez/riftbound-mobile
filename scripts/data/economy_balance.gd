@@ -25,6 +25,16 @@ extends Resource
 ## Levels at or above this also cost one Ancient Relic.
 @export var student_relic_from_level: int = 7
 
+@export_group("Expeditions")
+## Team power per student = base + per_level × level; students of the place's preferred element count × match.
+@export var expedition_power_base: float = 8.0
+@export var expedition_power_per_level: float = 4.0
+@export var expedition_element_match: float = 1.5
+## Success chance = clamp(power / recommended, min, 1).
+@export var expedition_min_chance: float = 0.35
+## Share of the rewards paid when an expedition fails.
+@export var expedition_fail_fraction: float = 0.5
+
 @export_group("Academy hub")
 @export var hub_size: Vector2 = Vector2(300.0, 640.0)
 @export var hub_spawn: Vector2 = Vector2(150.0, 400.0)

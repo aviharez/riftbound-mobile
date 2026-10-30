@@ -102,9 +102,17 @@ Accept:
 - [x] Student levels add max HP and starting-ball damage to runs, and are saved. *(verified off-device)*
 - [ ] Each ultimate feels distinct and worth charging (playtest on a phone).
 
-## M10 — Expeditions
+## M10 — Expeditions ✅ (2026-10-30, placeholder art)
 
-Expedition board, team select, timers (real time), results with resources and story clues.
+Expedition board, team select, timers (real time), results with resources and story clues. See `docs/expedition-spec.md`.
+
+Accept:
+- [x] Three places with their own duration, threat, team size, rewards and unlock rule. *(verified off-device)*
+- [x] Team picker shows power and success chance; at least one student must stay home. *(verified off-device)*
+- [x] Students away can't enter the Rift; the selected student switches if they leave. *(verified off-device)*
+- [x] Timers survive closing the game; the outcome is fixed at departure and saved. *(verified off-device)*
+- [x] Claiming pays rewards (half on failure), may add a relic, and reveals the next clue on success. *(verified off-device)*
+- [ ] Durations and rewards feel worth it next to a Rift run (playtest).
 
 ## M11 — Dialogue and relationships
 
@@ -120,4 +128,4 @@ Lyra (idle/run/cast/hurt), mite, shard, brute, one boss, arena tileset + wall + 
 
 ## Later
 
-Character select (Selene, Noah + their ultimates), meta progression (Mana Shards → academy), academy hub, library codex for recipes, friendship-gated duo evolutions, expeditions, story.
+More students and places, more Rift biomes and bosses, main story chapters, audio, Android release build.

@@ -12,6 +12,8 @@ const NAV_H := 34.0
 var _resources: HBoxContainer
 var _prompt: Button
 var _prompt_id: StringName = &""
+var _expedition_button: Button
+var _badge_timer: float = 0.0
 
 
 func _ready() -> void:
@@ -56,7 +58,7 @@ func _ready() -> void:
 	var row := HBoxContainer.new()
 	row.add_theme_constant_override("separation", 2)
 	nav.add_child(row)
-	for tab: Array in [[&"academy", "Academy", true], [&"rift", "Rift", true], [&"characters", "Students", true], [&"expeditions", "Expedition", false], [&"stories", "Stories", false]]:
+	for tab: Array in [[&"academy", "Academy", true], [&"rift", "Rift", true], [&"characters", "Students", true], [&"expeditions", "Expedition", true], [&"stories", "Stories", false]]:
 		var b := Button.new()
 		b.text = tab[1] if tab[2] else "%s\nsoon" % tab[1]
 		b.size_flags_horizontal = Control.SIZE_EXPAND_FILL
@@ -66,6 +68,8 @@ func _ready() -> void:
 		if tab[0] == &"academy":
 			b.add_theme_stylebox_override("normal", UiTheme.box(Color("2b2b4a"), UiTheme.CYAN, 1, 2))
 		var id: StringName = tab[0]
+		if id == &"expeditions":
+			_expedition_button = b
 		b.pressed.connect(func() -> void: nav_pressed.emit(id))
 		row.add_child(b)
 
@@ -115,3 +119,21 @@ func covers(screen_pos: Vector2) -> bool:
 	if screen_pos.y <= TOP_H or screen_pos.y >= size.y - NAV_H:
 		return true
 	return _prompt.visible and _prompt.get_global_rect().has_point(screen_pos)
+
+
+func _process(delta: float) -> void:
+	_badge_timer -= delta
+	if _badge_timer > 0.0 or _expedition_button == null:
+		return
+	_badge_timer = 1.0
+	var ready := GameState.ready_expedition_count()
+	var away := GameState.expeditions_active.size()
+	if ready > 0:
+		_expedition_button.text = "Expedition\n%d back!" % ready
+		_expedition_button.add_theme_color_override("font_color", UiTheme.GOLD)
+	elif away > 0:
+		_expedition_button.text = "Expedition\n%d away" % away
+		_expedition_button.remove_theme_color_override("font_color")
+	else:
+		_expedition_button.text = "Expedition"
+		_expedition_button.remove_theme_color_override("font_color")

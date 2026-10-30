@@ -1,0 +1,21 @@
+[gd_resource type="Resource" script_class="ExpeditionData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/data/expedition_data.gd" id="1_script"]
+
+[resource]
+script = ExtResource("1_script")
+id = &"sunken_archives"
+display_name = "Sunken Archives"
+description = "The lower library flooded when the Rift opened. The records of the Riftfall night are somewhere under the water."
+duration_seconds = 900.0
+threat = 2
+recommended_power = 25.0
+max_team = 3
+preferred_element = &"frost"
+rewards = Vector3i(90, 40, 0)
+rare_chance = 0.25
+rare_reward = Vector3i(0, 0, 1)
+unlock_building = &"library"
+unlock_building_level = 1
+unlock_best_wave = 0
+clues = Array[String](["A ledger of night-watch shifts. The last entry is torn out, but the pen pressed through to the next page: 'the gate answered'.", "Frozen pages show a diagram of the Rift Gate drawn years before it existed.", "A sealed letter addressed to Selene Frostvale. The wax bears the academy crest, cracked."])

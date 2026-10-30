@@ -34,6 +34,8 @@ Newest at the bottom. When a decision changes, add a new entry instead of editin
 | 2026-10-30 | `GameState` autoload owns resources, buildings, stats, JSON save and scene changes. Test tools use a separate save file. | One place for persistent state; tests never wipe the player's progress. |
 
 | 2026-10-30 | Students: Lyra (start), Selene (Dormitory Lv1), Noah (Dormitory Lv2). Ultimates: Flame Orb, Frost Nova (slow everything + damage), Verdant Bloom (heal, collect all drops, hit enemies near the line). Levels 1–10 bought with resources: +1 max HP per level, +1 starting-ball damage at Lv4/7/10. | Gives the Dormitory a purpose and each student a distinct role (damage / control / support) as in the overview. |
+| 2026-10-30 | Expeditions: three real-time places (5/15/30 min). Success chance = team power / recommended (min 35%), element match ×1.5. Outcome rolled at departure and saved. Failure pays 50%, no clue. One student must stay home. | Real-time idle loop like the overview's "send expeditions"; rolling at departure stops save-scumming; the stay-home rule means the Rift is never blocked. Details in expedition-spec. |
+| 2026-10-30 | Expedition timers trust the system clock. | Offline single-player game; tamper protection isn't worth the complexity yet. |
 
 ## Open questions
 

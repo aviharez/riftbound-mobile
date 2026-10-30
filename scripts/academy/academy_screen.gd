@@ -6,6 +6,7 @@ extends Node
 @onready var map: AcademyMap = $WorldContainer/WorldViewport/AcademyMap
 @onready var hud: AcademyHud = $UI/Root/AcademyHud
 @onready var overlays: AcademyOverlays = $UI/Root/AcademyOverlays
+@onready var expeditions: ExpeditionOverlays = $UI/Root/ExpeditionOverlays
 
 var _press_pos: Vector2 = Vector2.INF
 
@@ -31,19 +32,24 @@ func _layout() -> void:
 
 
 func _process(_delta: float) -> void:
-	hud.set_prompt(&"" if overlays.is_open() else map.building_in_reach())
+	hud.set_prompt(&"" if _modal_open() else map.building_in_reach())
+
+
+func _modal_open() -> bool:
+	return overlays.is_open() or expeditions.is_open()
 
 
 func _notification(what: int) -> void:
 	if what == NOTIFICATION_WM_GO_BACK_REQUEST:
-		if overlays.is_open():
+		if _modal_open():
 			overlays.close()
+			expeditions.close()
 		else:
 			GameState.go_to(GameState.SCENE_TITLE)
 
 
 func _unhandled_input(event: InputEvent) -> void:
-	if overlays.is_open():
+	if _modal_open():
 		return
 	if event is InputEventScreenTouch:
 		var t := event as InputEventScreenTouch
@@ -63,6 +69,7 @@ func _unhandled_input(event: InputEvent) -> void:
 func _open_building(id: StringName) -> void:
 	if id == &"":
 		return
+	expeditions.close()
 	overlays.show_building(id)
 
 
@@ -88,5 +95,10 @@ func _on_nav(tab: StringName) -> void:
 			_enter_rift()
 		&"academy":
 			overlays.close()
+			expeditions.close()
 		&"characters":
+			expeditions.close()
 			overlays.show_roster()
+		&"expeditions":
+			overlays.close()
+			expeditions.show_board()

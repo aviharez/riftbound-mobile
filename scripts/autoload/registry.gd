@@ -10,6 +10,7 @@ const ITEMS_DIR := "res://data/items"
 const ENEMIES_DIR := "res://data/enemies"
 const BUILDINGS_DIR := "res://data/buildings"
 const CHARACTERS_DIR := "res://data/characters"
+const EXPEDITIONS_DIR := "res://data/expeditions"
 const ECONOMY_PATH := "res://data/balance/economy_balance.tres"
 
 var balance: CombatBalance
@@ -21,6 +22,8 @@ var economy: EconomyBalance
 var buildings: Dictionary[StringName, BuildingData] = {}
 ## Playable students, in roster order (by unlock level).
 var characters: Array[CharacterData] = []
+## Expedition locations, in board order (by duration).
+var expeditions: Array[ExpeditionData] = []
 
 
 func _ready() -> void:
@@ -41,6 +44,11 @@ func _ready() -> void:
 		if cd:
 			characters.append(cd)
 	characters.sort_custom(func(a: CharacterData, b: CharacterData) -> bool: return a.unlock_dormitory_level < b.unlock_dormitory_level)
+	for res: Resource in _load_dir(EXPEDITIONS_DIR):
+		var ex := res as ExpeditionData
+		if ex:
+			expeditions.append(ex)
+	expeditions.sort_custom(func(a: ExpeditionData, b: ExpeditionData) -> bool: return a.duration_seconds < b.duration_seconds)
 	for res: Resource in _load_dir(ELEMENTS_DIR):
 		var e := res as ElementData
 		if e:
@@ -90,3 +98,10 @@ func character(id: StringName) -> CharacterData:
 		if c.id == id:
 			return c
 	return characters[0] if not characters.is_empty() else null
+
+
+func expedition(id: StringName) -> ExpeditionData:
+	for e: ExpeditionData in expeditions:
+		if e.id == id:
+			return e
+	return null
