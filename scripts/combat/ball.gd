@@ -4,7 +4,7 @@ extends RefCounted
 
 enum State { HAND, FLY, RETURN }
 
-const TRAIL_POINTS := 7
+const TRAIL_POINTS := 8
 
 ## Stable identity across loadout rebuilds ("<slot uid>:<copy>" or "baby:<n>").
 var key: String = ""

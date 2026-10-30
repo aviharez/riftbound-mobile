@@ -23,12 +23,17 @@ extends Resource
 @export var zone_tolerance: float = 8.0
 @export var aim_min_deg: float = 15.0
 @export var aim_max_deg: float = 165.0
-@export var crosshair_distance: float = 35.0
+@export var crosshair_distance: float = 80.0
+@export var crosshair_radius: float = 5.0
+## Spacing of the 2 px dots of the aim line.
+@export var aim_dot_spacing: float = 9.0
 ## Initial aim, slightly off vertical so the first shots don't loop straight up an empty column.
 @export var start_aim_deg: float = 78.0
 
 @export_group("Balls")
 @export var ball_radius: float = 3.0
+## Length of the streak drawn behind each ball, along its path.
+@export var ball_trail_length: float = 22.0
 @export var ball_speed: float = 420.0
 @export var return_speed: float = 710.0
 @export var max_substep: float = 2.0

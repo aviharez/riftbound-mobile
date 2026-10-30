@@ -12,7 +12,9 @@ var aim_mode: StringName = AIM_ABSOLUTE
 var aim_sensitivity: float = 0.6
 var zone_tolerance: float = 8.0
 ## Extra bounces shown by the aim line after the first contact (0, 1 or 3).
-var aim_preview_bounces: int = 0
+## -1 = off (dotted line to the crosshair only), 0 = to first contact, 1 / 3 = extra bounces.
+## Saved as "aim_line" (the old "aim_preview_bounces" key, always written as 0, is ignored so the new default applies).
+var aim_preview_bounces: int = -1
 var show_touches: bool = false
 var screen_shake: bool = true
 var damage_numbers: bool = true
@@ -35,7 +37,7 @@ func load_from_disk() -> void:
 	aim_mode = StringName(str(cfg.get_value("controls", "aim_mode", aim_mode)))
 	aim_sensitivity = float(cfg.get_value("controls", "aim_sensitivity", aim_sensitivity))
 	zone_tolerance = float(cfg.get_value("controls", "zone_tolerance", zone_tolerance))
-	aim_preview_bounces = int(cfg.get_value("controls", "aim_preview_bounces", aim_preview_bounces))
+	aim_preview_bounces = int(cfg.get_value("controls", "aim_line", aim_preview_bounces))
 	show_touches = bool(cfg.get_value("debug", "show_touches", show_touches))
 	screen_shake = bool(cfg.get_value("feedback", "screen_shake", screen_shake))
 	damage_numbers = bool(cfg.get_value("feedback", "damage_numbers", damage_numbers))
@@ -47,7 +49,7 @@ func save() -> void:
 	cfg.set_value("controls", "aim_mode", String(aim_mode))
 	cfg.set_value("controls", "aim_sensitivity", aim_sensitivity)
 	cfg.set_value("controls", "zone_tolerance", zone_tolerance)
-	cfg.set_value("controls", "aim_preview_bounces", aim_preview_bounces)
+	cfg.set_value("controls", "aim_line", aim_preview_bounces)
 	cfg.set_value("debug", "show_touches", show_touches)
 	cfg.set_value("feedback", "screen_shake", screen_shake)
 	cfg.set_value("feedback", "damage_numbers", damage_numbers)

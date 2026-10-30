@@ -37,9 +37,9 @@ Therefore: **side walls must extend at least 45 px beyond each side of the playf
 | Player character (Lyra etc.) | 32 × 32 (or 32 × 40) | body ~20 × 28, feet at the bottom center; idle 4f, run 6f, cast 4f, hurt 2f |
 | Enemy (mite, shard, brute) | 32 × 32 | creature kept within ~26 × 26 (hitbox stays 24 × 24); idle 4f, hit flash via shader, death = VFX |
 | Boss | 54 × 54 | idle 6f, attack/telegraph 6f |
-| Baby ball | 7 px disc (1 px dark outline, 5 px pale grey, 3 px white core) | no glow, faint 3-point trail |
-| Element ball | 9 px disc (dark outline in the element hue, 7 px element colour, 5 px bright core) | additive halo, long tapering trail in the element colour |
-| Fused ball | 11 px disc with a pulsing ring | bigger halo; distinct size, not only color |
+| Baby ball | 7 px disc, white with a pale lavender rim | soft white halo, thin white streak |
+| Element ball | 7 px disc: element colour, lighter ring, white core | halo and streak in the element colour |
+| Fused ball | 9 px disc with a pulsing ring | bigger halo; distinct size, not only color |
 | XP gem | 5 × 5 | green diamond |
 | Rift Prism | 7 × 9 | rainbow cycle |
 | Floor tile | 16 × 16 | field = 15 × 16 tiles wide |
@@ -68,7 +68,7 @@ Heaviness comes from timing and contrast, not from particle count or bloom.
 3. Small screen shake (trauma model), always whole-pixel offsets, toggleable.
 4. Flipbook explosions drawn at world resolution, not generic particles.
 5. Short trails on projectiles so ricochet paths are readable.
-   Baby and element balls must tell apart at a glance by **size, glow and trail**, not colour alone. Every ball has a near-black outline so it reads on grey stone. The aim preview is bright cyan marching dashes with a dark edge (not white, which is the baby-ball colour), with an outlined dot at each bounce.
+   Ball and aim shapes follow the owner's reference: balls are bright discs about a quarter of an enemy's width, each with a thin streak (3 → 1 px, 22 long) that bends with the path. Baby balls are white; element balls carry their colour in the disc, halo and streak. The aim is a short line of 2 px dots ending in a ring crosshair 80 from the player.
 6. Damage numbers in a pixel font, crits/charged in gold.
 7. Shaders allowed: hit flash, dissolve on death, palette swap for element variants, Rift portal distortion. Avoid full-screen glow/bloom.
 8. All VFX snap to the world pixel grid. No rotated or sub-pixel scaled pixel art (it creates "mixels").

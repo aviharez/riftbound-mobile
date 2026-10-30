@@ -1187,63 +1187,84 @@ func _disc(c: Vector2, d: int, col: Color) -> void:
 		draw_rect(Rect2(c.x - float(w / 2), top + float(i), float(w), 1.0), col)
 
 
-## Baby balls: small, pale, outlined, faint short trail, no glow. Element balls: bigger, filled with the
-## element colour around a bright core, with a long tapering trail of that colour (and a halo in FxGlow).
-## Fused balls: bigger again with a pulsing ring. All are outlined in near-black so they read on grey stone.
+## Ball look follows the owner's reference: a bright 7 px disc (the 6 px hitbox plus a soft rim) with a thin
+## streak that tapers behind it along the real path. Baby balls are white; element balls are their element
+## colour around a white core, with a trail of that colour; fused balls are 9 px with a pulsing ring.
 func _draw_ball(b: Ball) -> void:
 	var returning := b.state == Ball.State.RETURN
-	var glow: Color = COL_GOLD if b.charged else (b.slot.glow_color if b.slot else Color(0.9, 0.9, 0.94))
+	var glow: Color = COL_GOLD if b.charged else (b.slot.glow_color if b.slot else Color("e8e4f6"))
 	var fade := 0.45 if returning else 1.0
-	var n := b.trail.size()
 	var p := b.pos.round()
+	_draw_streak(b, glow, (0.6 if b.slot else 0.45) * fade)
 	if b.slot == null:
-		for i in range(maxi(0, n - 3), n):
-			draw_rect(Rect2(b.trail[i].round() - Vector2.ONE, Vector2(2, 2)), Color(glow, 0.16 * fade))
-		_disc(p, 7, Color(0.04, 0.04, 0.08, 0.85 * fade))
-		_disc(p, 5, Color(COL_GOLD if b.charged else Color("c9c9d6"), fade))
-		_disc(p, 3, Color(Color("fff3c4") if b.charged else Color("eeeef4"), fade))
-		draw_rect(Rect2(p + Vector2(-1, -1), Vector2.ONE), Color(1, 1, 1, fade))
+		_disc(p, 7, Color(Color("cfc8ea"), fade))
+		_disc(p, 5, Color(Color("fff3c4") if b.charged else Color.WHITE, fade))
+	elif b.slot.fused:
+		var pulse := int(run_time * 10.0) % 2 == 0
+		_disc(p, 9, Color(glow, fade))
+		_disc(p, 7, Color(glow.lightened(0.45) if pulse else glow.lightened(0.25), fade))
+		_disc(p, 3, Color(1, 1, 1, fade))
 	else:
-		for i in n:
-			var k := float(i + 1) / float(n + 1)
-			var sz := 5.0 if k > 0.7 else (3.0 if k > 0.4 else 1.0)
-			draw_rect(Rect2(b.trail[i].round() - Vector2(floorf(sz * 0.5), floorf(sz * 0.5)), Vector2(sz, sz)), Color(glow, (0.15 + 0.45 * k) * fade))
-		var core: Color = Color("fff3c4") if b.charged else b.slot.core_color
-		var outline := Color(glow.darkened(0.8), 0.9 * fade)
-		if b.slot.fused:
-			var pulse := int(run_time * 10.0) % 2 == 0
-			_disc(p, 11, outline)
-			_disc(p, 9, Color(glow, fade))
-			_disc(p, 7, Color(glow.lightened(0.35) if pulse else glow, fade))
-			_disc(p, 5, Color(core, fade))
-		else:
-			_disc(p, 9, outline)
-			_disc(p, 7, Color(glow, fade))
-			_disc(p, 5, Color(core, fade))
-		draw_rect(Rect2(p + Vector2(-1, -1), Vector2.ONE), Color(1, 1, 1, 0.9 * fade))
+		_disc(p, 7, Color(glow, fade))
+		_disc(p, 5, Color(glow.lightened(0.45), fade))
+		_disc(p, 3, Color(1, 1, 1, fade))
 	if returning:
 		return
 	if b.gems > 0:
 		for i in mini(b.gems, 6):
 			var a := run_time * 8.0 + float(i) * 1.05
-			draw_rect(Rect2((p + Vector2(cos(a), sin(a)) * 7.0).round(), Vector2.ONE), COL_GEM)
+			draw_rect(Rect2((p + Vector2(cos(a), sin(a)) * 6.0).round(), Vector2.ONE), COL_GEM)
 	if b.prism:
-		draw_rect(Rect2(p + Vector2(-1, -10), Vector2(3, 3)), PRISM_COLORS[int(run_time * 10.0) % PRISM_COLORS.size()])
+		draw_rect(Rect2(p + Vector2(-1, -9), Vector2(3, 3)), PRISM_COLORS[int(run_time * 10.0) % PRISM_COLORS.size()])
+
+
+## Thin tapering streak behind a ball, a fixed length along its recent path (so it bends at bounces and
+## does not grow at x3 speed): 3 px wide at the ball, 1 px at the tail, fading out.
+func _draw_streak(b: Ball, col: Color, alpha: float) -> void:
+	var length := balance.ball_trail_length
+	var head := b.pos
+	var walked := 0.0
+	var i := b.trail.size() - 1
+	var s := 2.0
+	while i >= 0 and walked < length:
+		var tail := b.trail[i]
+		var seg := head.distance_to(tail)
+		while s <= walked + seg and s < length:
+			var k := s / length
+			var q := head.lerp(tail, (s - walked) / maxf(seg, 0.001)).round()
+			var w := 3.0 if k < 0.3 else (2.0 if k < 0.65 else 1.0)
+			draw_rect(Rect2(q - Vector2(floorf(w * 0.5), floorf(w * 0.5)), Vector2(w, w)), Color(col, alpha * (1.0 - k)))
+			s += 1.0
+		walked += seg
+		head = tail
+		i -= 1
 
 
 func _draw_aim() -> void:
 	var dir := _aim_dir()
+	var origin := player + Vector2(0, -3)
+	var gap := balance.aim_dot_spacing
+	# Short dotted line to the crosshair (the owner's reference look): 2 px dots with a faint shadow.
+	var d := gap
+	while d < balance.crosshair_distance - 6.0:
+		_aim_dot((origin + dir * d).round(), 0.9)
+		d += gap
+	var c := (origin + dir * balance.crosshair_distance).round()
+	_crosshair(c)
+	if settings.aim_preview_bounces < 0:
+		return
+	# Optional trajectory preview (settings): the same dots, fainter, from the crosshair to the first contact
+	# and any extra bounces.
 	var probe := Ball.new()
-	probe.pos = player + Vector2(0, -3) + dir * balance.launch_offset
+	probe.pos = origin + dir * balance.launch_offset
 	probe.vel = dir
 	var bounces := 0
 	var r := balance.ball_radius
 	var size_y := float(balance.world_size.y)
 	if _columns.size() != balance.grid_columns:
 		_rebuild_columns()
-	# Marching dashes, outlined so they read on any floor; each bounce dims the next leg.
-	var dist := 0.0
-	var march := fmod(run_time * 30.0, 9.0)
+	var dist := balance.launch_offset
+	var next_dot := balance.crosshair_distance + gap
 	for i in 700:
 		probe.pos += probe.vel * 2.0
 		dist += 2.0
@@ -1259,31 +1280,36 @@ func _draw_aim() -> void:
 						break
 				if hit:
 					break
+		var a := 0.5 / (1.0 + float(bounces))
 		if hit:
-			var q := probe.pos.round()
-			var bright := 1.0 / (1.0 + float(bounces) * 0.9)
-			_disc(q, 5, Color(0.04, 0.04, 0.08, 0.7 * bright))
-			_disc(q, 3, Color(COL_PARCH, bright))
+			_disc(probe.pos.round(), 3, Color(Color("f4e8f2"), a * 1.4))
 			bounces += 1
 			if bounces > settings.aim_preview_bounces:
 				break
-		elif fmod(dist - march + 900.0, 9.0) < 5.0 and dist > 6.0:
-			var a := 1.0 / (1.0 + float(bounces) * 0.9)
-			# 2 px dash with a dark edge below and to the right.
-			for q: Vector2 in [probe.pos.round(), (probe.pos - probe.vel).round()]:
-				draw_rect(Rect2(q + Vector2(0, 1), Vector2(3, 2)), Color(0.03, 0.03, 0.08, 0.6 * a))
-			for q: Vector2 in [probe.pos.round(), (probe.pos - probe.vel).round()]:
-				draw_rect(Rect2(q - Vector2(1, 0), Vector2(2, 2)), Color(Color("7ff0ff"), a))
+		elif dist >= next_dot:
+			_aim_dot(probe.pos.round(), a)
+			next_dot = dist + gap
 		if probe.pos.y > size_y:
 			break
-	var c := (player + Vector2(0, -3) + dir * balance.crosshair_distance).round()
-	var pulse := 4.0 + roundf(sin(run_time * 6.0) + 1.0)
-	draw_arc(c + Vector2(0.5, 0.5), pulse, 0.0, TAU, 16, COL_PARCH, 1.0)
-	draw_rect(Rect2(c.x, c.y - pulse - 3, 1, 2), COL_PARCH)
-	draw_rect(Rect2(c.x, c.y + pulse + 1, 1, 2), COL_PARCH)
-	draw_rect(Rect2(c.x - pulse - 3, c.y, 2, 1), COL_PARCH)
-	draw_rect(Rect2(c.x + pulse + 1, c.y, 2, 1), COL_PARCH)
-	draw_string(font, c + Vector2(-20, pulse + 10), str(roundi(aim_deg)), HORIZONTAL_ALIGNMENT_CENTER, 40.0, 8, Color(COL_PARCH, 0.55))
+
+
+func _aim_dot(q: Vector2, a: float) -> void:
+	draw_rect(Rect2(q + Vector2(0, 1), Vector2(2, 2)), Color(0.03, 0.03, 0.08, 0.35 * a))
+	draw_rect(Rect2(q - Vector2(1, 1), Vector2(2, 2)), Color(Color("f4e8f2"), a))
+
+
+## Ring with four ticks crossing it and a small plus in the middle.
+func _crosshair(c: Vector2) -> void:
+	var col := Color("f4e8f2")
+	var shadow := Color(0.03, 0.03, 0.08, 0.35)
+	var rad := balance.crosshair_radius
+	draw_arc(c + Vector2(0.5, 1.5), rad, 0.0, TAU, 24, shadow, 1.0)
+	draw_arc(c + Vector2(0.5, 0.5), rad, 0.0, TAU, 24, col, 1.0)
+	for v: Vector2 in [Vector2.UP, Vector2.DOWN, Vector2.LEFT, Vector2.RIGHT]:
+		for j in range(int(rad) - 1, int(rad) + 3):
+			draw_rect(Rect2(c + v * float(j), Vector2.ONE), col)
+	draw_rect(Rect2(c.x - 1, c.y, 3, 1), col)
+	draw_rect(Rect2(c.x, c.y - 1, 1, 3), col)
 
 
 func _draw_player() -> void:

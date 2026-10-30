@@ -37,8 +37,8 @@ func show_pause(battle: Battle, s: PlayerSettings) -> void:
 		func(i: int) -> void: s.aim_mode = PlayerSettings.AIM_ABSOLUTE if i == 0 else PlayerSettings.AIM_RELATIVE))
 	box.add_child(_slider("Relative aim sensitivity", 0.2, 1.6, 0.1, s.aim_sensitivity, "%.1fx", func(v: float) -> void: s.aim_sensitivity = v))
 	box.add_child(_slider("Zone line tolerance", 0.0, 30.0, 1.0, s.zone_tolerance, "%d px", func(v: float) -> void: s.zone_tolerance = v))
-	var previews: Array[String] = ["To first contact", "+1 bounce", "+3 bounces"]
-	var preview_values: Array[int] = [0, 1, 3]
+	var previews: Array[String] = ["Crosshair only", "To first contact", "+1 bounce", "+3 bounces"]
+	var preview_values: Array[int] = [-1, 0, 1, 3]
 	box.add_child(_option("Aim line", previews, maxi(0, preview_values.find(s.aim_preview_bounces)),
 		func(i: int) -> void: s.aim_preview_bounces = preview_values[i]))
 	box.add_child(_check("Show touches and zones", s.show_touches, func(on: bool) -> void: s.show_touches = on))

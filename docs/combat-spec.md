@@ -38,7 +38,7 @@ The Rift portal sits at the top center, behind the HUD band; enemies emerge from
   - Relative mode (settings): horizontal drag rotates the angle (`aim_sensitivity`, default 0.6 → ×1.2 deg per unit).
   - Angle clamp 15°–165° (0° = right, 90° = straight up). Touches below the player clamp to the nearest limit.
 - `zone_tolerance` default 8 (settings 0–30).
-- Aim line: dotted line from the player to the first contact point (settings: +1 / +3 bounce preview, later an upgrade). Crosshair drawn at a fixed 35 from the player along the angle, with the angle in degrees.
+- Aim line: short line of 2 px dots every 9 (`aim_dot_spacing`) from the player to a crosshair at a fixed 80 along the angle (`crosshair_distance`; ring radius 5 with four ticks and a centre plus). No angle number. Trajectory preview is a setting, off by default: to first contact, +1 or +3 bounces, drawn as fainter dots.
 - Desktop/debug: WASD/arrows move, Q/E rotate aim, Space ultimate, Esc pause.
 - Initial aim 78° (`start_aim_deg`), slightly off vertical so the first shots don't loop up an empty column.
 
@@ -55,7 +55,7 @@ The Rift portal sits at the top center, behind the HUD band; enemies emerge from
 - Launch from player + 4.5 along the aim, speed **420**.
 
 ### 3.3 Movement and collision
-- Collision radius **3** for every ball (was 2: balls read too small on a phone). Visual diameter: baby 7 px, element 9 px, fused 11 px including a 1 px dark outline (art-spec "Projectiles"). With enemies 24 px in 30 px cells the 6 px gap no longer lets a ball slip between two neighbours.
+- Collision radius **3** for every ball (was 2: balls read too small on a phone). Visual diameter: 7 px for baby and element balls (6 px hitbox plus a soft rim), 9 px for fused, each with a 22-long tapering streak along its path (`ball_trail_length`) (art-spec). With enemies 24 px in 30 px cells the 6 px gap no longer lets a ball slip between two neighbours.
 - Substep so no step exceeds 2 units.
 - Walls: reflect x at x = 32 / 238; ceiling: reflect y at y = 40.
 - Enemies: circle vs AABB. Normal = from closest point to center (inside → axis of least penetration). Reflect velocity only if moving into the surface; push out by radius + 0.3. One enemy hit per substep.

@@ -44,16 +44,11 @@ func _draw() -> void:
 		if b.state == Ball.State.RETURN:
 			draw_circle(p, 2.0, Color(glow, 0.08))
 			continue
-		if b.trail.size() > 1:
-			var pts := b.trail.duplicate()
-			pts.append(b.pos)
-			if b.slot:
-				draw_polyline(pts, Color(glow, 0.32), 1.0)
-		# Only element and fused balls glow; baby balls stay plain so the two read apart at a glance.
-		if b.slot:
-			var big := 1.3 if b.slot.fused else 1.0
-			draw_circle(p, 10.0 * big, Color(glow, 0.10))
-			draw_circle(p, 6.5 * big, Color(glow, 0.22))
+		# Soft halo; element and fused balls glow in their colour and a little stronger than baby balls.
+		var big := 1.3 if (b.slot and b.slot.fused) else 1.0
+		var k := 1.0 if b.slot else 0.6
+		draw_circle(p, 8.0 * big, Color(glow, 0.09 * k))
+		draw_circle(p, 5.5 * big, Color(glow, 0.2 * k))
 	for bo: Fx.Bolt in fx.bolts():
 		var a := 1.0 - bo.t / bo.life
 		draw_line(bo.from, bo.to, Color(bo.color, 0.22 * a), 3.0)
