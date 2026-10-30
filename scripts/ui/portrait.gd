@@ -34,6 +34,9 @@ func _draw() -> void:
 	if framed:
 		draw_rect(Rect2(Vector2.ZERO, s), Color("0b0b16"))
 		draw_rect(Rect2(Vector2(0, s.y * 0.55), Vector2(s.x, s.y * 0.45)), Color(glow, 0.18))
+	if character.sprite_sheet:
+		_draw_sprite(s, glow)
+		return
 	var hair := character.hair_color
 	var skin := Color("f1d3bd")
 	var uni := Color("24306a")
@@ -55,5 +58,28 @@ func _draw() -> void:
 	else:
 		draw_rect(Rect2(Vector2(14, 16) * k, Vector2(2, 2) * k), Color("3a2a1e"))
 		draw_rect(Rect2(Vector2(20, 16) * k, Vector2(2, 2) * k), Color("3a2a1e"))
+	if framed:
+		draw_rect(Rect2(Vector2.ZERO, s), Color(glow, 0.7) if not locked else UiTheme.LINE, false, 1.0)
+
+
+## Generated sprite at a whole-number scale: framed portraits show the head, big ones the full body.
+func _draw_sprite(s: Vector2, glow: Color) -> void:
+	var tex := character.sprite_sheet
+	var src: Rect2
+	if framed:
+		src = SpriteKit.head_rect(tex)
+	else:
+		src = SpriteKit.frame_rect(SpriteKit.Dir.SOUTH)
+	var k := maxf(1.0, floorf(minf(s.x / src.size.x, s.y / src.size.y)))
+	var dst_size := src.size * k
+	var at := Vector2(floorf((s.x - dst_size.x) * 0.5), s.y - dst_size.y if not framed else floorf((s.y - dst_size.y) * 0.5))
+	var tint := Color.WHITE
+	if locked:
+		tint = Color(0.12, 0.11, 0.17)
+	elif dimmed:
+		tint = Color(0.4, 0.4, 0.5)
+	draw_texture_rect_region(tex, Rect2(at, dst_size), src, tint)
+	if locked:
+		draw_string(UiTheme.pixel_font(), Vector2(0, s.y * 0.62), "?", HORIZONTAL_ALIGNMENT_CENTER, s.x, int(maxf(8.0, s.x * 0.4)), UiTheme.MUTED)
 	if framed:
 		draw_rect(Rect2(Vector2.ZERO, s), Color(glow, 0.7) if not locked else UiTheme.LINE, false, 1.0)

@@ -2,7 +2,7 @@
 
 Portrait mobile pixel-art roguelite. Ricochet magic combat in a vertical Rift arena, an academy to restore, and students to grow close to.
 
-**Status:** Combat (M1–M6), core loop (M8), students (M9), expeditions (M10), relationships (M11) and library & quests (M12) implemented with placeholder art; waiting for on-device testing. Next: art pass (M7) (see [`docs/milestones.md`](docs/milestones.md)).
+**Status:** Combat (M1–M6), core loop (M8), students (M9), expeditions (M10), relationships (M11) and library & quests (M12) implemented with placeholder art; waiting for on-device testing. Art pass (M7) in progress: students, enemies and arena floor generated with PixelLab (see [`docs/milestones.md`](docs/milestones.md)).
 
 ## Requirements
 

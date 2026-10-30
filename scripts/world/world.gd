@@ -13,6 +13,22 @@ const COL_ZONE := Color(0.412, 0.847, 0.910, 0.04)       # Arcane Cyan tint
 const COL_RIFT := Color(0.435, 0.290, 0.902)             # Rift Violet
 const FLOOR_SHADES: Array[Color] = [Color("262834"), Color("232530"), Color("292b38"), Color("24262f"), Color("2a2c37")]
 const TILE := 16
+## Darkens the floor art so it stays mid-dark behind enemies and balls.
+const FLOOR_TINT := Color(0.8, 0.8, 0.85)
+## Cells of the floor sheet with the same terrain on all four corners (assets/art/tiles/arena_floor.png,
+## a blue-grey recolour of the PixelLab sheet arena_floor_wang.png made with tools/art/recolor.py),
+## so they tile seamlessly in any order. The sheet's transition tiles are not used yet.
+const FLOOR_CELLS: Array[Vector2i] = [Vector2i(0, 0), Vector2i(3, 3)]
+
+## PixelLab floor tileset (16x16 cells). Null = flat placeholder shades.
+@export var floor_sheet: Texture2D = preload("res://assets/art/tiles/arena_floor.png")
+## Decorations along the bottom of the move zone and beside the Rift: [texture, position, alpha].
+## Kept dim and out of the enemies' lanes so projectiles stay the brightest thing on screen (art-spec §4).
+var _props: Array = [
+	[preload("res://assets/art/props/rubble.png"), Vector2(14, 530), 0.85],
+	[preload("res://assets/art/props/crystals.png"), Vector2(40, 6), 0.55],
+	[preload("res://assets/art/props/crystals.png"), Vector2(200, 6), 0.55],
+]
 
 ## Visible area in playfield coordinates. Set by Main whenever the screen size changes.
 var visible_rect: Rect2 = Rect2(0, 0, 270, 560)
@@ -43,8 +59,12 @@ func _draw() -> void:
 	while ty < int(size.y):
 		var tx := int(field.position.x)
 		while tx < int(field.end.x):
-			var shade := FLOOR_SHADES[absi(hash(Vector2i(tx, ty))) % FLOOR_SHADES.size()]
-			draw_rect(Rect2(tx + 1, ty + 1, TILE - 1, TILE - 1), shade)
+			if floor_sheet:
+				var cell := FLOOR_CELLS[absi(hash(Vector2i(tx, ty))) % FLOOR_CELLS.size()]
+				draw_texture_rect_region(floor_sheet, Rect2(tx, ty, TILE, TILE), Rect2(cell * TILE, Vector2(TILE, TILE)), FLOOR_TINT)
+			else:
+				var shade := FLOOR_SHADES[absi(hash(Vector2i(tx, ty))) % FLOOR_SHADES.size()]
+				draw_rect(Rect2(tx + 1, ty + 1, TILE - 1, TILE - 1), shade)
 			tx += TILE
 		ty += TILE
 	# Faint magic circle in the middle of the field.
@@ -60,6 +80,13 @@ func _draw() -> void:
 	# Rift glow at the top center.
 	for i in 4:
 		draw_circle(Vector2(size.x * 0.5, b.ceiling_y), 46.0 - float(i) * 10.0, Color(COL_RIFT, 0.06 + 0.05 * float(i)))
+
+	for pr: Array in _props:
+		var tex: Texture2D = pr[0]
+		var pos: Vector2 = pr[1]
+		if pos.y < b.ceiling_y:
+			pos.y = b.ceiling_y - tex.get_height() + 4.0  # sits on the ceiling ledge
+		draw_texture(tex, pos.round(), Color(1, 1, 1, pr[2]))
 
 	# Move zone and rune line.
 	draw_rect(Rect2(field.position.x, b.rune_line_y, field.size.x, size.y - b.rune_line_y), COL_ZONE)

@@ -15,6 +15,8 @@ var font: Font
 var _target: Vector2 = Vector2.INF
 var _pending_building: StringName = &""
 var _facing: float = 1.0
+## Sprite facing (SpriteKit.Dir) from the last walking direction.
+var _dir: int = SpriteKit.Dir.SOUTH
 var _walk_t: float = 0.0
 var _time: float = 0.0
 var _highlight: StringName = &""
@@ -87,6 +89,10 @@ func _process(delta: float) -> void:
 			var dir := to.normalized()
 			if absf(dir.x) > 0.2:
 				_facing = signf(dir.x)
+			if absf(dir.x) > absf(dir.y):
+				_dir = SpriteKit.Dir.EAST if dir.x > 0.0 else SpriteKit.Dir.WEST
+			else:
+				_dir = SpriteKit.Dir.SOUTH if dir.y > 0.0 else SpriteKit.Dir.NORTH
 			if not _move_to(avatar + dir * step):
 				_target = Vector2.INF  # blocked: stop
 				_pending_building = &""
@@ -273,8 +279,11 @@ func _draw_avatar() -> void:
 	var p := avatar.round()
 	var bob := roundf(absf(sin(_walk_t * 10.0))) if _target != Vector2.INF else 0.0
 	draw_rect(Rect2(p.x - 5, p.y + 6, 10, 2), Color(0, 0, 0, 0.4))
-	draw_rect(Rect2(p.x - 4, p.y - 2 - bob, 8, 8), Color("24306a"))
 	var student := GameState.current_student()
+	if student.sprite_sheet:
+		draw_texture_rect_region(student.sprite_sheet, Rect2(p.x - 16.0, p.y - 23.0 - bob, 32.0, 32.0), SpriteKit.frame_rect(_dir))
+		return
+	draw_rect(Rect2(p.x - 4, p.y - 2 - bob, 8, 8), Color("24306a"))
 	draw_rect(Rect2(p.x - 4, p.y + 5 - bob, 8, 1), student.accent_color)
 	draw_rect(Rect2(p.x - 2, p.y - 7 - bob, 5, 5), Color("f1d3bd"))
 	draw_rect(Rect2(p.x - 3, p.y - 9 - bob, 7, 3), student.hair_color)

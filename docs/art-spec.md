@@ -90,6 +90,16 @@ Both tools can be driven from Claude Code through MCP: **PixelLab** (remote MCP 
 | VFX flipbooks | Tool animation + hand cleanup, or drawn | Must read at 1× and match timing in combat-spec §10 |
 | Anime portraits, dialogue CGs | Separate illustration pipeline | Not what these pixel tools are for |
 
+Working notes from the first PixelLab session (2026-10-30):
+- The cloud sandbox cannot reach PixelLab's file hosts, so downloads fail. Images arrive through the MCP tool results instead. `get_character` and `get_object` previews are exact transparent PNGs. `pixelart_workbench join` sheets are exact too, but carry an 18 px label strip and an opaque background (#1f252c); crop the strip and key that colour out. Verified pixel-exact against a direct preview.
+- Trial plan: 40 generations, one job at a time. Costs:
+  - Character (v3, 32 px, 8 directions): 2.
+  - 64-candidate object batch at 32 px: 10.
+  - Standard tileset: 1.
+  - Tiles Pro: needs a paid plan.
+- Tileset corner metadata is only on the server. Until it can be fetched, the floor uses the sheet's pure tiles only.
+- Generated art is recoloured with `tools/art/recolor.py` (colours only, never resampled).
+
 Rules for every generated asset:
 1. **Generate at the final canvas size** from §3. Never downscale pixel art; regenerate or redraw instead.
 2. **Snap to the project palette**: reduce colors to `assets/art/palette.png` (tool color reduction or Aseprite). Unsnapped assets drift and the arena stops reading as one world.

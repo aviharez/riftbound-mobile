@@ -16,6 +16,8 @@ extends Resource
 @export_multiline var ultimate_description: String = ""
 @export var hair_color: Color = Color("c7432c")
 @export var accent_color: Color = Color("E6BD73")
+## 4 cells of 32x32 facing south, east, north, west (SpriteKit.Dir). Null = placeholder drawing.
+@export var sprite_sheet: Texture2D
 ## Dormitory level needed before this student joins (0 = available from the start).
 @export var unlock_dormitory_level: int = 0
 @export var max_level: int = 10

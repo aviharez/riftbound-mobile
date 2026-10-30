@@ -137,9 +137,16 @@ Accept:
 - [x] The Journal tab (quests, bonds, clues) shows how many things are ready. *(verified off-device)*
 - [ ] Research prices and quest rewards fit the economy pacing (playtest).
 
-## M7 — Art pass (vertical slice)
+## M7 — Art pass (vertical slice) — in progress (2026-10-30)
 
 Lyra (idle/run/cast/hurt), mite, shard, brute, one boss, arena tileset + wall + Rift, ball/element/fused sprites, gems/prism, core VFX flipbooks, HUD skin. Follow `art-spec.md`.
+
+Done (PixelLab, see `assets/art/CREDITS.md`):
+- [x] Lyra, Selene and Noah: 32 px sprites in 4 directions. Used in battle (from behind), in the academy (facing the walking direction) and as UI portraits (head crop or full body, integer scales only).
+- [x] Mite, shard, brute sprites, centred on their 24 px hitboxes. Hit flash is a cached white silhouette; spawn fades in instead of scaling.
+- [x] Arena floor from a PixelLab tileset, recoloured to low-saturation blue-grey; dim props on the ceiling ledge and in the move zone.
+
+Still to do: boss (54 px), walk/idle/cast animations, ball/gem/prism sprites, VFX flipbooks, wall and Rift art, HUD skin, academy buildings.
 
 ## Later
 

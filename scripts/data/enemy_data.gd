@@ -14,6 +14,8 @@ extends Resource
 @export var spawn_chance_base: float = 0.0
 @export var spawn_chance_per_wave: float = 0.0
 @export var size_cells: int = 1
+## Sprite drawn centred on the enemy's cell (a 32x32 sprite on a 24x24 hitbox). Null = placeholder drawing.
+@export var sprite: Texture2D
 @export var gem_drop: int = 1
 @export var prism_chance: float = 0.0
 @export var energy_on_kill: float = 3.0

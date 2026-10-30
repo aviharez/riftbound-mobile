@@ -1061,6 +1061,9 @@ func _draw_enemy(e: Enemy) -> void:
 		return
 	var x := roundf(e.pos.x + (e.size - s) * 0.5)
 	var y := roundf(e.pos.y + (e.size - s) * 0.5)
+	if e.data.sprite:
+		_draw_enemy_sprite(e)
+		return
 	if e.flash > 0.0:
 		draw_rect(Rect2(x, y, s, s), Color.WHITE)
 		return
@@ -1113,6 +1116,22 @@ func _draw_enemy(e: Enemy) -> void:
 	if e.hp < e.max_hp:
 		draw_rect(Rect2(x + 2, y + s - 3, s - 4, 1), Color(0, 0, 0, 0.6))
 		draw_rect(Rect2(x + 2, y + s - 3, maxf(1.0, roundf((s - 4.0) * float(e.hp) / float(e.max_hp))), 1), Color("ff6b6b"))
+
+
+## Generated sprite, centred on the hitbox at whole pixels. Spawn fades in instead of scaling (no mixels);
+## a hit shows the cached white silhouette.
+func _draw_enemy_sprite(e: Enemy) -> void:
+	var tex := e.data.sprite
+	var sz := tex.get_size()
+	var bob := roundf(sin(e.phase))
+	var pos := (e.pos + Vector2(e.size, e.size) * 0.5 - sz * 0.5).round() + Vector2(0.0, bob)
+	var a := clampf(e.spawn, 0.0, 1.0)
+	draw_texture(SpriteKit.white(tex) if e.flash > 0.0 else tex, pos, Color(1, 1, 1, a))
+	if e.hp < e.max_hp and e.flash <= 0.0:
+		var x := roundf(e.pos.x)
+		var y := roundf(e.pos.y + e.size + 1.0)
+		draw_rect(Rect2(x + 2, y, e.size - 4, 1), Color(0, 0, 0, 0.6))
+		draw_rect(Rect2(x + 2, y, maxf(1.0, roundf((e.size - 4.0) * float(e.hp) / float(e.max_hp))), 1), Color("ff6b6b"))
 
 
 func _enemy_colors(id: StringName) -> Array[Color]:
@@ -1216,6 +1235,11 @@ func _draw_aim() -> void:
 func _draw_player() -> void:
 	var p := player.round()
 	draw_rect(Rect2(p.x - 5, p.y + 6, 10, 2), Color(0, 0, 0, 0.4))
+	if character and character.sprite_sheet:
+		# Seen from behind (facing the Rift); feet on the shadow.
+		draw_texture_rect_region(character.sprite_sheet, Rect2(p.x - 16.0, p.y - 23.0, 32.0, 32.0), SpriteKit.frame_rect(SpriteKit.Dir.NORTH))
+		_draw_hand(p)
+		return
 	var hair := character.hair_color if character else Color("c7432c")
 	var accent := character.accent_color if character else Color("E6BD73")
 	draw_rect(Rect2(p.x - 5, p.y - 3, 10, 9), accent)
@@ -1232,6 +1256,11 @@ func _draw_player() -> void:
 		i += 2.0
 	var tip := (p + Vector2(0, -2) + dir * 9.0).round()
 	draw_rect(Rect2(tip - Vector2.ONE, Vector2(3, 3)), Color("ffb347") if int(run_time * 8.0) % 2 == 0 else Color("fff1a8"))
+	_draw_hand(p)
+
+
+## Balls waiting in hand, as dots under the student.
+func _draw_hand(p: Vector2) -> void:
 	var hand: Array[Ball] = []
 	for b: Ball in balls:
 		if b.state == Ball.State.HAND:

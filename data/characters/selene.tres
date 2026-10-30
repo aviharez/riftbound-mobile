@@ -1,6 +1,8 @@
-[gd_resource type="Resource" script_class="CharacterData" load_steps=2 format=3]
+[gd_resource type="Resource" script_class="CharacterData" load_steps=3 format=3]
 
 [ext_resource type="Script" path="res://scripts/data/character_data.gd" id="1_script"]
+
+[ext_resource type="Texture2D" path="res://assets/art/characters/selene_dirs.png" id="2_tex"]
 
 [resource]
 script = ExtResource("1_script")
@@ -16,3 +18,4 @@ ultimate_description = "A wave of frost sweeps the arena: every enemy is slowed 
 hair_color = Color(0.6588, 0.7843, 0.9098, 1)
 accent_color = Color(0.8118, 0.8471, 0.902, 1)
 unlock_dormitory_level = 1
+sprite_sheet = ExtResource("2_tex")
