@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="ResearchData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/data/research_data.gd" id="1_script"]
+
+[resource]
+script = ExtResource("1_script")
+id = &"ley_line_theory"
+display_name = "Ley Line Theory"
+description = "Old maps of the mana currents under the academy. Students who study them learn faster in the Rift."
+stat = &"xp_mult"
+value = 0.1
+cost = Vector3i(60, 20, 0)
+library_level = 1
+effect_text = "+10% XP in runs"

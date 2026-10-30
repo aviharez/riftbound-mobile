@@ -38,6 +38,9 @@ Newest at the bottom. When a decision changes, add a new entry instead of editin
 | 2026-10-30 | Expedition timers trust the system clock. | Offline single-player game; tamper protection isn't worth the complexity yet. |
 | 2026-10-30 | Relationships are bonds between pairs of students (not student-to-player). Points from Dormitory scenes (2 + choice 0–2) and shared expeditions (+1 per pair). Bond Lv3 (12 points) unlocks the pair's duo evolution, which replaces the normal recipe for that element pair for every student. | Matches the planned "duo evolutions (e.g. Lyra + Selene)"; ties M10 expeditions to M11; three best-choice scenes reach Lv3 exactly. |
 | 2026-10-30 | One new scene per Rift run; bonds capped at Lv3 until there are more scenes. | Keeps the Rift the heart of the loop; no empty levels that promise nothing. |
+| 2026-10-30 | Research is bought instantly and lasts forever; topics are gated by Library level. One new stat, `reward_mult`, boosts run shards and materials (not relics). | Gives the Library a second purpose besides its XP bonus, without another timer on top of expeditions. |
+| 2026-10-30 | Quests read existing counters instead of listening for events; "Stories" tab renamed "Journal" with Quests / Bonds / Clues tabs. | No hooks to forget in other systems; earlier progress counts. Five bottom tabs stay readable on a phone. |
+| 2026-10-30 | Recipes are recorded through a `Battle.fused` signal handled by `BattleScreen`. | Keeps combat code free of save state, so stress tests stay pure. |
 
 ## Open questions
 

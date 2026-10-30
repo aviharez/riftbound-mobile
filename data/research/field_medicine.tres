@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="ResearchData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/data/research_data.gd" id="1_script"]
+
+[resource]
+script = ExtResource("1_script")
+id = &"field_medicine"
+display_name = "Field Medicine"
+description = "A healer's notebook, half burned but still readable."
+stat = &"max_hp"
+value = 1.0
+cost = Vector3i(120, 60, 0)
+library_level = 2
+effect_text = "+1 max HP in runs"

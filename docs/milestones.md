@@ -123,12 +123,19 @@ Accept:
 - [x] Scenes play with portraits, typewriter text, a choice and its reply; skip and back work. *(verified off-device)*
 - [x] Scenes and shared expeditions add bond points; bond Lv3 unlocks the pair's duo evolution. *(verified off-device)*
 - [x] An unlocked duo evolution replaces the normal recipe in the Rift, with its bonus stats. *(verified off-device)*
-- [x] Stories tab lists bonds, replays watched scenes and shows expedition clues. *(verified off-device)*
+- [x] Stories tab (now Journal) lists bonds, replays watched scenes and shows expedition clues. *(verified off-device)*
 - [ ] Scene text reads well on a phone, and the pacing (one scene per run) feels right (playtest).
 
-## M12 — Library and quests
+## M12 — Library and quests ✅ (2026-10-30, placeholder art)
 
-Research (passive bonuses), fusion recipe codex, quest journal.
+Research (passive bonuses), fusion recipe codex, quest journal. See `docs/library-spec.md`.
+
+Accept:
+- [x] Six research topics gated by Library level; each is bought once and its bonus reaches the run. *(verified off-device)*
+- [x] Fusing a recipe in the Rift records it in the codex; duo entries show their bond. *(verified off-device)*
+- [x] Twelve quests read progress from existing state, can be claimed once, and pay their reward. *(verified off-device)*
+- [x] The Journal tab (quests, bonds, clues) shows how many things are ready. *(verified off-device)*
+- [ ] Research prices and quest rewards fit the economy pacing (playtest).
 
 ## M7 — Art pass (vertical slice)
 

@@ -7,6 +7,8 @@ signal building_changed(id: StringName)
 signal student_changed(id: StringName)
 signal expeditions_changed
 signal bonds_changed
+signal library_changed
+signal quests_changed
 
 const SAVE_PATH := "user://save.json"
 const TEST_SAVE_PATH := "user://save_test.json"
@@ -40,6 +42,14 @@ var bond_points: Dictionary[StringName, int] = {}
 var scenes_seen: Array[StringName] = []
 ## `runs` when the last new scene was watched; the next one opens after EconomyBalance.runs_per_scene more runs.
 var last_scene_run: int = 0
+## Expeditions brought home (success or failure).
+var expeditions_completed: int = 0
+## Library research bought (permanent).
+var research_done: Array[StringName] = []
+## Evolution recipes fused at least once (shown in the Library codex).
+var recipes_discovered: Array[StringName] = []
+## Quests whose reward was claimed.
+var quests_claimed: Array[StringName] = []
 
 ## Screen hand-off (not saved): rewards of the run that just ended, shown on the result screen.
 var last_rewards: Vector3i = Vector3i.ZERO
@@ -86,6 +96,10 @@ func reset() -> void:
 	bond_points.clear()
 	scenes_seen.clear()
 	last_scene_run = 0
+	expeditions_completed = 0
+	research_done.clear()
+	recipes_discovered.clear()
+	quests_claimed.clear()
 	resources_changed.emit()
 
 
@@ -156,11 +170,11 @@ func meta_bonus(stat: StringName) -> float:
 func run_bonuses() -> Dictionary:
 	var out := {}
 	for stat: StringName in [&"baby_balls", &"max_hp", &"xp_mult", &"energy_gain", &"rerolls"]:
-		out[stat] = meta_bonus(stat)
+		out[stat] = meta_bonus(stat) + research_bonus(stat)
 	var c := current_student()
 	var lv := student_level(c.id)
 	out[&"max_hp"] = float(out[&"max_hp"]) + float(c.hp_bonus(lv))
-	out[&"start_damage"] = float(c.start_damage_bonus(lv))
+	out[&"start_damage"] = float(c.start_damage_bonus(lv)) + research_bonus(&"start_damage")
 	out[&"duo_recipes"] = unlocked_duo_recipes()
 	return out
 
@@ -353,6 +367,7 @@ func claim_expedition(id: StringName) -> Dictionary:
 				var up := add_bond_points(bo.id, Registry.economy.bond_expedition_points)
 				bond_ups.append(up)
 	expeditions_active.erase(id)
+	expeditions_completed += 1
 	expeditions_changed.emit()
 	save_game()
 	return {"success": success, "rare": rec.rare, "rewards": r, "clue": clue, "team": rec.team, "bonds": bond_ups}
@@ -482,12 +497,118 @@ func finish_scene(id: StringName, choice_index: int) -> Dictionary:
 	return result
 
 
+# ---------------------------------------------------------------- library
+
+func research_bonus(stat: StringName) -> float:
+	var total := 0.0
+	for id: StringName in research_done:
+		var r := Registry.research_topic(id)
+		if r and r.stat == stat:
+			total += r.value
+	return total
+
+
+## Why a topic can't be researched now, or "" if it can.
+func research_problem(r: ResearchData) -> String:
+	if research_done.has(r.id):
+		return "Researched"
+	if building_level(&"library") < r.library_level:
+		return "Needs Library Lv%d" % r.library_level
+	if not can_afford(r.cost):
+		return "Not enough resources"
+	return ""
+
+
+func buy_research(id: StringName) -> bool:
+	var r := Registry.research_topic(id)
+	if r == null or research_problem(r) != "":
+		return false
+	add_resources(-r.cost)
+	research_done.append(id)
+	library_changed.emit()
+	save_game()
+	return true
+
+
+func available_research_count() -> int:
+	var n := 0
+	for r: ResearchData in Registry.research:
+		if research_problem(r) == "":
+			n += 1
+	return n
+
+
+func discover_recipe(result_id: StringName) -> void:
+	if Registry.recipe(result_id) and not recipes_discovered.has(result_id):
+		recipes_discovered.append(result_id)
+		library_changed.emit()
+		save_game()
+
+
+# ---------------------------------------------------------------- quests
+
+## Current value of a quest's counter.
+func quest_value(q: QuestData) -> int:
+	match q.kind:
+		&"runs": return runs
+		&"best_wave": return best_wave
+		&"kills": return total_kills
+		&"bosses": return bosses_defeated
+		&"building_level": return building_level(q.param)
+		&"expeditions": return expeditions_completed
+		&"clues":
+			var n := 0
+			for k: StringName in clues_found:
+				n += clues_found[k]
+			return n
+		&"bond_level":
+			var best := 0
+			for b: BondData in Registry.bonds:
+				best = maxi(best, bond_level(b.id))
+			return best
+		&"scenes": return scenes_seen.size()
+		&"recipes": return recipes_discovered.size()
+		&"research": return research_done.size()
+		&"student_level":
+			var top := 0
+			for id: StringName in student_levels:
+				top = maxi(top, student_levels[id])
+			return top
+	push_warning("GameState: unknown quest kind %s" % q.kind)
+	return 0
+
+
+func quest_complete(q: QuestData) -> bool:
+	return quest_value(q) >= q.target
+
+
+func claimable_quest_count() -> int:
+	var n := 0
+	for q: QuestData in Registry.quests:
+		if not quests_claimed.has(q.id) and quest_complete(q):
+			n += 1
+	return n
+
+
+func claim_quest(id: StringName) -> bool:
+	var q := Registry.quest(id)
+	if q == null or quests_claimed.has(id) or not quest_complete(q):
+		return false
+	quests_claimed.append(id)
+	add_resources(q.rewards)
+	quests_changed.emit()
+	save_game()
+	return true
+
+
 # ---------------------------------------------------------------- runs
 
 ## Banks the rewards of a finished run and updates lifetime stats. Returns the rewards.
 func finish_run(kills: int, wave: int, bosses: int, bonus_shards: int, retreated: bool) -> Vector3i:
 	var eco := Registry.economy
 	var r := eco.run_rewards(kills, wave, bosses, bonus_shards)
+	var rm := 1.0 + research_bonus(&"reward_mult")
+	r = Vector3i(roundi(r.x * rm), roundi(r.y * rm), r.z)
 	if retreated:
 		r = Vector3i(roundi(r.x * eco.retreat_fraction), roundi(r.y * eco.retreat_fraction), roundi(r.z * eco.retreat_fraction))
 	add_resources(r)
@@ -522,6 +643,10 @@ func save_game() -> void:
 		"bonds": _bond_dict(),
 		"scenes_seen": scenes_seen.map(func(x: StringName) -> String: return String(x)),
 		"last_scene_run": last_scene_run,
+		"expeditions_completed": expeditions_completed,
+		"research": _names(research_done),
+		"recipes": _names(recipes_discovered),
+		"quests_claimed": _names(quests_claimed),
 	}
 	var f := FileAccess.open(save_path, FileAccess.WRITE)
 	if f == null:
@@ -582,11 +707,28 @@ func load_game() -> bool:
 		if Registry.dialogue(dn) and not scenes_seen.has(dn):
 			scenes_seen.append(dn)
 	last_scene_run = int(d.get("last_scene_run", 0))
+	expeditions_completed = int(d.get("expeditions_completed", 0))
+	for x: Variant in d.get("research", []):
+		if Registry.research_topic(StringName(str(x))) and not research_done.has(StringName(str(x))):
+			research_done.append(StringName(str(x)))
+	for x: Variant in d.get("recipes", []):
+		if Registry.recipe(StringName(str(x))) and not recipes_discovered.has(StringName(str(x))):
+			recipes_discovered.append(StringName(str(x)))
+	for x: Variant in d.get("quests_claimed", []):
+		if Registry.quest(StringName(str(x))) and not quests_claimed.has(StringName(str(x))):
+			quests_claimed.append(StringName(str(x)))
 	var sel := StringName(str(d.get("selected_student", selected_student)))
 	if student_levels.has(sel) and is_student_unlocked(sel) and not student_busy(sel):
 		selected_student = sel
 	resources_changed.emit()
 	return true
+
+
+static func _names(list: Array[StringName]) -> Array[String]:
+	var out: Array[String] = []
+	for x: StringName in list:
+		out.append(String(x))
+	return out
 
 
 func _bond_dict() -> Dictionary:

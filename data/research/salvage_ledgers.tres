@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="ResearchData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/data/research_data.gd" id="1_script"]
+
+[resource]
+script = ExtResource("1_script")
+id = &"salvage_ledgers"
+display_name = "Salvage Ledgers"
+description = "The quartermaster's records of what the ruins are made of. Nothing useful gets left behind."
+stat = &"reward_mult"
+value = 0.15
+cost = Vector3i(80, 30, 0)
+library_level = 1
+effect_text = "+15% Mana Shards and Ruins Materials from runs"

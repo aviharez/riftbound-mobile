@@ -13,6 +13,8 @@ const CHARACTERS_DIR := "res://data/characters"
 const EXPEDITIONS_DIR := "res://data/expeditions"
 const BONDS_DIR := "res://data/bonds"
 const DIALOGUES_DIR := "res://data/dialogues"
+const RESEARCH_DIR := "res://data/research"
+const QUESTS_DIR := "res://data/quests"
 const ECONOMY_PATH := "res://data/balance/economy_balance.tres"
 
 var balance: CombatBalance
@@ -30,6 +32,10 @@ var expeditions: Array[ExpeditionData] = []
 var bonds: Array[BondData] = []
 ## Dialogue scenes, sorted by bond then required level.
 var dialogues: Array[DialogueData] = []
+## Library research, by required Library level then cost.
+var research: Array[ResearchData] = []
+## Quest journal, by order.
+var quests: Array[QuestData] = []
 
 
 func _ready() -> void:
@@ -68,6 +74,17 @@ func _ready() -> void:
 			dialogues.append(dl)
 	dialogues.sort_custom(func(a: DialogueData, b: DialogueData) -> bool:
 		return a.bond_level_required < b.bond_level_required if a.bond_id == b.bond_id else String(a.bond_id) < String(b.bond_id))
+	for res: Resource in _load_dir(RESEARCH_DIR):
+		var rd := res as ResearchData
+		if rd:
+			research.append(rd)
+	research.sort_custom(func(a: ResearchData, b: ResearchData) -> bool:
+		return a.library_level < b.library_level if a.library_level != b.library_level else a.cost.x < b.cost.x)
+	for res: Resource in _load_dir(QUESTS_DIR):
+		var qd := res as QuestData
+		if qd:
+			quests.append(qd)
+	quests.sort_custom(func(a: QuestData, b: QuestData) -> bool: return a.order < b.order)
 	for res: Resource in _load_dir(ELEMENTS_DIR):
 		var e := res as ElementData
 		if e:
@@ -106,6 +123,20 @@ func recipe(result_id: StringName) -> EvolutionRecipe:
 	for r: EvolutionRecipe in evolutions:
 		if r.result_id == result_id:
 			return r
+	return null
+
+
+func research_topic(id: StringName) -> ResearchData:
+	for r: ResearchData in research:
+		if r.id == id:
+			return r
+	return null
+
+
+func quest(id: StringName) -> QuestData:
+	for q: QuestData in quests:
+		if q.id == id:
+			return q
 	return null
 
 

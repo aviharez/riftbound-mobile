@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="QuestData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/data/quest_data.gd" id="1_script"]
+
+[resource]
+script = ExtResource("1_script")
+id = &"old_books"
+title = "Old Books"
+description = "Repair the Library."
+kind = &"building_level"
+param = &"library"
+target = 1
+rewards = Vector3i(40, 20, 0)
+order = 2

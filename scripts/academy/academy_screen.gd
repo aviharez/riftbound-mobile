@@ -9,6 +9,7 @@ extends Node
 @onready var expeditions: ExpeditionOverlays = $UI/Root/ExpeditionOverlays
 @onready var stories: StoriesOverlays = $UI/Root/StoriesOverlays
 @onready var dialogue: DialoguePlayer = $UI/Root/DialoguePlayer
+@onready var library: LibraryOverlays = $UI/Root/LibraryOverlays
 
 var _press_pos: Vector2 = Vector2.INF
 ## Scene being played and whether it is a replay (replays pay no bond points).
@@ -32,6 +33,13 @@ func _ready() -> void:
 	stories.replay_pressed.connect(func(id: StringName) -> void: _play_scene(id, true))
 	stories.dormitory_pressed.connect(func() -> void: _open_building(&"dormitory"))
 	dialogue.finished.connect(_on_scene_finished)
+	overlays.research_pressed.connect(func() -> void:
+		overlays.close()
+		library.show_research())
+	overlays.codex_pressed.connect(func() -> void:
+		overlays.close()
+		library.show_codex())
+	library.back_pressed.connect(func() -> void: _open_building(&"library"))
 	get_viewport().size_changed.connect(_layout)
 	_layout()
 
@@ -45,7 +53,7 @@ func _process(_delta: float) -> void:
 
 
 func _modal_open() -> bool:
-	return overlays.is_open() or expeditions.is_open() or stories.is_open() or dialogue.is_open()
+	return overlays.is_open() or expeditions.is_open() or stories.is_open() or dialogue.is_open() or library.is_open()
 
 
 func _notification(what: int) -> void:
@@ -121,6 +129,7 @@ func _close_modals() -> void:
 	overlays.close()
 	expeditions.close()
 	stories.close()
+	library.close()
 
 
 func _play_scene(id: StringName, replay: bool) -> void:

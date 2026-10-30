@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="QuestData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/data/quest_data.gd" id="1_script"]
+
+[resource]
+script = ExtResource("1_script")
+id = &"something_like_friends"
+title = "Something Like Friends"
+description = "Reach bond Lv1 with any pair of students."
+kind = &"bond_level"
+param = &""
+target = 1
+rewards = Vector3i(50, 20, 0)
+order = 6

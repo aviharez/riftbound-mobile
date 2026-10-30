@@ -27,7 +27,7 @@ State: `GameState.bond_points`, `scenes_seen`, `last_scene_run`, all saved.
 |---|---|
 | Finishing a new Dormitory scene | 2 (`bond_scene_points`) + the choice's 0–2 |
 | Coming back from an expedition together (success or failure) | 1 per pair in the team (`bond_expedition_points`) |
-| Replaying a scene from Stories | 0 |
+| Replaying a scene from the Journal | 0 |
 
 The three scenes of a bond with the warmest choices give 4 + 4 + 4 = 12 points, exactly Lv3. Weaker choices need one to three shared expeditions to make up the difference.
 
@@ -54,11 +54,11 @@ The three scenes of a bond with the warmest choices give 4 + 4 + 4 = 12 points, 
   - Text box with a typewriter effect (60 chars/s). A tap finishes the line, the next tap advances.
   - Choice buttons. **Skip** jumps to the choice, or to the end once a choice has been made. The choice itself can't be skipped.
 - **Bond result**: points gained, progress bar, "Bond level N reached!", and a duo evolution notice with what to fuse.
-- **Stories tab** (bottom bar):
+- **Journal tab** (bottom bar; called Stories in M11, it gained a Quests tab in M12), tabs Bonds and Clues:
   - Bonds: level, progress, duo status, scene status.
   - Replay of watched scenes.
   - Expedition clues (found ones quoted, others as "???").
-  - The tab shows "new scene" in gold when a pair can talk.
+  - The bottom-bar button shows "N ready" in gold when a pair can talk or a quest can be claimed.
 - **Expedition result**: lists bond points per pair and any duo unlocked.
 - **Battle fusion card**: duo results are labelled "Duo evolution · bond".
 

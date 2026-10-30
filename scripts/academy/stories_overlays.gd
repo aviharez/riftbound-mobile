@@ -1,22 +1,100 @@
 class_name StoriesOverlays
 extends ModalLayer
-## Stories tab: student bonds (level, progress, duo evolution), watched scenes to replay, and expedition clues.
+## Journal (the "Stories" tab): quests to claim, student bonds (level, progress, duo evolution) with scene replays,
+## and expedition clues.
 ## Also the "bond grew" result after a Dormitory scene. See docs/relationship-spec.md.
 
 signal replay_pressed(dialogue_id: StringName)
 signal dormitory_pressed
 
 
-func show_stories() -> void:
+## Tabs: &"quests", &"bonds", &"clues". Empty = whichever has something waiting (quests by default).
+func show_stories(tab: StringName = &"") -> void:
+	if tab == &"":
+		tab = &"bonds" if GameState.claimable_quest_count() == 0 and GameState.available_scene_count() > 0 else &"quests"
 	var box := _open()
 	box.add_child(_label("Astralis Academy", "Eyebrow"))
-	box.add_child(_label("Stories", "Title"))
-	box.add_child(_label("Bonds grow from Dormitory scenes and from expeditions taken together. At bond Lv%d a pair unlocks a duo evolution in the Rift." % Registry.economy.duo_bond_level, "Small", true))
+	box.add_child(_label("Journal", "Title"))
+	var tabs := HBoxContainer.new()
+	tabs.add_theme_constant_override("separation", 3)
+	for t: Array in [[&"quests", "Quests", GameState.claimable_quest_count()], [&"bonds", "Bonds", GameState.available_scene_count()], [&"clues", "Clues", 0]]:
+		var id: StringName = t[0]
+		var n: int = t[2]
+		var b := Button.new()
+		b.text = t[1] + (" (%d)" % n if n > 0 else "")
+		b.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		b.add_theme_font_size_override("font_size", 8)
+		if id == tab:
+			b.add_theme_stylebox_override("normal", UiTheme.box(Color("2b2b4a"), UiTheme.CYAN, 1, 3))
+		elif n > 0:
+			b.add_theme_color_override("font_color", UiTheme.GOLD)
+		b.pressed.connect(func() -> void: show_stories(id))
+		tabs.add_child(b)
+	box.add_child(tabs)
+	match tab:
+		&"quests":
+			_quests(box)
+		&"bonds":
+			_bonds(box)
+		_:
+			_clues(box)
+	box.add_child(_button("Close", "", func() -> void: close()))
 
-	box.add_child(_label("Bonds", "Heading"))
+
+func _quests(box: VBoxContainer) -> void:
+	box.add_child(_label("Goals for the academy. Rewards are claimed here.", "Small", true))
+	var done := 0
+	var shown := 0
+	# Claimable first, then in progress (journal order); claimed ones are only counted.
+	var list: Array[QuestData] = []
+	for q: QuestData in Registry.quests:
+		if GameState.quests_claimed.has(q.id):
+			done += 1
+		elif GameState.quest_complete(q):
+			list.insert(shown, q)  # after earlier claimable quests, before the ones in progress
+			shown += 1
+		else:
+			list.append(q)
+	for q: QuestData in list:
+		box.add_child(_quest_card(q))
+	if list.is_empty():
+		box.add_child(_label("Every quest is done. More will come with the story.", "Small", true))
+	box.add_child(_label("Completed: %d / %d" % [done, Registry.quests.size()], "Small"))
+
+
+func _quest_card(q: QuestData) -> Control:
+	var complete := GameState.quest_complete(q)
+	var panel := PanelContainer.new()
+	panel.add_theme_stylebox_override("panel", UiTheme.box(Color("1b1b33"), UiTheme.GOLD if complete else Color(UiTheme.GOLD, 0.35), 1, 6))
+	var col := VBoxContainer.new()
+	col.add_theme_constant_override("separation", 2)
+	panel.add_child(col)
+	var top := HBoxContainer.new()
+	var t := _label(q.title, "CardTitle")
+	t.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	top.add_child(t)
+	var v := mini(GameState.quest_value(q), q.target)
+	var prog := _label("%d / %d" % [v, q.target], "Eyebrow")
+	if complete:
+		prog.add_theme_color_override("font_color", UiTheme.GEM)
+	top.add_child(prog)
+	col.add_child(top)
+	var d := _label(q.description, "Small", true)
+	d.custom_minimum_size.x = PANEL_W - 40.0
+	col.add_child(d)
+	col.add_child(_resource_row(q.rewards))
+	if complete:
+		var id := q.id
+		col.add_child(_button("Claim", "Primary", func() -> void:
+			if GameState.claim_quest(id):
+				show_stories(&"quests")))
+	return panel
+
+
+func _bonds(box: VBoxContainer) -> void:
+	box.add_child(_label("Bonds grow from Dormitory scenes and from expeditions taken together. At bond Lv%d a pair unlocks a duo evolution in the Rift." % Registry.economy.duo_bond_level, "Small", true))
 	for b: BondData in Registry.bonds:
 		box.add_child(_bond_card(b))
-
 	box.add_child(_label("Scenes", "Heading"))
 	var any := false
 	for d: DialogueData in Registry.dialogues:
@@ -32,7 +110,9 @@ func show_stories() -> void:
 	if not any:
 		box.add_child(_label("No scenes yet. Visit the Dormitory once two students live there.", "Small", true))
 
-	box.add_child(_label("Clues", "Heading"))
+
+func _clues(box: VBoxContainer) -> void:
+	box.add_child(_label("What the expeditions have found about the Riftfall.", "Small", true))
 	for e: ExpeditionData in Registry.expeditions:
 		var found: int = GameState.clues_found.get(e.id, 0)
 		box.add_child(_label("%s  %d / %d" % [e.display_name, found, e.clues.size()], "CardTitle"))
@@ -41,7 +121,6 @@ func show_stories() -> void:
 			if i >= found:
 				l.add_theme_color_override("font_color", UiTheme.LINE.lightened(0.3))
 			box.add_child(l)
-	box.add_child(_button("Close", "", func() -> void: close()))
 
 
 ## After a new scene: points gained, level up, duo evolution unlocked.

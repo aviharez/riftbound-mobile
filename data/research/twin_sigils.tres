@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="ResearchData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/data/research_data.gd" id="1_script"]
+
+[resource]
+script = ExtResource("1_script")
+id = &"twin_sigils"
+display_name = "Twin Sigils"
+description = "A paired sigil that splits one cast into two small sparks."
+stat = &"baby_balls"
+value = 1.0
+cost = Vector3i(220, 100, 1)
+library_level = 3
+effect_text = "+1 baby ball"

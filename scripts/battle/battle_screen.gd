@@ -31,6 +31,9 @@ func _ready() -> void:
 	hud.touches = _touches
 	battle.level_up_ready.connect(_on_level_up_ready)
 	battle.fusion_ready.connect(_on_fusion_ready)
+	battle.fused.connect(func(r: BallSlot) -> void:
+		if r.evolved:
+			GameState.discover_recipe(r.id))
 	battle.run_ended.connect(_on_run_ended)
 	overlays.again_pressed.connect(_start_run)
 	overlays.academy_pressed.connect(func() -> void: GameState.go_to(GameState.SCENE_ACADEMY))

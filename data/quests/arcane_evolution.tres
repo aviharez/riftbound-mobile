@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="QuestData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/data/quest_data.gd" id="1_script"]
+
+[resource]
+script = ExtResource("1_script")
+id = &"arcane_evolution"
+title = "Arcane Evolution"
+description = "Discover 2 fusion recipes in the Rift."
+kind = &"recipes"
+param = &""
+target = 2
+rewards = Vector3i(80, 40, 0)
+order = 8

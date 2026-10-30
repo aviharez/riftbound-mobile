@@ -126,7 +126,8 @@ func _process(delta: float) -> void:
 			check(GameState.bond_points.get(&"selene_noah", 0) == 1, "expedition together = +1 bond")
 			shot("07-expedition-bond"); wait = 0.2; phase = 15
 		15:
-			ac._on_nav(&"stories"); wait = 0.4; phase = 16
+			ac._on_nav(&"stories")
+			ac.stories.show_stories(&"bonds"); wait = 0.4; phase = 16
 		16:
 			shot("08-stories"); wait = 0.2; phase = 17
 		17:

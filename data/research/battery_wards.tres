@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="ResearchData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/data/research_data.gd" id="1_script"]
+
+[resource]
+script = ExtResource("1_script")
+id = &"battery_wards"
+display_name = "Battery Wards"
+description = "Runes that catch stray mana from every kill and feed it to the caster."
+stat = &"energy_gain"
+value = 0.1
+cost = Vector3i(120, 50, 0)
+library_level = 2
+effect_text = "Ultimate charges 10% faster"

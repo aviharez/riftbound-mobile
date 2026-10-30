@@ -7,6 +7,8 @@ extends Node2D
 signal level_up_ready
 signal fusion_ready
 signal run_ended
+## A fusion happened (for the codex; Battle itself never touches GameState).
+signal fused(result: BallSlot)
 
 const PRISM_COLORS: Array[Color] = [Color("ff6a6a"), Color("ffd27a"), Color("7fe0a8"), Color("69D8E8"), Color("a98bff")]
 const COL_GEM := Color("7fe0a8")
@@ -327,6 +329,7 @@ func apply_fusion(pair: Vector2i) -> void:
 	fusions += 1
 	_fusion_snooze = ""
 	rebuild_balls()
+	fused.emit(r)
 	popup(("EVOLUTION: " if r.evolved else "FUSION: ") + r.display_name.to_upper(), r.glow_color)
 	fx.ring(player, 46.0, r.glow_color, 0.5)
 	fx.ring(player, 22.0, Color.WHITE, 0.35)

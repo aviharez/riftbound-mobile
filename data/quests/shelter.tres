@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="QuestData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/data/quest_data.gd" id="1_script"]
+
+[resource]
+script = ExtResource("1_script")
+id = &"shelter"
+title = "Shelter"
+description = "Repair the Dormitory so another student can move in."
+kind = &"building_level"
+param = &"dormitory"
+target = 1
+rewards = Vector3i(40, 20, 0)
+order = 1

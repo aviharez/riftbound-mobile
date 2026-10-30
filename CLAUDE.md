@@ -12,6 +12,7 @@ A portrait (9:16-ish) mobile pixel-art roguelite. Ricochet combat inspired by th
 - Students (roster, ultimates, levels): `docs/character-spec.md`
 - Expeditions (places, team power, timers, clues): `docs/expedition-spec.md`
 - Bonds, dialogue scenes, duo evolutions: `docs/relationship-spec.md`
+- Library research, recipe codex, quest journal: `docs/library-spec.md`
 - Art and display rules: `docs/art-spec.md`
 - Build order and acceptance criteria: `docs/milestones.md`
 - Why things are the way they are: `docs/decisions.md`

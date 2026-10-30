@@ -59,7 +59,7 @@ func _ready() -> void:
 	var row := HBoxContainer.new()
 	row.add_theme_constant_override("separation", 2)
 	nav.add_child(row)
-	for tab: Array in [[&"academy", "Academy", true], [&"rift", "Rift", true], [&"characters", "Students", true], [&"expeditions", "Expedition", true], [&"stories", "Stories", true]]:
+	for tab: Array in [[&"academy", "Academy", true], [&"rift", "Rift", true], [&"characters", "Students", true], [&"expeditions", "Expedition", true], [&"stories", "Journal", true]]:
 		var b := Button.new()
 		b.text = tab[1] if tab[2] else "%s\nsoon" % tab[1]
 		b.size_flags_horizontal = Control.SIZE_EXPAND_FILL
@@ -140,9 +140,9 @@ func _process(delta: float) -> void:
 	else:
 		_expedition_button.text = "Expedition"
 		_expedition_button.remove_theme_color_override("font_color")
-	var scenes := GameState.available_scene_count()
-	_stories_button.text = "Stories\nnew scene" if scenes > 0 else "Stories"
-	if scenes > 0:
+	var waiting := GameState.available_scene_count() + GameState.claimable_quest_count()
+	_stories_button.text = "Journal\n%d ready" % waiting if waiting > 0 else "Journal"
+	if waiting > 0:
 		_stories_button.add_theme_color_override("font_color", UiTheme.GOLD)
 	else:
 		_stories_button.remove_theme_color_override("font_color")

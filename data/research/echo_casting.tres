@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="ResearchData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/data/research_data.gd" id="1_script"]
+
+[resource]
+script = ExtResource("1_script")
+id = &"echo_casting"
+display_name = "Echo Casting"
+description = "A technique to recall a spell you just let go of, and choose again."
+stat = &"rerolls"
+value = 1.0
+cost = Vector3i(200, 90, 1)
+library_level = 3
+effect_text = "+1 level-up reroll per run"

@@ -8,6 +8,8 @@ signal enter_rift_pressed
 signal student_select_pressed(id: StringName)
 signal student_upgrade_pressed(id: StringName)
 signal talk_pressed(dialogue_id: StringName)
+signal research_pressed
+signal codex_pressed
 
 
 func show_building(id: StringName) -> void:
@@ -32,6 +34,14 @@ func show_building(id: StringName) -> void:
 		box.add_child(_button("Enter the Rift", "Primary", func() -> void: enter_rift_pressed.emit()))
 	if id == &"dormitory" and lv >= 1:
 		_add_bond_rows(box)
+	if id == &"library":
+		var n := GameState.available_research_count()
+		var rb := _button("Research" + (" (%d available)" % n if n > 0 else ""), "Primary" if n > 0 else "", func() -> void: research_pressed.emit())
+		rb.disabled = lv <= 0
+		box.add_child(rb)
+		box.add_child(_button("Recipe codex (%d / %d)" % [GameState.recipes_discovered.size(), Registry.evolutions.size()], "", func() -> void: codex_pressed.emit()))
+		if lv <= 0:
+			box.add_child(_label("Repair the Library to start research.", "Small", true))
 
 	if lv < b.max_level:
 		var cost := GameState.next_cost(id)

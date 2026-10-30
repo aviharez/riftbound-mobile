@@ -176,7 +176,7 @@ Area effects, chains and shard blasts are **queued and resolved next frame**.
 | Lyra & Noah | Ember + Verdant | Sunbloom | burn, spread, blast, siphon | +1 damage |
 | Selene & Noah | Frost + Verdant | Winter Garden | slow, chain, chainSlow, siphon | +1 power |
 
-- Planned (not decided): discovered recipes recorded in the Library.
+- Fused recipes are recorded in the Library codex (library-spec) via the `Battle.fused` signal.
 
 ## 9. Ultimate
 
