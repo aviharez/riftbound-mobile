@@ -78,7 +78,7 @@ Heaviness comes from timing and contrast, not from particle count or bloom.
 Rules, from owner feedback (the art must never contradict the gameplay):
 - **Boundaries are exact and straight.** Stone curbs sit on the bounce lines: walls at x = 30 / 240, ceiling at y = 38. Shadow falls onto the floor. Nothing sticks out of a wall into the field.
 - **Enemies only stand on floor.** The Rift is a tear in the floor at the top end (`rift_tear.gdshader`, `World.ARENA_RIFT`) that they crawl out of, not a gate inside the arena.
-- **The stage fills the whole move zone** (x 30–240, from the rune line to the bottom) with no props inside it. It's dark slate, unlike the cobbled floor, with a glowing magic circle where the student stands. There are no drawn lines: the edge is the dais's lit top rows plus a soft shadow on the floor in front of it (owner: thin grey/gold lines looked cheap).
+- **The stage fills the whole move zone** (x 30–240, from the rune line to the bottom) with no props inside it. It's plain dark slate, unlike the cobbled floor, with no decal (owner: no magic circle). There are no drawn lines: the edge is the dais's lit top rows plus a soft shadow on the floor in front of it (owner: thin grey/gold lines looked cheap).
 - **Wall decoration stays inside the wall band.** Torches (`World.ARENA_TORCHES`) are lit by FxGlow.
 
 Why not one generated image: AI images don't respect exact geometry, and an earlier painted arena put enemies over the gate, narrowed the stage and had uneven edges.

@@ -88,25 +88,6 @@ for i, k in enumerate((1.45, 1.3, 1.15, 1.06)):
 paste(canvas, dais, WALL_L, RUNE)
 for i, k in enumerate((0.55, 0.7, 0.82, 0.92)):
     shade(canvas, WALL_L, RUNE - 1 - i, WALL_R, RUNE - i, k)
-# Glowing magic circle where the student stands (lifted from a PixelLab render: bright, saturated pixels only).
-src = load("stage_circle.png")
-hsv = np.array([[colorsys.rgb_to_hsv(*(src[y, x, :3] / 255)) for x in range(src.shape[1])] for y in range(src.shape[0])])
-cyan = (hsv[..., 0] > 0.42) & (hsv[..., 0] < 0.62)
-goldh = (hsv[..., 0] > 0.07) & (hsv[..., 0] < 0.17)
-mask = (hsv[..., 1] > 0.45) & (hsv[..., 2] > 0.5) & (cyan | goldh)
-cy_, cx_ = [v.mean() for v in np.nonzero(mask & cyan)]   # the circle is the cyan part
-yy, xx = np.mgrid[0:src.shape[0], 0:src.shape[1]]
-mask &= ((xx - cx_) / 92.0) ** 2 + ((yy - cy_) / 50.0) ** 2 <= 1.0
-ys, xs = np.nonzero(mask)
-y0, y1, x0, x1 = ys.min(), ys.max() + 1, xs.min(), xs.max() + 1
-circle = np.zeros((y1 - y0, x1 - x0, 4))
-sub = mask[y0:y1, x0:x1]
-circle[sub] = src[y0:y1, x0:x1][sub]
-circle[sub, 3] = 230
-print("circle", circle.shape)
-circle = circle[:, : WALL_R - WALL_L - 4]
-paste(canvas, circle, 135 - circle.shape[1] // 2, min(512 - circle.shape[0] // 2, 564 - circle.shape[0]))
-
 # ---------------------------------------------------------------- curbs and shadows (exact boundaries)
 curb_hi, curb, curb_dk = (120, 130, 156), (70, 76, 98), (24, 24, 36)
 for x, cols in ((WALL_L - 3, (curb_dk, curb, curb_hi)), (WALL_R, (curb_hi, curb, curb_dk))):
