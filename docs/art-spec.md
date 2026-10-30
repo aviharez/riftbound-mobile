@@ -71,21 +71,17 @@ Heaviness comes from timing and contrast, not from particle count or bloom.
 7. Shaders allowed: hit flash, dissolve on death, palette swap for element variants, Rift portal distortion. Avoid full-screen glow/bloom.
 8. All VFX snap to the world pixel grid. No rotated or sub-pixel scaled pixel art (it creates "mixels").
 
-### Painted arena (M7)
+### Arena (M7)
 
-`assets/art/arena/rift_arena.png` covers world x −45…315, y −116…564 (`World.ARENA_ORIGIN`). Pipeline:
-1. PixelLab Pro image, 180×336.
-2. `image_to_pixelart` (faithful) redraws it at native 270×504. Pass the PixelLab download URL as `image_url`: their server fetches it, so the blocked sandbox doesn't have to.
-3. A floor band is repeated so the stage top lands on the rune line (y 455).
-4. Side strips are mirrored, and sky fills the area above, so wide or tall screens never show an empty edge.
+`assets/art/arena/rift_arena.png` is assembled by `tools/art/compose_arena.py` from PixelLab textures in `assets/art/arena/src/`. It covers world x −45…315, y −116…564 (`World.ARENA_ORIGIN`).
 
-What `World` adds on top:
-- Torch and brazier positions (`ARENA_TORCHES`), which FxGlow lights.
-- The portal shader at 55% opacity over the painted portal (`ARENA_PORTAL`), to animate it.
+Rules, from owner feedback (the art must never contradict the gameplay):
+- **Boundaries are exact and straight.** Stone curbs sit on the bounce lines: walls at x = 30 / 240, ceiling at y = 38. Shadow falls onto the floor. Nothing sticks out of a wall into the field.
+- **Enemies only stand on floor.** The Rift is a tear in the floor at the top end (`rift_tear.gdshader`, `World.ARENA_RIFT`) that they crawl out of, not a gate inside the arena.
+- **The stage fills the whole move zone** (x 30–240, from the rune line to the bottom) with no props inside it. A lit edge and a gold inlay frame mark the rune line, and a gold rune circle (two ellipses = a circle in 3/4 view) is drawn by the script.
+- **Wall decoration stays inside the wall band.** Torches (`World.ARENA_TORCHES`) are lit by FxGlow.
 
-Enemies draw a contact shadow so they sit on the 3/4 floor.
-
-To redo it at higher quality on a paid plan, generate the full 270×600 directly with the owner's mockup as a reference image.
+Why not one generated image: AI images don't respect exact geometry, and an earlier painted arena put enemies over the gate, narrowed the stage and had uneven edges.
 
 ### Implemented VFX (M7)
 

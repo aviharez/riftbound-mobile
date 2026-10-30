@@ -30,6 +30,11 @@ func _draw() -> void:
 			var fl := 0.8 + 0.2 * sin(_t * 9.0 + tp.y) + 0.1 * sin(_t * 23.0 + tp.x)
 			draw_circle(tp, 9.0 * fl, Color(1.0, 0.45, 0.15, 0.07))
 			draw_circle(tp, 5.0 * fl, Color(1.0, 0.6, 0.25, 0.14))
+		var rc := world.rift_center()
+		if rc != Vector2.INF:
+			var pulse := 0.8 + 0.2 * sin(_t * 2.5)
+			draw_circle(rc, 30.0 * pulse, Color(0.45, 0.3, 0.95, 0.06))
+			draw_circle(rc, 18.0 * pulse, Color(0.55, 0.4, 1.0, 0.09))
 	_draw_circle_under(battle)
 	for b: Ball in battle.balls:
 		if b.state == Ball.State.HAND:

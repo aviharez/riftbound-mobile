@@ -1,0 +1,144 @@
+"""Assemble the battle arena backdrop with exact gameplay geometry (art-spec "Arena").
+
+Sources (PixelLab, see assets/art/CREDITS.md) live in assets/art/arena/src/. Geometry comes from CombatBalance:
+walls at x 30 / 240, ceiling y 38, rune line / stage top y 455, visible world x -45..315, y -116..564.
+Boundaries are straight stone curbs drawn here, so the art never suggests a different bounce line.
+
+Usage: python3 tools/art/compose_arena.py  ->  assets/art/arena/rift_arena.png (+ prints torch points)
+"""
+import colorsys
+import numpy as np
+from PIL import Image
+
+ROOT = "assets/art/arena/"
+WALL_L, WALL_R, CEIL, RUNE = 30, 240, 38, 455
+OX, OY = -45, -116            # canvas origin in world units
+W, H = 360, 680               # world x -45..315, y -116..564
+
+def load(p):
+    return np.asarray(Image.open(ROOT + "src/" + p).convert("RGBA")).astype(np.float64)
+
+def to_canvas(x, y):
+    return x - OX, y - OY
+
+def paste(dst, src, x, y):
+    cx, cy = to_canvas(x, y)
+    h, w = src.shape[:2]
+    a = src[..., 3:4] / 255.0
+    region = dst[cy:cy + h, cx:cx + w]
+    region[..., :3] = region[..., :3] * (1 - a) + src[..., :3] * a
+    region[..., 3] = np.maximum(region[..., 3], src[..., 3])
+
+def recolor_greys(img, hue_deg, sat=0.2, val=1.0, max_s=0.3):
+    """Shift only low-saturation pixels (stone) to a hue; torches, ivy, crystals keep their colours."""
+    out = img.copy()
+    for y in range(img.shape[0]):
+        for x in range(img.shape[1]):
+            r, g, b, a = img[y, x]
+            h, s, v = colorsys.rgb_to_hsv(r / 255, g / 255, b / 255)
+            if s <= max_s:
+                r2, g2, b2 = colorsys.hsv_to_rgb(hue_deg / 360, max(s, sat), min(1.0, v * val))
+                out[y, x, :3] = (r2 * 255, g2 * 255, b2 * 255)
+    return out
+
+def shade(dst, x0, y0, x1, y1, k):
+    cx0, cy0 = to_canvas(x0, y0)
+    cx1, cy1 = to_canvas(x1, y1)
+    dst[cy0:cy1, cx0:cx1, :3] *= k
+
+def rect(dst, x0, y0, x1, y1, rgb):
+    cx0, cy0 = to_canvas(x0, y0)
+    cx1, cy1 = to_canvas(x1, y1)
+    dst[cy0:cy1, cx0:cx1, :3] = rgb
+    dst[cy0:cy1, cx0:cx1, 3] = 255
+
+canvas = np.zeros((H, W, 4))
+canvas[..., :3] = (14, 14, 24)
+canvas[..., 3] = 255
+
+# ---------------------------------------------------------------- walls
+strip = load("wall_strip.png")                       # 48 x 512, pillar side faces right
+strip[120:200, 18:30] = strip[30:110, 18:30]         # remove the half-visible banner
+strip = recolor_greys(strip, 222, sat=0.16, val=0.85)
+# extend to 680 rows: repeat the plain-brick upper band (seam-matched)
+best = min(range(0, 240 - 168), key=lambda r: np.abs(strip[r:r + 3, :, :3] - strip[r + 168:r + 171, :, :3]).mean())
+tall = np.concatenate([strip[:best + 168], strip[best:best + 168], strip[best + 168:]], axis=0)
+left = np.concatenate([tall[:, ::-1][:, :27], tall], axis=1)[:, -75:]     # 75 wide: world -45..30
+right = np.roll(left[:, ::-1], -250, axis=0)                              # mirrored; torches land mid-arena
+paste(canvas, left, -45, -116)
+paste(canvas, right, 240, -116)
+# top wall behind the HUD: plain bricks tiled across
+brick = strip[10:10 + 48, :48]
+for x in range(30, 240, 48):
+    for y in range(-116, CEIL, 48):
+        paste(canvas, brick[: min(48, CEIL - y), : min(48, 240 - x)], x, y)
+
+# ---------------------------------------------------------------- floor
+floor = load("floor.png")[30:30 + (RUNE - CEIL), 25:25 + (WALL_R - WALL_L)]
+floor[..., :3] *= 0.8          # mid-dark, so bright projectiles carry the colour (art-spec §4)
+paste(canvas, floor, WALL_L, CEIL)
+
+# ---------------------------------------------------------------- stage (fills the move zone)
+# Neat rectangular slabs (a built platform, unlike the cobbled floor), widened with a seam-matched band.
+bricks = load("stage_bricks.png")[48:48 + 110, 24:212]            # 188 wide, inside the image's frame
+band = 22
+c = min(range(10, 188 - band - 10), key=lambda c: np.abs(bricks[:, c:c + 2, :3] - bricks[:, c + band:c + band + 2, :3]).mean())
+bricks = np.concatenate([bricks[:, :c + band], bricks[:, c:c + band], bricks[:, c + band:]], axis=1)[:, :WALL_R - WALL_L]
+bricks = recolor_greys(bricks, 215, sat=0.1, val=1.05, max_s=1.0)
+paste(canvas, bricks[: 564 - RUNE], WALL_L, RUNE)
+gold, gold_dk = (214, 165, 92), (110, 76, 36)
+rect(canvas, WALL_L, RUNE - 1, WALL_R, RUNE, (20, 20, 32))           # gap behind the raised edge
+rect(canvas, WALL_L, RUNE, WALL_R, RUNE + 1, (176, 186, 206))        # lit lip of the raised stage
+shade(canvas, WALL_L, RUNE + 1, WALL_R, RUNE + 3, 0.85)
+for (x0, y0, x1, y1) in [(36, 461, 234, 462), (36, 461, 37, 564), (233, 461, 234, 564)]:
+    rect(canvas, x0, y0 + 1, x1, y1 + 1, gold_dk)
+    rect(canvas, x0, y0, x1, y1, gold)
+# Rune circle: two gold ellipses (a circle seen in 3/4 view) with eight rune marks between them.
+cx, cy = 135, 511
+def ellipse(rx, ry, col, thick=1.0):
+    for py in range(cy - ry - 2, cy + ry + 3):
+        for px in range(cx - rx - 2, cx + rx + 3):
+            d = ((px - cx) / rx) ** 2 + ((py - cy) / ry) ** 2
+            if abs(d - 1.0) < thick * 2.0 / max(rx, ry) * 1.5:
+                rect(canvas, px, py, px + 1, py + 1, col)
+for rx, ry in ((36, 21), (27, 15)):
+    ellipse(rx, ry + 1, gold_dk)
+    ellipse(rx, ry, gold)
+import math
+for i in range(8):
+    a = i * math.tau / 8 + math.tau / 16
+    px, py = round(cx + math.cos(a) * 31.5), round(cy + math.sin(a) * 18)
+    for dx, dy in ((0, -1), (-1, 0), (0, 0), (1, 0), (0, 1)):
+        rect(canvas, px + dx, py + dy, px + dx + 1, py + dy + 1, gold)
+ellipse(6, 3, gold)
+
+# ---------------------------------------------------------------- curbs and shadows (exact boundaries)
+curb_hi, curb, curb_dk = (120, 130, 156), (70, 76, 98), (24, 24, 36)
+for x, cols in ((WALL_L - 3, (curb_dk, curb, curb_hi)), (WALL_R, (curb_hi, curb, curb_dk))):
+    for i, c in enumerate(cols):
+        rect(canvas, x + i, CEIL - 3, x + i + 1, 564, c)
+for i, c in enumerate((curb_dk, curb, curb_hi)):
+    rect(canvas, WALL_L - 3, CEIL - 3 + i, WALL_R + 3, CEIL - 2 + i, c)
+for i, k in enumerate((0.55, 0.7, 0.82, 0.92)):
+    shade(canvas, WALL_L + i, CEIL, WALL_L + i + 1, RUNE - 1, k)
+    shade(canvas, WALL_R - 1 - i, CEIL, WALL_R - i, RUNE - 1, k)
+    shade(canvas, WALL_L, CEIL + i, WALL_R, CEIL + i + 1, k)
+
+out = np.clip(canvas, 0, 255).astype(np.uint8)
+Image.fromarray(out).save(ROOT + "rift_arena.png")
+print("arena", out.shape)
+
+# torches: warm bright clusters on the walls (world coordinates)
+warm = (out[..., 0] > 200) & (out[..., 1] > 100) & (out[..., 2] < 110) & (out[..., 0] > out[..., 2] + 90)
+ys, xs = np.nonzero(warm)
+clusters = []
+for x, y in zip(xs, ys):
+    for c in clusters:
+        if abs(c[0] / c[2] - x) < 6 and abs(c[1] / c[2] - y) < 6:
+            c[0] += x; c[1] += y; c[2] += 1; break
+    else:
+        clusters.append([x, y, 1])
+for c in clusters:
+    wx, wy = round(c[0] / c[2]) + OX, round(c[1] / c[2]) + OY
+    if c[2] >= 14 and (20 <= wx < WALL_L or WALL_R < wx <= 250):
+        print("torch", wx, wy, c[2])

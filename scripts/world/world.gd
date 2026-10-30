@@ -30,16 +30,16 @@ var _props: Array = [
 	[preload("res://assets/art/props/crystals.png"), Vector2(200, 6), 0.55],
 ]
 
-## Painted arena (PixelLab Pro, redrawn at native 270 px, floor extended; see assets/art/CREDITS.md).
-## Covers world x -45..315 and y -116..564; its stage starts exactly at the rune line (y 455).
-## Null = the older code-drawn arena below.
+## Arena backdrop assembled by tools/art/compose_arena.py from PixelLab textures (see assets/art/CREDITS.md).
+## Covers world x -45..315 and y -116..564. Its boundaries are exact: straight curbs on the walls (x 30 / 240)
+## and the ceiling (y 38), and a full-width stage from the rune line (y 455). Null = the code-drawn arena below.
 @export var arena_backdrop: Texture2D = preload("res://assets/art/arena/rift_arena.png")
 const ARENA_ORIGIN := Vector2(-45, -116)
 ## Torches and braziers in the painted arena (world coordinates), lit by FxGlow.
-const ARENA_TORCHES: Array[Vector2] = [Vector2(86, 114), Vector2(183, 114), Vector2(48, 135), Vector2(221, 135),
-	Vector2(31, 183), Vector2(237, 183), Vector2(20, 500), Vector2(249, 500)]
-## The painted portal's swirl, animated by the portal shader on top.
-const ARENA_PORTAL := Rect2(113, 52, 44, 56)
+const ARENA_TORCHES: Array[Vector2] = [Vector2(245, 151), Vector2(245, 211), Vector2(245, 282),
+	Vector2(24, 401), Vector2(24, 461), Vector2(24, 532)]
+## The Rift tear in the floor at the top of the arena, where the creatures crawl out.
+const ARENA_RIFT := Rect2(97, 39, 76, 24)
 
 ## Visible area in playfield coordinates. Set by Main whenever the screen size changes.
 var visible_rect: Rect2 = Rect2(0, 0, 270, 560)
@@ -53,14 +53,13 @@ func _ready() -> void:
 	_portal = ColorRect.new()
 	_portal.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	if arena_backdrop:
-		_portal.size = ARENA_PORTAL.size
-		_portal.position = ARENA_PORTAL.position
+		_portal.size = ARENA_RIFT.size
+		_portal.position = ARENA_RIFT.position
 	else:
 		_portal.size = Vector2(96, 40)
 		_portal.position = Vector2(float(b.world_size.x) * 0.5 - 48.0, b.ceiling_y - 14.0)
 	var pm := ShaderMaterial.new()
-	pm.shader = preload("res://assets/shaders/portal.gdshader")
-	pm.set_shader_parameter(&"opacity", 0.55 if arena_backdrop else 1.0)
+	pm.shader = preload("res://assets/shaders/rift_tear.gdshader") if arena_backdrop else preload("res://assets/shaders/portal.gdshader")
 	_portal.material = pm
 	add_child(_portal)
 	move_child(_portal, 0)
@@ -85,6 +84,11 @@ func _layout_overlays() -> void:
 	if _vignette:
 		_vignette.position = visible_rect.position
 		_vignette.size = visible_rect.size
+
+
+## Centre of the Rift tear (FxGlow gives it a violet glow), or Vector2.INF without the backdrop.
+func rift_center() -> Vector2:
+	return ARENA_RIFT.get_center() if arena_backdrop else Vector2.INF
 
 
 ## Torch positions on the walls (playfield coordinates); FxGlow lights them.

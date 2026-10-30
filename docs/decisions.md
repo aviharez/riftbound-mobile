@@ -45,7 +45,7 @@ Newest at the bottom. When a decision changes, add a new entry instead of editin
 | 2026-10-30 | VFX "glow" is per-object additive light at world resolution (pixel discs, lines, flares) plus two pixel-quantised shaders (portal, dithered vignette). Still no full-screen bloom. | Matches the mockups' glowing trails without breaking art-spec §5's no-bloom rule or the pixel grid. |
 | 2026-10-30 | Where the mockups differ from earlier decisions, the decisions win: ultimate bottom-right, no virtual joystick. | Both were explicit owner choices during the control design. |
 | 2026-10-30 | Arena narrowed to 7 enemy columns with 30 px walls (field x 30–240, was 8 columns / 15 px). | Owner choice: the mockup's dungeon look needs real wall space on 20:9 phones. Fewer enemies per row; balance to re-check in playtests. |
-| 2026-10-30 | The arena is one painted backdrop (PixelLab Pro, redrawn at native resolution) instead of code-drawn tiles; its stage is aligned to the rune line. The code-drawn arena stays as a fallback. | Owner feedback: the stage, dungeon walls and 3/4 view can only come from real environment art. |
+| 2026-10-30 | The arena is a composite of PixelLab textures with geometry set by script: straight curbs on the exact bounce lines, the Rift as a tear in the floor, a full-width stage. (Replaces a one-image painted arena the owner rejected.) | Art must not contradict gameplay: uneven edges suggest wrong bounces, enemies over a gate look like walking on walls, a narrow stage felt cramped. |
 
 ## Open questions
 
